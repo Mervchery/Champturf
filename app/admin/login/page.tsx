@@ -1,14 +1,21 @@
 "use client";
 
-import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { LockKeyhole } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
-function LoginContent() {
+export default function AdminLoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <AdminLoginForm />
+    </Suspense>
+  );
+}
+
+function AdminLoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -19,29 +26,18 @@ function LoginContent() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-
     if (!email.trim() || !password.trim()) {
       setError("Enter your email and password to continue.");
       return;
     }
-
     setLoading(true);
-
     const supabase = createClient();
-
-    const { error: signInError } =
-      await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
+    const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
-
     if (signInError) {
       setError(signInError.message);
       return;
     }
-
     router.push(params.get("next") || "/admin");
     router.refresh();
   }
@@ -49,30 +45,18 @@ function LoginContent() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-[380px] card p-8">
-        <span className="text-xs font-semibold text-coral">
-          RESTRICTED ACCESS
-        </span>
-
-        <h2 className="font-display text-2xl mt-1.5 flex items-center gap-2">
-          <LockKeyhole size={20} />
-          Admin sign in
-        </h2>
-
-        <p className="text-sm opacity-70 mt-1.5 mb-5">
-          Sign in with your Supabase account. Your role determines what you can
-          do here.
-        </p>
+        <span className="text-xs font-semibold text-coral">RESTRICTED ACCESS</span>
+        <h2 className="font-display text-2xl mt-1.5 flex items-center gap-2"><LockKeyhole size={20} /> Admin sign in</h2>
+        <p className="text-sm opacity-70 mt-1.5 mb-5">Sign in with your Supabase account. Your role determines what you can do here.</p>
 
         {notAuthorized && (
           <div className="text-coral text-sm mb-4 bg-parchment2 p-3 rounded-md">
-            That account is signed in but doesn&apos;t have an admin role yet.
-            Ask a Super Admin to grant one.
+            That account is signed in but doesn&apos;t have an admin role yet. Ask a Super Admin to grant one.
           </div>
         )}
 
         <form onSubmit={onSubmit}>
           <label className="text-xs opacity-65 block mb-1.5">Email</label>
-
           <input
             type="email"
             value={email}
@@ -82,10 +66,7 @@ function LoginContent() {
             autoComplete="email"
           />
 
-          <label className="text-xs opacity-65 block mb-1.5">
-            Password
-          </label>
-
+          <label className="text-xs opacity-65 block mb-1.5">Password</label>
           <input
             type="password"
             value={password}
@@ -95,34 +76,18 @@ function LoginContent() {
             autoComplete="current-password"
           />
 
-          {error && (
-            <div className="text-coral text-sm mt-2.5">{error}</div>
-          )}
+          {error && <div className="text-coral text-sm mt-2.5">{error}</div>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="btn btn-dark w-full justify-center mt-5 disabled:opacity-60"
-          >
+          <button type="submit" disabled={loading} className="btn btn-dark w-full justify-center mt-5 disabled:opacity-60">
             {loading ? "Signing in…" : "Sign in"}
           </button>
         </form>
 
         <div className="text-xs opacity-55 bg-parchment2 p-3 rounded-md mt-4 leading-relaxed">
-          No account yet? Create one in the Supabase dashboard
-          (Authentication → Users), or enable sign-up and add it here.
-          New accounts have no admin role by default — see
-          <code> supabase/schema.sql</code>.
+          No account yet? Create one in the Supabase dashboard (Authentication → Users), or enable sign-up
+          and add it here. New accounts have no admin role by default — see <code>supabase/schema.sql</code>.
         </div>
       </div>
     </div>
-  );
-}
-
-export default function AdminLoginPage() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <LoginContent />
-    </Suspense>
   );
 }
