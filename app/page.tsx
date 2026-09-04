@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Play, Trophy, Newspaper } from "lucide-react";
 import Countdown from "@/components/Countdown";
-import { getRaces, getCompletedRacesWithResults, fmtMoney } from "@/lib/races";
+import { getRaces, getCompletedRacesWithResults } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 import { getHorses } from "@/lib/horses";
 import { getJockeys } from "@/lib/jockeys";
 import { getNews } from "@/lib/news";

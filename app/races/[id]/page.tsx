@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Camera, Video } from "lucide-react";
-import { getRaceById, getEntriesForRace, getResultsForRace, fmtMoney } from "@/lib/races";
+import { getRaceById, getEntriesForRace, getResultsForRace } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 
 export const revalidate = 0;
 

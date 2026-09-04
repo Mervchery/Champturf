@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Plus, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Race, RaceEntry, RaceResult } from "@/lib/races";
-import { fmtMoney } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 import {
   createRace, deleteRace, updateRace,
   createEntry, deleteEntry,

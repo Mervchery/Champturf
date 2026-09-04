@@ -92,7 +92,3 @@ export async function getCompletedRacesWithResults(): Promise<(Race & { results:
     results: (results ?? []).filter((row) => row.race_id === r.id),
   }));
 }
-
-export function fmtMoney(n: number) {
-  return "Rs " + n.toLocaleString("en-US");
-}

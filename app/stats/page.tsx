@@ -3,7 +3,7 @@ import { getHorses } from "@/lib/horses";
 import { getJockeys } from "@/lib/jockeys";
 import { getTrainers } from "@/lib/trainers";
 import { getStables } from "@/lib/stables";
-import { fmtMoney } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 
 export const revalidate = 0;
 

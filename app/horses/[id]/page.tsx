@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HorseIcon } from "@/components/RacingIcons";
 import { getHorseById, getRecentForm } from "@/lib/horses";
-import { fmtMoney } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 
 export const revalidate = 0;
 
