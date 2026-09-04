@@ -1,7 +1,10 @@
 import { StableIcon } from "@/components/RacingIcons";
-import { STABLES } from "@/lib/data";
+import { getStables } from "@/lib/stables";
 
-export default function StablesPage() {
+export const revalidate = 0;
+
+export default async function StablesPage() {
+  const stables = await getStables();
   return (
     <div>
       <div className="detail-hero">
@@ -12,7 +15,7 @@ export default function StablesPage() {
       </div>
       <section className="py-14">
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {STABLES.map((s) => (
+          {stables.map((s) => (
             <div key={s.id} className="card">
               <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
                 <StableIcon size={32} />
@@ -25,10 +28,11 @@ export default function StablesPage() {
                   <div><b className="block font-mono text-sm">{s.staff}</b>Staff</div>
                   <div><b className="block font-mono text-sm">{s.gallery}</b>Gallery</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">Trainer(s): {s.trainers.join(", ")}</div>
+                <div className="text-xs opacity-60 mt-2.5">Trainer(s): {s.trainers}</div>
               </div>
             </div>
           ))}
+          {stables.length === 0 && <p className="text-sm opacity-60">No stables yet.</p>}
         </div>
       </section>
     </div>

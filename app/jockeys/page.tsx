@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { JockeyIcon } from "@/components/RacingIcons";
-import { JOCKEYS } from "@/lib/data";
+import { getJockeys } from "@/lib/jockeys";
 
-export default function JockeysPage({ searchParams }: { searchParams: { tab?: string } }) {
+export const revalidate = 0;
+
+export default async function JockeysPage({ searchParams }: { searchParams: { tab?: string } }) {
   const tab = searchParams.tab === "apprentice" ? "apprentice" : "pro";
-  const list = JOCKEYS.filter((j) => (tab === "apprentice" ? j.apprentice : !j.apprentice));
+  const jockeys = await getJockeys();
+  const list = jockeys.filter((j) => (tab === "apprentice" ? j.apprentice : !j.apprentice));
 
   return (
     <div>
@@ -24,6 +27,7 @@ export default function JockeysPage({ searchParams }: { searchParams: { tab?: st
               Apprentice / trainee
             </Link>
           </div>
+          {list.length === 0 && <p className="text-sm opacity-60">None yet.</p>}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {list.map((j) => (
               <Link key={j.id} href={`/jockeys/${j.id}`} className="card">
@@ -32,10 +36,10 @@ export default function JockeysPage({ searchParams }: { searchParams: { tab?: st
                 </div>
                 <div className="p-4">
                   <h4 className="font-semibold">{j.name}</h4>
-                  <div className="text-xs opacity-60 mt-1">{j.nat}{j.apprentice ? ` · Apprentice (${j.allowance})` : ""}</div>
+                  <div className="text-xs opacity-60 mt-1">{j.nationality}{j.apprentice ? ` · Apprentice (${j.allowance})` : ""}</div>
                   <div className="flex gap-3.5 mt-3 text-xs">
                     <div><b className="block font-mono text-sm">{j.wins}</b>Wins</div>
-                    <div><b className="block font-mono text-sm">{j.winPct}%</b>Win rate</div>
+                    <div><b className="block font-mono text-sm">{j.win_pct}%</b>Win rate</div>
                   </div>
                 </div>
               </Link>

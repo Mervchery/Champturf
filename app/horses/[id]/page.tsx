@@ -1,15 +1,15 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HorseIcon } from "@/components/RacingIcons";
-import { HORSES, fmtMoney } from "@/lib/data";
+import { getHorseById, getRecentForm } from "@/lib/horses";
+import { fmtMoney } from "@/lib/races";
 
-export function generateStaticParams() {
-  return HORSES.map((h) => ({ id: h.id }));
-}
+export const revalidate = 0;
 
-export default function HorseDetailPage({ params }: { params: { id: string } }) {
-  const h = HORSES.find((x) => x.id === params.id);
+export default async function HorseDetailPage({ params }: { params: { id: string } }) {
+  const h = await getHorseById(params.id);
   if (!h) return notFound();
+  const form = await getRecentForm(h.name);
 
   return (
     <div>
@@ -19,9 +19,11 @@ export default function HorseDetailPage({ params }: { params: { id: string } }) 
             <HorseIcon size={40} />
           </div>
           <div>
-            <span className="text-xs font-semibold text-gold2">HORSE PROFILE · #{h.id.toUpperCase()}</span>
+            <span className="text-xs font-semibold text-gold2">HORSE PROFILE</span>
             <h1 className="text-3xl font-display mt-1">{h.name}</h1>
-            <div className="text-white/70 text-sm mt-1.5">{h.age}yo {h.sex} · {h.breed} · {h.color} · Born {h.origin}</div>
+            <div className="text-white/70 text-sm mt-1.5">
+              {h.age}yo {h.sex} · {h.breed} · {h.color} · Born {h.origin}
+            </div>
           </div>
         </div>
       </div>
@@ -41,20 +43,24 @@ export default function HorseDetailPage({ params }: { params: { id: string } }) 
               <h4 className="text-sm font-semibold mb-3">Connections</h4>
               <table>
                 <tbody>
-                  <tr><td>Owner</td><td>{h.owner}</td></tr>
-                  <tr><td>Trainer</td><td>{h.trainer}</td></tr>
-                  <tr><td>Stable</td><td>{h.stable}</td></tr>
-                  <tr><td>Medical status</td><td><span className="pill pill-gold">Cleared to race</span></td></tr>
+                  <tr><td>Owner</td><td>{h.owner ?? "—"}</td></tr>
+                  <tr><td>Trainer</td><td>{h.trainer ?? "—"}</td></tr>
+                  <tr><td>Stable</td><td>{h.stable ?? "—"}</td></tr>
+                  <tr><td>Medical status</td><td><span className="pill pill-gold">{h.medical_status ?? "Cleared to race"}</span></td></tr>
                 </tbody>
               </table>
             </div>
             <div className="panel">
-              <h4 className="text-sm font-semibold mb-3">Recent form (last 5)</h4>
-              <div className="flex gap-2">
-                {h.form.map((f, i) => (
-                  <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"}`}>{f}</span>
-                ))}
-              </div>
+              <h4 className="text-sm font-semibold mb-3">Recent form (from entered results)</h4>
+              {form.length === 0 ? (
+                <p className="text-sm opacity-60">No results recorded for this horse yet.</p>
+              ) : (
+                <div className="flex gap-2">
+                  {form.map((f, i) => (
+                    <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"}`}>{f}</span>
+                  ))}
+                </div>
+              )}
               <h4 className="text-sm font-semibold mt-5 mb-2">Racing history</h4>
               <div className="text-sm opacity-60">Full past-performance log available in the Results Centre.</div>
             </div>

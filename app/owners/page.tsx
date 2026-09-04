@@ -1,7 +1,10 @@
 import { User } from "lucide-react";
-import { OWNERS } from "@/lib/data";
+import { getOwners } from "@/lib/owners";
 
-export default function OwnersPage() {
+export const revalidate = 0;
+
+export default async function OwnersPage() {
+  const owners = await getOwners();
   return (
     <div>
       <div className="detail-hero">
@@ -12,7 +15,7 @@ export default function OwnersPage() {
       </div>
       <section className="py-14">
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-          {OWNERS.map((o) => (
+          {owners.map((o) => (
             <div key={o.id} className="card">
               <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
                 <User size={30} />
@@ -27,6 +30,7 @@ export default function OwnersPage() {
               </div>
             </div>
           ))}
+          {owners.length === 0 && <p className="text-sm opacity-60">No owners yet.</p>}
         </div>
       </section>
     </div>

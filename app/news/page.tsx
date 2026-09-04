@@ -1,10 +1,13 @@
 import Link from "next/link";
 import { Newspaper } from "lucide-react";
-import { NEWS } from "@/lib/data";
+import { getNews } from "@/lib/news";
 
-export default function NewsPage({ searchParams }: { searchParams: { cat?: string } }) {
+export const revalidate = 0;
+
+export default async function NewsPage({ searchParams }: { searchParams: { cat?: string } }) {
   const cat = searchParams.cat || "";
-  const list = NEWS.filter((n) => !cat || n.cat === cat);
+  const news = await getNews();
+  const list = news.filter((n) => !cat || n.category === cat);
   const cats = ["Race preview", "Race review", "Interview", "Press release"];
 
   return (
@@ -23,6 +26,7 @@ export default function NewsPage({ searchParams }: { searchParams: { cat?: strin
               <Link key={c} href={`/news?cat=${encodeURIComponent(c)}`} className={`pill ${cat === c ? "pill-gold" : "pill-outline"}`}>{c}</Link>
             ))}
           </div>
+          {list.length === 0 && <p className="text-sm opacity-60">No articles yet.</p>}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
             {list.map((n) => (
               <div key={n.id} className="card">
@@ -30,10 +34,10 @@ export default function NewsPage({ searchParams }: { searchParams: { cat?: strin
                   <Newspaper size={28} />
                 </div>
                 <div className="p-4">
-                  <span className="pill">{n.cat}</span>
+                  <span className="pill">{n.category}</span>
                   <h4 className="mt-2 font-semibold">{n.title}</h4>
                   <p className="text-sm opacity-60 mt-1.5">{n.excerpt}</p>
-                  <div className="text-xs opacity-55 mt-2.5">{n.date}</div>
+                  <div className="text-xs opacity-55 mt-2.5">{n.article_date}</div>
                 </div>
               </div>
             ))}

@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Play, Radio } from "lucide-react";
-import { RACES } from "@/lib/data";
+import { createClient } from "@/lib/supabase/client";
+import type { Race } from "@/lib/races";
 
 const SOURCES = ["YouTube", "Facebook Live", "Twitch", "Custom RTMP/HLS"];
 const TICKER = [
@@ -22,7 +23,19 @@ export default function LivePage() {
   const [source, setSource] = useState(SOURCES[0]);
   const [messages, setMessages] = useState(CHAT_SEED);
   const [input, setInput] = useState("");
-  const replays = RACES.filter((r) => r.status === "completed");
+  const [races, setRaces] = useState<Race[]>([]);
+
+  useEffect(() => {
+    const supabase = createClient();
+    supabase
+      .from("races")
+      .select("*")
+      .eq("status", "completed")
+      .order("race_date", { ascending: false })
+      .then(({ data }) => setRaces(data ?? []));
+  }, []);
+
+  const replays = races;
 
   function sendChat(e: React.FormEvent) {
     e.preventDefault();
@@ -82,7 +95,7 @@ export default function LivePage() {
                   </div>
                   <div className="p-3">
                     <h4 className="text-sm font-semibold">{r.name}</h4>
-                    <div className="text-xs opacity-60">{r.date}</div>
+                    <div className="text-xs opacity-60">{r.race_date}</div>
                   </div>
                 </Link>
               ))}

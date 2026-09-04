@@ -1,9 +1,12 @@
 import Link from "next/link";
-import { RACES, fmtMoney } from "@/lib/data";
+import { getRaces, fmtMoney } from "@/lib/races";
 
-export default function RacesPage({ searchParams }: { searchParams: { tab?: string } }) {
+export const revalidate = 0;
+
+export default async function RacesPage({ searchParams }: { searchParams: { tab?: string } }) {
   const tab = searchParams.tab === "completed" ? "completed" : "upcoming";
-  const list = RACES.filter((r) => r.status === tab);
+  const races = await getRaces();
+  const list = races.filter((r) => r.status === tab);
 
   return (
     <div>
@@ -23,10 +26,11 @@ export default function RacesPage({ searchParams }: { searchParams: { tab?: stri
               Completed
             </Link>
           </div>
+          {list.length === 0 && <p className="text-sm opacity-60">No {tab} races yet.</p>}
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
             {list.map((r) => (
               <Link key={r.id} href={`/races/${r.id}`} className="card p-4">
-                <span className={`pill ${r.status === "upcoming" ? "pill-gold" : ""}`}>{r.date}</span>
+                <span className={`pill ${r.status === "upcoming" ? "pill-gold" : ""}`}>{r.race_date}</span>
                 <h4 className="mt-2 font-semibold">{r.name}</h4>
                 <div className="text-xs opacity-60 mt-1">{r.course} · {r.distance} · {fmtMoney(r.prize)}</div>
                 <div className="text-xs opacity-60 mt-1">{r.conditions}</div>

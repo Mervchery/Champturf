@@ -1,5 +1,11 @@
 import Link from "next/link";
-import { HORSES, JOCKEYS, TRAINERS, STABLES, fmtMoney } from "@/lib/data";
+import { getHorses } from "@/lib/horses";
+import { getJockeys } from "@/lib/jockeys";
+import { getTrainers } from "@/lib/trainers";
+import { getStables } from "@/lib/stables";
+import { fmtMoney } from "@/lib/races";
+
+export const revalidate = 0;
 
 const TABS = [
   ["horses", "Leading horses"],
@@ -8,8 +14,11 @@ const TABS = [
   ["stables", "Leading stables"],
 ] as const;
 
-export default function StatsPage({ searchParams }: { searchParams: { tab?: string } }) {
+export default async function StatsPage({ searchParams }: { searchParams: { tab?: string } }) {
   const tab = (searchParams.tab as (typeof TABS)[number][0]) || "horses";
+  const [horses, jockeys, trainers, stables] = await Promise.all([
+    getHorses(), getJockeys(), getTrainers(), getStables(),
+  ]);
 
   return (
     <div>
@@ -33,7 +42,7 @@ export default function StatsPage({ searchParams }: { searchParams: { tab?: stri
               <table>
                 <thead><tr><th>#</th><th>Horse</th><th>Trainer</th><th>Starts</th><th>Wins</th><th>Places</th><th>Earnings</th></tr></thead>
                 <tbody>
-                  {[...HORSES].sort((a, b) => b.wins - a.wins).map((h, i) => (
+                  {[...horses].sort((a, b) => b.wins - a.wins).map((h, i) => (
                     <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.places}</td><td>{fmtMoney(h.earnings)}</td></tr>
                   ))}
                 </tbody>
@@ -43,8 +52,8 @@ export default function StatsPage({ searchParams }: { searchParams: { tab?: stri
               <table>
                 <thead><tr><th>#</th><th>Jockey</th><th>Nationality</th><th>Rides</th><th>Wins</th><th>Win %</th></tr></thead>
                 <tbody>
-                  {[...JOCKEYS].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).map((j, i) => (
-                    <tr key={j.id}><td>{i + 1}</td><td>{j.name}</td><td>{j.nat}</td><td>{j.rides}</td><td>{j.wins}</td><td>{j.winPct}%</td></tr>
+                  {[...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).map((j, i) => (
+                    <tr key={j.id}><td>{i + 1}</td><td>{j.name}</td><td>{j.nationality}</td><td>{j.rides}</td><td>{j.wins}</td><td>{j.win_pct}%</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -53,7 +62,7 @@ export default function StatsPage({ searchParams }: { searchParams: { tab?: stri
               <table>
                 <thead><tr><th>#</th><th>Trainer</th><th>Stable</th><th>Horses</th><th>Wins</th></tr></thead>
                 <tbody>
-                  {[...TRAINERS].sort((a, b) => b.wins - a.wins).map((t, i) => (
+                  {[...trainers].sort((a, b) => b.wins - a.wins).map((t, i) => (
                     <tr key={t.id}><td>{i + 1}</td><td>{t.name}</td><td>{t.stable}</td><td>{t.horses}</td><td>{t.wins}</td></tr>
                   ))}
                 </tbody>
@@ -63,7 +72,7 @@ export default function StatsPage({ searchParams }: { searchParams: { tab?: stri
               <table>
                 <thead><tr><th>#</th><th>Stable</th><th>Location</th><th>Horses</th><th>Staff</th></tr></thead>
                 <tbody>
-                  {[...STABLES].sort((a, b) => b.horses - a.horses).map((s, i) => (
+                  {[...stables].sort((a, b) => b.horses - a.horses).map((s, i) => (
                     <tr key={s.id}><td>{i + 1}</td><td>{s.name}</td><td>{s.location}</td><td>{s.horses}</td><td>{s.staff}</td></tr>
                   ))}
                 </tbody>

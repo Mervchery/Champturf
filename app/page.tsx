@@ -1,14 +1,27 @@
 import Link from "next/link";
 import { Play, Trophy, Newspaper } from "lucide-react";
 import Countdown from "@/components/Countdown";
-import { RACES, HORSES, JOCKEYS, NEWS, horseById, fmtMoney } from "@/lib/data";
+import { getRaces, getCompletedRacesWithResults, fmtMoney } from "@/lib/races";
+import { getHorses } from "@/lib/horses";
+import { getJockeys } from "@/lib/jockeys";
+import { getNews } from "@/lib/news";
 
-export default function HomePage() {
-  const feature = RACES.find((r) => r.status === "upcoming")!;
-  const upcoming = RACES.filter((r) => r.status === "upcoming");
-  const completed = RACES.filter((r) => r.status === "completed").slice(0, 3);
-  const topHorses = [...HORSES].sort((a, b) => b.wins - a.wins).slice(0, 5);
-  const topJockeys = [...JOCKEYS].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).slice(0, 5);
+export const revalidate = 0;
+
+export default async function HomePage() {
+  const [races, completedWithResultsAll, horses, jockeys, news] = await Promise.all([
+    getRaces(),
+    getCompletedRacesWithResults(),
+    getHorses(),
+    getJockeys(),
+    getNews(),
+  ]);
+  const upcoming = races.filter((r) => r.status === "upcoming");
+  const feature = upcoming[0];
+  const completedWithResults = completedWithResultsAll.slice(0, 3);
+
+  const topHorses = [...horses].sort((a, b) => b.wins - a.wins).slice(0, 5);
+  const topJockeys = [...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).slice(0, 5);
 
   return (
     <div>
@@ -30,14 +43,21 @@ export default function HomePage() {
               <Link href="/races" className="btn btn-ghost">Race calendar</Link>
             </div>
           </div>
-          <div className="bg-white/[0.06] border border-white/15 rounded backdrop-blur-md p-5">
-            <span className="text-[0.7rem] font-semibold text-gold2">FEATURED RACE OF THE WEEK</span>
-            <h3 className="text-white text-2xl mt-2 font-display">{feature.name}</h3>
-            <div className="text-white/65 text-sm mt-1.5">
-              {feature.course} · {feature.distance} · {fmtMoney(feature.prize)} · {feature.entries.length} runners
+          {feature ? (
+            <div className="bg-white/[0.06] border border-white/15 rounded backdrop-blur-md p-5">
+              <span className="text-[0.7rem] font-semibold text-gold2">FEATURED RACE OF THE WEEK</span>
+              <h3 className="text-white text-2xl mt-2 font-display">{feature.name}</h3>
+              <div className="text-white/65 text-sm mt-1.5">
+                {feature.course} · {feature.distance} · {fmtMoney(feature.prize)}
+              </div>
+              <Countdown target={`${feature.race_date}T${feature.race_time}`} />
             </div>
-            <Countdown target={`${feature.date}T${feature.time}:00`} />
-          </div>
+          ) : (
+            <div className="bg-white/[0.06] border border-white/15 rounded backdrop-blur-md p-5">
+              <span className="text-[0.7rem] font-semibold text-gold2">NO UPCOMING RACE SCHEDULED</span>
+              <p className="text-white/65 text-sm mt-2">Check back soon, or add one from the admin dashboard.</p>
+            </div>
+          )}
         </div>
       </section>
 
@@ -48,24 +68,29 @@ export default function HomePage() {
             <h2 className="font-display text-3xl">Recent results</h2>
             <Link href="/results" className="text-sm border-b border-ink pb-0.5">Full results centre →</Link>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {completed.map((r) => {
-              const win = r.result![0];
-              const h = horseById(win.horse)!;
-              return (
-                <Link key={r.id} href={`/races/${r.id}`} className="card">
-                  <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
-                    <Trophy size={32} />
-                  </div>
-                  <div className="p-4">
-                    <span className="pill pill-coral">{r.date}</span>
-                    <h4 className="mt-2 font-semibold">{r.name}</h4>
-                    <div className="text-xs opacity-60 mt-1">Winner: {h.name} — {win.jockey}, {win.time}</div>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
+          {completedWithResults.length === 0 ? (
+            <p className="text-sm opacity-60">No results yet.</p>
+          ) : (
+            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+              {completedWithResults.map((r) => {
+                const win = r.results[0];
+                return (
+                  <Link key={r.id} href={`/races/${r.id}`} className="card">
+                    <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                      <Trophy size={32} />
+                    </div>
+                    <div className="p-4">
+                      <span className="pill pill-coral">{r.race_date}</span>
+                      <h4 className="mt-2 font-semibold">{r.name}</h4>
+                      <div className="text-xs opacity-60 mt-1">
+                        {win ? `Winner: ${win.horse_name} — ${win.jockey}, ${win.finish_time}` : "Result pending"}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -101,7 +126,7 @@ export default function HomePage() {
                   <div className="font-mono text-sm text-coral font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{j.name}</div>
-                    <div className="text-xs opacity-60">{j.nat}</div>
+                    <div className="text-xs opacity-60">{j.nationality}</div>
                   </div>
                   <div className="font-mono font-semibold text-right">{j.wins}W</div>
                 </Link>
@@ -118,15 +143,19 @@ export default function HomePage() {
             <h2 className="font-display text-3xl">Upcoming race days</h2>
             <Link href="/races" className="text-sm border-b border-ink pb-0.5">See calendar →</Link>
           </div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
-            {upcoming.map((r) => (
-              <Link key={r.id} href={`/races/${r.id}`} className="card p-4">
-                <span className="pill pill-gold">{r.date}</span>
-                <h4 className="mt-2 text-sm font-semibold">{r.name}</h4>
-                <div className="text-xs opacity-60 mt-1">{r.distance} · {fmtMoney(r.prize)}</div>
-              </Link>
-            ))}
-          </div>
+          {upcoming.length === 0 ? (
+            <p className="text-sm opacity-60">No upcoming races scheduled.</p>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+              {upcoming.map((r) => (
+                <Link key={r.id} href={`/races/${r.id}`} className="card p-4">
+                  <span className="pill pill-gold">{r.race_date}</span>
+                  <h4 className="mt-2 text-sm font-semibold">{r.name}</h4>
+                  <div className="text-xs opacity-60 mt-1">{r.distance} · {fmtMoney(r.prize)}</div>
+                </Link>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
@@ -138,15 +167,15 @@ export default function HomePage() {
             <Link href="/news" className="text-sm border-b border-ink pb-0.5">All news →</Link>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
-            {NEWS.slice(0, 3).map((n) => (
+            {news.slice(0, 3).map((n) => (
               <div key={n.id} className="card">
                 <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
                   <Newspaper size={28} />
                 </div>
                 <div className="p-4">
-                  <span className="pill">{n.cat}</span>
+                  <span className="pill">{n.category}</span>
                   <h4 className="mt-2 font-semibold">{n.title}</h4>
-                  <div className="text-xs opacity-55 mt-2">{n.date}</div>
+                  <div className="text-xs opacity-55 mt-2">{n.article_date}</div>
                 </div>
               </div>
             ))}

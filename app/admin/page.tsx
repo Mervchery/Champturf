@@ -1,7 +1,17 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminRole } from "@/lib/roles";
+import { getRaces } from "@/lib/races";
+import { getHorses } from "@/lib/horses";
+import { getJockeys } from "@/lib/jockeys";
+import { getTrainers } from "@/lib/trainers";
+import { getStables } from "@/lib/stables";
+import { getOwners } from "@/lib/owners";
+import { getNews } from "@/lib/news";
+import { getProfiles } from "@/lib/users";
 import AdminDashboard from "@/components/AdminDashboard";
+
+export const revalidate = 0;
 
 export default async function AdminPage() {
   // Real authorization check, independent of middleware: getUser() verifies
@@ -22,5 +32,29 @@ export default async function AdminPage() {
     redirect("/admin/login?error=not_authorized");
   }
 
-  return <AdminDashboard role={profile.role} email={user.email ?? ""} />;
+  const [races, horses, jockeys, trainers, stables, owners, news, profiles] = await Promise.all([
+    getRaces(),
+    getHorses(),
+    getJockeys(),
+    getTrainers(),
+    getStables(),
+    getOwners(),
+    getNews(),
+    getProfiles(),
+  ]);
+
+  return (
+    <AdminDashboard
+      role={profile.role}
+      email={user.email ?? ""}
+      races={races}
+      horses={horses}
+      jockeys={jockeys}
+      trainers={trainers}
+      stables={stables}
+      owners={owners}
+      news={news}
+      profiles={profiles}
+    />
+  );
 }
