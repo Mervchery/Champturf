@@ -92,3 +92,13 @@ export async function getCompletedRacesWithResults(): Promise<(Race & { results:
     results: (results ?? []).filter((row) => row.race_id === r.id),
   }));
 }
+
+export function fmtMoney(value: number): string {
+  return new Intl.NumberFormat("en-MU", {
+    style: "currency",
+    currency: "MUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+
