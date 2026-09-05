@@ -123,7 +123,7 @@ export default function AdminDashboard({
           </div>
         )}
 
-        {section === "races" && <RacesAdminPanel races={races} notify={notify} />}
+        {section === "races" && <RacesAdminPanel races={races} horses={horses} jockeys={jockeys} notify={notify} />}
 
         {section === "horses" && (
           <EntityAdminPanel
@@ -133,6 +133,7 @@ export default function AdminDashboard({
             columns={[
               { key: "name", label: "Horse" },
               { key: "trainer", label: "Trainer" },
+              { key: "starts", label: "Starts" },
               { key: "wins", label: "Wins" },
             ]}
             fields={[
@@ -145,14 +146,13 @@ export default function AdminDashboard({
               { key: "owner", label: "Owner" },
               { key: "trainer", label: "Trainer" },
               { key: "stable", label: "Stable" },
-              { key: "wins", label: "Wins", type: "number" },
-              { key: "places", label: "Places", type: "number" },
-              { key: "starts", label: "Starts", type: "number" },
-              { key: "earnings", label: "Earnings (Rs)", type: "number" },
               { key: "medical_status", label: "Medical status" },
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "horses" && "Wins/places/starts/earnings aren't editable here — they're computed automatically from entered race results."}
+        </p>
 
         {section === "jockeys" && (
           <EntityAdminPanel

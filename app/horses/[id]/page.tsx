@@ -9,7 +9,7 @@ export const revalidate = 0;
 export default async function HorseDetailPage({ params }: { params: { id: string } }) {
   const h = await getHorseById(params.id);
   if (!h) return notFound();
-  const form = await getRecentForm(h.name);
+  const form = await getRecentForm(h.id);
 
   return (
     <div>
@@ -33,10 +33,13 @@ export default async function HorseDetailPage({ params }: { params: { id: string
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-7">
             <div className="panel"><div className="text-xs opacity-60">Wins</div><div className="font-mono font-semibold text-xl">{h.wins}</div></div>
-            <div className="panel"><div className="text-xs opacity-60">Places</div><div className="font-mono font-semibold text-xl">{h.places}</div></div>
+            <div className="panel"><div className="text-xs opacity-60">Placed</div><div className="font-mono font-semibold text-xl">{h.seconds + h.thirds}</div></div>
             <div className="panel"><div className="text-xs opacity-60">Starts</div><div className="font-mono font-semibold text-xl">{h.starts}</div></div>
             <div className="panel"><div className="text-xs opacity-60">Career earnings</div><div className="font-mono font-semibold text-xl">{fmtMoney(h.earnings)}</div></div>
           </div>
+          <p className="text-xs opacity-50 mb-7 -mt-4">
+            Stats above are computed automatically from entered race results — they can&apos;t be edited directly.
+          </p>
 
           <div className="grid md:grid-cols-2 gap-5">
             <div className="panel">

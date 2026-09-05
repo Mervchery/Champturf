@@ -12,7 +12,7 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
   const filtered = useMemo(() => {
     const query = q.toLowerCase();
     return races.filter((r) => {
-      const blob = (r.name + " " + r.results.map((x) => x.horse_name + " " + x.jockey).join(" ")).toLowerCase();
+      const blob = (r.name + " " + r.results.map((x) => (x.horses?.name ?? "") + " " + x.jockey).join(" ")).toLowerCase();
       return blob.includes(query);
     });
   }, [q, races]);
@@ -48,7 +48,7 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
                 {r.results.map((row) => (
                   <tr key={row.id}>
                     <td>{row.position}</td>
-                    <td>{row.horse_name}</td>
+                    <td>{row.horses?.name ?? "—"}</td>
                     <td>{row.jockey}</td>
                     <td className="font-mono">{row.finish_time}</td>
                   </tr>

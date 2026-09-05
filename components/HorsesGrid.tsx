@@ -42,7 +42,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
               <div className="text-xs opacity-60 mt-1">{h.age}yo {h.sex} · {h.color}</div>
               <div className="flex gap-3.5 mt-3 text-xs">
                 <div><b className="block font-mono text-sm">{h.wins}</b>Wins</div>
-                <div><b className="block font-mono text-sm">{h.places}</b>Places</div>
+                <div><b className="block font-mono text-sm">{h.seconds + h.thirds}</b>Placed</div>
                 <div><b className="block font-mono text-sm">{h.starts}</b>Starts</div>
               </div>
             </div>

@@ -43,7 +43,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
                 <thead><tr><th>#</th><th>Horse</th><th>Trainer</th><th>Starts</th><th>Wins</th><th>Places</th><th>Earnings</th></tr></thead>
                 <tbody>
                   {[...horses].sort((a, b) => b.wins - a.wins).map((h, i) => (
-                    <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.places}</td><td>{fmtMoney(h.earnings)}</td></tr>
+                    <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.seconds + h.thirds}</td><td>{fmtMoney(h.earnings)}</td></tr>
                   ))}
                 </tbody>
               </table>

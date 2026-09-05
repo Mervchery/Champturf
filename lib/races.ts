@@ -12,22 +12,43 @@ export type Race = {
   conditions: string | null;
 };
 
+// A "runner" is a horse joined with race-specific details (gate/jockey/
+// weight for entries, or position/time for results) plus the horse's own
+// record (stable/trainer/owner/age/sex) — this is what the race card and
+// results table actually display, per horse.
+export type HorseSummary = {
+  id: string;
+  name: string;
+  trainer: string | null;
+  stable: string | null;
+  owner: string | null;
+  age: number | null;
+  sex: string | null;
+};
+
 export type RaceEntry = {
   id: string;
   race_id: string;
   gate: number | null;
-  horse_name: string;
-  trainer: string | null;
+  weight_kg: number | null;
+  horse_id: string;
+  horses: HorseSummary | null; // joined
+  jockey_id: string | null;
+  jockeys: { id: string; name: string } | null; // joined
 };
 
 export type RaceResult = {
   id: string;
   race_id: string;
   position: number;
-  horse_name: string;
   jockey: string;
   finish_time: string | null;
+  horse_id: string;
+  horses: HorseSummary | null; // joined
 };
+
+const ENTRY_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex), jockeys(id, name)";
+const RESULT_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex)";
 
 export async function getRaces(): Promise<Race[]> {
   const supabase = createClient();
@@ -50,22 +71,22 @@ export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("race_entries")
-    .select("*")
+    .select(ENTRY_SELECT)
     .eq("race_id", raceId)
     .order("gate", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data as any) ?? [];
 }
 
 export async function getResultsForRace(raceId: string): Promise<RaceResult[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("race_results")
-    .select("*")
+    .select(RESULT_SELECT)
     .eq("race_id", raceId)
     .order("position", { ascending: true });
   if (error) throw error;
-  return data ?? [];
+  return (data as any) ?? [];
 }
 
 /** Races with status='completed', each pre-loaded with its result rows —
@@ -82,23 +103,13 @@ export async function getCompletedRacesWithResults(): Promise<(Race & { results:
 
   const { data: results, error: resultsError } = await supabase
     .from("race_results")
-    .select("*")
+    .select(RESULT_SELECT)
     .in("race_id", races.map((r) => r.id))
     .order("position", { ascending: true });
   if (resultsError) throw resultsError;
 
   return races.map((r) => ({
     ...r,
-    results: (results ?? []).filter((row) => row.race_id === r.id),
+    results: ((results as any) ?? []).filter((row: RaceResult) => row.race_id === r.id),
   }));
 }
-
-export function fmtMoney(value: number): string {
-  return new Intl.NumberFormat("en-MU", {
-    style: "currency",
-    currency: "MUR",
-    maximumFractionDigits: 0,
-  }).format(value);
-}
-
-

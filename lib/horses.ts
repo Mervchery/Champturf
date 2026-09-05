@@ -11,8 +11,15 @@ export type Horse = {
   owner: string | null;
   trainer: string | null;
   stable: string | null;
+  // wins/seconds/thirds/unplaced/starts/earnings are NOT hand-edited —
+  // they're maintained automatically by a database trigger whenever
+  // race_results changes (see supabase/race_entries_results_migration.sql).
+  // Treat these as read-only in the app; there is no write path for them
+  // other than entering/editing official results.
   wins: number;
-  places: number;
+  seconds: number;
+  thirds: number;
+  unplaced: number;
   starts: number;
   earnings: number;
   medical_status: string | null;
@@ -32,17 +39,14 @@ export async function getHorseById(id: string): Promise<Horse | null> {
   return data;
 }
 
-/** Last 5 finishes for this horse, computed by matching horse_name against
- *  race_results — no horse_id foreign key needed, since races_schema.sql
- *  stores results as plain text. Sorted client-side after the join since
- *  ordering by an embedded resource's column isn't reliably supported by
- *  the query builder. */
-export async function getRecentForm(horseName: string): Promise<string[]> {
+/** Last 5 finishes for this horse, joined via the real horse_id foreign
+ *  key on race_results (no more name-matching). */
+export async function getRecentForm(horseId: string): Promise<string[]> {
   const supabase = createClient();
   const { data, error } = await supabase
     .from("race_results")
     .select("position, races(race_date)")
-    .eq("horse_name", horseName);
+    .eq("horse_id", horseId);
   if (error || !data) return [];
   const sorted = [...data].sort((a: any, b: any) => (b.races?.race_date ?? "").localeCompare(a.races?.race_date ?? ""));
   return sorted.slice(0, 5).map((row: any) => String(row.position));

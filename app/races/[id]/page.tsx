@@ -44,7 +44,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       {results.map((row) => (
                         <tr key={row.id}>
                           <td>{row.position}</td>
-                          <td>{row.horse_name}</td>
+                          <td>
+                            {row.horses ? (
+                              <Link href={`/horses/${row.horses.id}`} className="font-semibold">{row.horses.name}</Link>
+                            ) : "—"}
+                          </td>
                           <td>{row.jockey}</td>
                           <td className="font-mono">{row.finish_time}</td>
                         </tr>
@@ -76,13 +80,26 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
               ) : (
                 <div className="panel">
                   <table>
-                    <thead><tr><th>Gate</th><th>Horse</th><th>Trainer</th></tr></thead>
+                    <thead>
+                      <tr>
+                        <th>Gate</th><th>Horse</th><th>Age/Sex</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Owner</th><th>Weight</th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {entries.map((e) => (
                         <tr key={e.id}>
                           <td>{e.gate ?? "—"}</td>
-                          <td className="font-semibold">{e.horse_name}</td>
-                          <td>{e.trainer ?? "—"}</td>
+                          <td>
+                            {e.horses ? (
+                              <Link href={`/horses/${e.horses.id}`} className="font-semibold">{e.horses.name}</Link>
+                            ) : "—"}
+                          </td>
+                          <td>{e.horses?.age ? `${e.horses.age}yo` : "—"}{e.horses?.sex ? ` ${e.horses.sex}` : ""}</td>
+                          <td>{e.horses?.stable ?? "—"}</td>
+                          <td>{e.horses?.trainer ?? "—"}</td>
+                          <td>{e.jockeys?.name ?? "—"}</td>
+                          <td>{e.horses?.owner ?? "—"}</td>
+                          <td>{e.weight_kg ? `${e.weight_kg}kg` : "—"}</td>
                         </tr>
                       ))}
                     </tbody>

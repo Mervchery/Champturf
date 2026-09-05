@@ -59,13 +59,15 @@ export async function deleteRace(id: string) {
 export type ResultInput = {
   race_id: string;
   position: number;
-  horse_name: string;
+  horse_id: string;
   jockey: string;
   finish_time: string;
 };
 
 /** Creates or overwrites the result row for a given race+position
- *  (race_results has a unique constraint on (race_id, position)). */
+ *  (race_results has a unique constraint on (race_id, position)). Horse
+ *  stats (wins/seconds/thirds/unplaced/starts/earnings) update themselves
+ *  automatically via a database trigger — nothing to do here. */
 export async function upsertResult(input: ResultInput) {
   const supabase = await requireAdmin();
   const { error } = await supabase
@@ -74,6 +76,7 @@ export async function upsertResult(input: ResultInput) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
   revalidatePath("/results");
+  revalidatePath("/horses");
   revalidatePath(`/races/${input.race_id}`);
   revalidatePath("/");
 }
@@ -84,6 +87,7 @@ export async function deleteResult(id: string, raceId: string) {
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
   revalidatePath("/results");
+  revalidatePath("/horses");
   revalidatePath(`/races/${raceId}`);
   revalidatePath("/");
 }
@@ -91,8 +95,9 @@ export async function deleteResult(id: string, raceId: string) {
 export type EntryInput = {
   race_id: string;
   gate: number | null;
-  horse_name: string;
-  trainer: string;
+  horse_id: string;
+  jockey_id: string | null;
+  weight_kg: number | null;
 };
 
 export async function createEntry(input: EntryInput) {

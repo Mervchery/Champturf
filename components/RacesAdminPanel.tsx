@@ -6,13 +6,20 @@ import { Plus, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Race, RaceEntry, RaceResult } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
+import type { Horse } from "@/lib/horses";
+import type { Jockey } from "@/lib/jockeys";
 import {
   createRace, deleteRace, updateRace,
   createEntry, deleteEntry,
   upsertResult, deleteResult,
 } from "@/lib/actions/races";
 
-export default function RacesAdminPanel({ races, notify }: { races: Race[]; notify: (m: string) => void }) {
+const ENTRY_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex), jockeys(id, name)";
+const RESULT_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex)";
+
+export default function RacesAdminPanel({
+  races, horses, jockeys, notify,
+}: { races: Race[]; horses: Horse[]; jockeys: Jockey[]; notify: (m: string) => void }) {
   const router = useRouter();
   const [showNewRace, setShowNewRace] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -96,6 +103,8 @@ export default function RacesAdminPanel({ races, notify }: { races: Race[]; noti
       {expanded && (
         <RaceManagePanel
           race={races.find((r) => r.id === expanded)!}
+          horses={horses}
+          jockeys={jockeys}
           notify={notify}
           onChanged={() => router.refresh()}
         />
@@ -153,7 +162,9 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
-function RaceManagePanel({ race, notify, onChanged }: { race: Race; notify: (m: string) => void; onChanged: () => void }) {
+function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
+  race: Race; horses: Horse[]; jockeys: Jockey[]; notify: (m: string) => void; onChanged: () => void;
+}) {
   const [entries, setEntries] = useState<RaceEntry[]>([]);
   const [results, setResults] = useState<RaceResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,11 +173,11 @@ function RaceManagePanel({ race, notify, onChanged }: { race: Race; notify: (m: 
     setLoading(true);
     const supabase = createClient();
     if (race.status === "upcoming") {
-      const { data } = await supabase.from("race_entries").select("*").eq("race_id", race.id).order("gate");
-      setEntries(data ?? []);
+      const { data } = await supabase.from("race_entries").select(ENTRY_SELECT).eq("race_id", race.id).order("gate");
+      setEntries((data as any) ?? []);
     } else {
-      const { data } = await supabase.from("race_results").select("*").eq("race_id", race.id).order("position");
-      setResults(data ?? []);
+      const { data } = await supabase.from("race_results").select(RESULT_SELECT).eq("race_id", race.id).order("position");
+      setResults((data as any) ?? []);
     }
     setLoading(false);
   }
@@ -187,6 +198,13 @@ function RaceManagePanel({ race, notify, onChanged }: { race: Race; notify: (m: 
     }
   }
 
+  // Results can only be entered for horses actually declared for this race.
+  // Falls back to the full horse list if no entries were ever recorded
+  // (e.g. a race created and completed without going through the entries step).
+  const resultHorseOptions = entries.length > 0
+    ? entries.map((e) => e.horses).filter((h): h is NonNullable<typeof h> => !!h)
+    : horses;
+
   return (
     <div className="panel mt-4">
       <h4 className="text-sm font-semibold mb-3">
@@ -196,64 +214,115 @@ function RaceManagePanel({ race, notify, onChanged }: { race: Race; notify: (m: 
       {loading ? (
         <p className="text-sm opacity-60">Loading…</p>
       ) : race.status === "upcoming" ? (
-        <EntriesEditor raceId={race.id} entries={entries} onAdd={(input) => handle(() => createEntry(input), "Entry added")} onDelete={(id) => handle(() => deleteEntry(id, race.id), "Entry removed")} />
+        <EntriesEditor
+          raceId={race.id}
+          entries={entries}
+          horses={horses}
+          jockeys={jockeys}
+          onAdd={(input) => handle(() => createEntry(input), "Entry added")}
+          onDelete={(id) => handle(() => deleteEntry(id, race.id), "Entry removed")}
+        />
       ) : (
-        <ResultsEditor raceId={race.id} results={results} onSave={(input) => handle(() => upsertResult(input), "Result saved")} onDelete={(id) => handle(() => deleteResult(id, race.id), "Result removed")} />
+        <ResultsEditor
+          raceId={race.id}
+          results={results}
+          horseOptions={resultHorseOptions}
+          onSave={(input) => handle(() => upsertResult(input), "Result saved — horse stats updated automatically")}
+          onDelete={(id) => handle(() => deleteResult(id, race.id), "Result removed — horse stats updated automatically")}
+        />
       )}
     </div>
   );
 }
 
-function EntriesEditor({ raceId, entries, onAdd, onDelete }: {
-  raceId: string; entries: RaceEntry[];
-  onAdd: (input: { race_id: string; gate: number | null; horse_name: string; trainer: string }) => void;
+function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
+  raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
+  onAdd: (input: { race_id: string; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [gate, setGate] = useState("");
-  const [horseName, setHorseName] = useState("");
-  const [trainer, setTrainer] = useState("");
+  const [horseId, setHorseId] = useState("");
+  const [jockeyId, setJockeyId] = useState("");
+  const [weight, setWeight] = useState("");
+
+  // A horse already entered in this race can't be entered again.
+  const enteredHorseIds = new Set(entries.map((e) => e.horse_id));
+  const availableHorses = horses.filter((h) => !enteredHorseIds.has(h.id));
 
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>Gate</th><th>Horse</th><th>Trainer</th><th /></tr></thead>
+        <thead><tr><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id}>
-              <td>{e.gate ?? "—"}</td><td>{e.horse_name}</td><td>{e.trainer ?? "—"}</td>
+              <td>{e.gate ?? "—"}</td>
+              <td className="font-semibold">{e.horses?.name ?? "—"}</td>
+              <td>{e.horses?.stable ?? "—"}</td>
+              <td>{e.horses?.trainer ?? "—"}</td>
+              <td>{e.jockeys?.name ?? "—"}</td>
+              <td>{e.weight_kg ? `${e.weight_kg}kg` : "—"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={4} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={7} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
-        <div><label className="text-xs opacity-65 block mb-1">Gate</label><input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} /></div>
-        <div><label className="text-xs opacity-65 block mb-1">Horse</label><input className="admin-input" value={horseName} onChange={(e) => setHorseName(e.target.value)} /></div>
-        <div><label className="text-xs opacity-65 block mb-1">Trainer</label><input className="admin-input" value={trainer} onChange={(e) => setTrainer(e.target.value)} /></div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Gate</label>
+          <input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Horse</label>
+          <select className="admin-input" value={horseId} onChange={(e) => setHorseId(e.target.value)}>
+            <option value="">Select a registered horse…</option>
+            {availableHorses.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Jockey</label>
+          <select className="admin-input" value={jockeyId} onChange={(e) => setJockeyId(e.target.value)}>
+            <option value="">Not yet assigned</option>
+            {jockeys.map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Weight (kg)</label>
+          <input type="number" className="admin-input w-24" value={weight} onChange={(e) => setWeight(e.target.value)} />
+        </div>
         <button
           className="btn btn-dark"
           onClick={() => {
-            if (!horseName) return;
-            onAdd({ race_id: raceId, gate: gate ? Number(gate) : null, horse_name: horseName, trainer });
-            setGate(""); setHorseName(""); setTrainer("");
+            if (!horseId) return;
+            onAdd({
+              race_id: raceId,
+              gate: gate ? Number(gate) : null,
+              horse_id: horseId,
+              jockey_id: jockeyId || null,
+              weight_kg: weight ? Number(weight) : null,
+            });
+            setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
           }}
         >
           Add entry
         </button>
       </div>
+      {horses.length === 0 && (
+        <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
+      )}
       <style>{`.admin-input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 0.84rem; }`}</style>
     </div>
   );
 }
 
-function ResultsEditor({ raceId, results, onSave, onDelete }: {
-  raceId: string; results: RaceResult[];
-  onSave: (input: { race_id: string; position: number; horse_name: string; jockey: string; finish_time: string }) => void;
+function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
+  raceId: string; results: RaceResult[]; horseOptions: { id: string; name: string }[];
+  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string }) => void;
   onDelete: (id: string) => void;
 }) {
   const [position, setPosition] = useState("");
-  const [horseName, setHorseName] = useState("");
+  const [horseId, setHorseId] = useState("");
   const [jockey, setJockey] = useState("");
   const [finishTime, setFinishTime] = useState("");
 
@@ -264,7 +333,7 @@ function ResultsEditor({ raceId, results, onSave, onDelete }: {
         <tbody>
           {results.map((r) => (
             <tr key={r.id}>
-              <td>{r.position}</td><td>{r.horse_name}</td><td>{r.jockey}</td><td className="font-mono">{r.finish_time}</td>
+              <td>{r.position}</td><td>{r.horses?.name ?? "—"}</td><td>{r.jockey}</td><td className="font-mono">{r.finish_time}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
@@ -272,21 +341,39 @@ function ResultsEditor({ raceId, results, onSave, onDelete }: {
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
-        <div><label className="text-xs opacity-65 block mb-1">Position</label><input type="number" className="admin-input w-20" value={position} onChange={(e) => setPosition(e.target.value)} /></div>
-        <div><label className="text-xs opacity-65 block mb-1">Horse</label><input className="admin-input" value={horseName} onChange={(e) => setHorseName(e.target.value)} /></div>
-        <div><label className="text-xs opacity-65 block mb-1">Jockey</label><input className="admin-input" value={jockey} onChange={(e) => setJockey(e.target.value)} /></div>
-        <div><label className="text-xs opacity-65 block mb-1">Time</label><input className="admin-input" placeholder="1:24.10" value={finishTime} onChange={(e) => setFinishTime(e.target.value)} /></div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Position</label>
+          <input type="number" className="admin-input w-20" value={position} onChange={(e) => setPosition(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Horse</label>
+          <select className="admin-input" value={horseId} onChange={(e) => setHorseId(e.target.value)}>
+            <option value="">Select a horse…</option>
+            {horseOptions.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
+          </select>
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Jockey</label>
+          <input className="admin-input" value={jockey} onChange={(e) => setJockey(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Time</label>
+          <input className="admin-input" placeholder="1:24.10" value={finishTime} onChange={(e) => setFinishTime(e.target.value)} />
+        </div>
         <button
           className="btn btn-dark"
           onClick={() => {
-            if (!position || !horseName || !jockey) return;
-            onSave({ race_id: raceId, position: Number(position), horse_name: horseName, jockey, finish_time: finishTime });
-            setPosition(""); setHorseName(""); setJockey(""); setFinishTime("");
+            if (!position || !horseId || !jockey) return;
+            onSave({ race_id: raceId, position: Number(position), horse_id: horseId, jockey, finish_time: finishTime });
+            setPosition(""); setHorseId(""); setJockey(""); setFinishTime("");
           }}
         >
           Save result
         </button>
       </div>
+      <p className="text-xs opacity-60 mt-2.5">
+        Enter every finisher, not just the podium — a horse's starts/unplaced count depends on a result row existing for it.
+      </p>
       <style>{`.admin-input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 0.84rem; }`}</style>
     </div>
   );
