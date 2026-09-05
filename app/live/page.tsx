@@ -1,48 +1,43 @@
-"use client";
-
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { Play, Radio } from "lucide-react";
-import { createClient } from "@/lib/supabase/client";
-import type { Race } from "@/lib/races";
+import { getActiveStream, type Stream } from "@/lib/streams";
+import { getRaces } from "@/lib/races";
+import LiveChat from "@/components/LiveChat";
 
-const SOURCES = ["YouTube", "Facebook Live", "Twitch", "Custom RTMP/HLS"];
+export const revalidate = 0;
+
+// Still a static placeholder — unrelated to the real stream wiring below.
+// A real version would come from race-day commentary, e.g. inserted rows
+// keyed to a race, polled or pushed via Supabase Realtime.
 const TICKER = [
   "R4 — Off and running — Corsaire du Nord takes early lead",
   "R4 — 600m: Belle Étoile moves up on the outside",
   "R4 — 200m: Île Royale and Roi des Sables locked together",
   "R4 — Photo finish called",
 ];
-const CHAT_SEED: [string, string][] = [
-  ["A. Coutinho", "Come on Corsaire!"],
-  ["M. Ramful", "Belle Étoile looks strong today"],
-  ["V. Teeluck", "Photo finish incoming"],
-];
 
-export default function LivePage() {
-  const [source, setSource] = useState(SOURCES[0]);
-  const [messages, setMessages] = useState(CHAT_SEED);
-  const [input, setInput] = useState("");
-  const [races, setRaces] = useState<Race[]>([]);
-
-  useEffect(() => {
-    const supabase = createClient();
-    supabase
-      .from("races")
-      .select("*")
-      .eq("status", "completed")
-      .order("race_date", { ascending: false })
-      .then(({ data }) => setRaces(data ?? []));
-  }, []);
-
-  const replays = races;
-
-  function sendChat(e: React.FormEvent) {
-    e.preventDefault();
-    if (!input.trim()) return;
-    setMessages((m) => [...m, ["You", input]]);
-    setInput("");
+function renderEmbed(stream: Stream) {
+  if (stream.source === "rtmp") {
+    // Native <video> HLS playback works in Safari; other browsers need
+    // hls.js for broad support — add it here if you need that later.
+    return <video className="w-full h-full" src={stream.embed_url} controls autoPlay muted playsInline />;
   }
+  // youtube / facebook / twitch all work as iframe embeds, as long as
+  // embed_url is already in the embeddable form documented in
+  // supabase/streams_schema.sql.
+  return (
+    <iframe
+      className="w-full h-full"
+      src={stream.embed_url}
+      allow="autoplay; encrypted-media; picture-in-picture"
+      allowFullScreen
+    />
+  );
+}
+
+export default async function LivePage() {
+  const [stream, races] = await Promise.all([getActiveStream(), getRaces()]);
+  const replays = races.filter((r) => r.status === "completed");
 
   return (
     <div>
@@ -55,26 +50,22 @@ export default function LivePage() {
       <section className="py-14">
         <div className="wrap grid md:grid-cols-[1.6fr_1fr] gap-8 items-start">
           <div>
-            <div className="relative aspect-video bg-black rounded flex items-center justify-center text-white/50 overflow-hidden">
-              <div className="absolute top-3.5 left-3.5 bg-coral text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5">
-                <Radio size={11} className="animate-pulse" /> LIVE
-              </div>
-              <div className="text-center">
-                <Play size={32} className="mx-auto" />
-                <div className="text-sm mt-1.5">Simulated stream — Race 4, Champ de Mars</div>
-              </div>
-            </div>
-
-            <div className="flex gap-2 flex-wrap mt-3">
-              {SOURCES.map((s) => (
-                <button
-                  key={s}
-                  onClick={() => setSource(s)}
-                  className={`px-3.5 py-1.5 rounded-full border text-xs ${source === s ? "bg-turf text-white border-turf" : "bg-surface border-line"}`}
-                >
-                  {s}
-                </button>
-              ))}
+            <div className="relative aspect-video bg-black rounded overflow-hidden">
+              {stream ? (
+                <>
+                  <div className="absolute top-3.5 left-3.5 bg-coral text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 z-10">
+                    <Radio size={11} className="animate-pulse" /> LIVE
+                  </div>
+                  {renderEmbed(stream)}
+                </>
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-white/50">
+                  <div className="text-center">
+                    <Play size={28} className="mx-auto opacity-60" />
+                    <div className="text-sm mt-2">No live stream right now — check back during a race day.</div>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="panel mt-5">
@@ -87,6 +78,7 @@ export default function LivePage() {
             <div className="flex justify-between items-end mt-8 mb-3">
               <h2 className="text-xl font-display">Replay archive</h2>
             </div>
+            {replays.length === 0 && <p className="text-sm opacity-60">No completed races yet.</p>}
             <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
               {replays.map((r) => (
                 <Link key={r.id} href={`/races/${r.id}`} className="card">
@@ -102,23 +94,7 @@ export default function LivePage() {
             </div>
           </div>
 
-          <div className="card flex flex-col h-[480px]">
-            <div className="px-3.5 py-3 border-b border-line text-sm font-semibold">Live chat</div>
-            <div className="flex-1 overflow-y-auto p-3.5 text-sm space-y-2.5">
-              {messages.map(([user, msg], i) => (
-                <div key={i}><b className="text-coral">{user}:</b> {msg}</div>
-              ))}
-            </div>
-            <form onSubmit={sendChat} className="flex border-t border-line">
-              <input
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="Say something…"
-                className="flex-1 border-none px-3.5 py-3 text-sm outline-none bg-transparent"
-              />
-              <button type="submit" className="px-4 text-coral font-semibold text-sm">Send</button>
-            </form>
-          </div>
+          <LiveChat />
         </div>
       </section>
     </div>

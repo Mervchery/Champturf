@@ -8,8 +8,9 @@ import { createRow, updateRow, deleteRow } from "@/lib/actions/db";
 export type FieldDef = {
   key: string;
   label: string;
-  type?: "text" | "number" | "checkbox" | "textarea";
+  type?: "text" | "number" | "checkbox" | "textarea" | "select";
   placeholder?: string;
+  options?: { value: string; label: string }[]; // required when type is "select"
 };
 
 export type ColumnDef = {
@@ -140,7 +141,13 @@ function EntityForm({ fields, initial, onSubmit, onCancel }: {
     const cleaned: Record<string, unknown> = {};
     for (const f of fields) {
       const raw = values[f.key];
-      cleaned[f.key] = f.type === "number" ? (raw === "" ? 0 : Number(raw)) : raw;
+      if (f.type === "number") {
+        cleaned[f.key] = raw === "" ? 0 : Number(raw);
+      } else if (f.type === "select" && raw === "") {
+        cleaned[f.key] = null; // e.g. an optional foreign key with no selection
+      } else {
+        cleaned[f.key] = raw;
+      }
     }
     onSubmit(cleaned);
   }
@@ -155,6 +162,11 @@ function EntityForm({ fields, initial, onSubmit, onCancel }: {
               <input type="checkbox" checked={!!values[f.key]} onChange={(e) => setField(f.key, e.target.checked)} className="w-4 h-4" />
             ) : f.type === "textarea" ? (
               <textarea className="input" rows={3} value={values[f.key]} placeholder={f.placeholder} onChange={(e) => setField(f.key, e.target.value)} />
+            ) : f.type === "select" ? (
+              <select className="input" value={values[f.key]} onChange={(e) => setField(f.key, e.target.value)}>
+                <option value="">—</option>
+                {f.options?.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+              </select>
             ) : (
               <input
                 type={f.type === "number" ? "number" : "text"}

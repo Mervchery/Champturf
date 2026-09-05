@@ -8,6 +8,7 @@ import { getTrainers } from "@/lib/trainers";
 import { getStables } from "@/lib/stables";
 import { getOwners } from "@/lib/owners";
 import { getNews } from "@/lib/news";
+import { getStreams } from "@/lib/streams";
 import { getProfiles } from "@/lib/users";
 import AdminDashboard from "@/components/AdminDashboard";
 
@@ -32,7 +33,7 @@ export default async function AdminPage() {
     redirect("/admin/login?error=not_authorized");
   }
 
-  const [races, horses, jockeys, trainers, stables, owners, news, profiles] = await Promise.all([
+  const [races, horses, jockeys, trainers, stables, owners, news, streams, profiles] = await Promise.all([
     getRaces(),
     getHorses(),
     getJockeys(),
@@ -40,6 +41,7 @@ export default async function AdminPage() {
     getStables(),
     getOwners(),
     getNews(),
+    getStreams(),
     getProfiles(),
   ]);
 
@@ -54,6 +56,7 @@ export default async function AdminPage() {
       stables={stables}
       owners={owners}
       news={news}
+      streams={streams}
       profiles={profiles}
     />
   );
