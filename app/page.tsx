@@ -84,7 +84,7 @@ export default async function HomePage() {
                       <span className="pill pill-coral">{r.race_date}</span>
                       <h4 className="mt-2 font-semibold">{r.name}</h4>
                       <div className="text-xs opacity-60 mt-1">
-                        {win ? `Winner: ${win.horse_name} — ${win.jockey}, ${win.finish_time}` : "Result pending"}
+                        {win ? `Winner: ${win.horses?.name ?? "—"} — ${win.jockey}, ${win.finish_time}` : "Result pending"}
                       </div>
                     </div>
                   </Link>

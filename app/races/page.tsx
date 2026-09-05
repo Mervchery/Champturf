@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { getRaces, fmtMoney } from "@/lib/races";
+import { getRaces } from "@/lib/races";
+import { fmtMoney } from "@/lib/format";
 
 export const revalidate = 0;
 
