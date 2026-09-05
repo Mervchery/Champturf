@@ -18,6 +18,7 @@ import type { Trainer } from "@/lib/trainers";
 import type { Stable } from "@/lib/stables";
 import type { Owner } from "@/lib/owners";
 import type { NewsArticle } from "@/lib/news";
+import type { Stream } from "@/lib/streams";
 import type { Profile } from "@/lib/users";
 
 const SECTIONS = [
@@ -39,11 +40,11 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number][0];
 
 export default function AdminDashboard({
-  role, email, races, horses, jockeys, trainers, stables, owners, news, profiles,
+  role, email, races, horses, jockeys, trainers, stables, owners, news, streams, profiles,
 }: {
   role: string; email: string;
   races: Race[]; horses: Horse[]; jockeys: Jockey[]; trainers: Trainer[];
-  stables: Stable[]; owners: Owner[]; news: NewsArticle[]; profiles: Profile[];
+  stables: Stable[]; owners: Owner[]; news: NewsArticle[]; streams: Stream[]; profiles: Profile[];
 }) {
   const [section, setSection] = useState<SectionId>("overview");
   const [toast, setToast] = useState("");
@@ -297,41 +298,41 @@ export default function AdminDashboard({
         )}
 
         {section === "stream" && (
-          <div>
-            <h2 className="font-display text-2xl mb-5">Live stream management</h2>
-            <div className="panel">
-              <p className="text-sm opacity-70 mb-3.5">
-                Not connected to a real stream provider yet — wiring this up means storing the source/URL/status
-                below somewhere (a `streams` table, following the same pattern as races) and pointing the
-                /live page at real embed URLs.
-              </p>
-              <div className="grid sm:grid-cols-2 gap-3.5">
-                <div>
-                  <label className="text-xs opacity-65 block mb-1.5">Stream source</label>
-                  <select className="w-full px-3 py-2.5 border border-line rounded-md bg-surface text-sm">
-                    <option>YouTube</option><option>Facebook Live</option><option>Twitch</option><option>Custom RTMP/HLS</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs opacity-65 block mb-1.5">Stream URL</label>
-                  <input placeholder="https://…" className="w-full px-3 py-2.5 border border-line rounded-md bg-surface text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs opacity-65 block mb-1.5">Race</label>
-                  <select className="w-full px-3 py-2.5 border border-line rounded-md bg-surface text-sm">
-                    {races.map((r) => <option key={r.id}>{r.name}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-xs opacity-65 block mb-1.5">Status</label>
-                  <select className="w-full px-3 py-2.5 border border-line rounded-md bg-surface text-sm">
-                    <option>Scheduled</option><option>Active</option><option>Ended</option>
-                  </select>
-                </div>
-              </div>
-              <button className="btn btn-dark mt-4" onClick={() => notify("Not connected yet — see panel note above")}>Save stream</button>
-            </div>
-          </div>
+          <EntityAdminPanel
+            table="streams" title="Live streams" addLabel="New stream" notify={notify}
+            paths={["/admin", "/live"]}
+            rows={streams}
+            columns={[
+              { key: "source", label: "Source" },
+              { key: "embed_url", label: "URL", render: (row) => <span className="truncate block max-w-[220px]">{row.embed_url}</span> },
+              { key: "status", label: "Status" },
+              { key: "race_id", label: "Race", render: (row) => races.find((r) => r.id === row.race_id)?.name ?? "—" },
+            ]}
+            fields={[
+              {
+                key: "source", label: "Stream source", type: "select",
+                options: [
+                  { value: "youtube", label: "YouTube" },
+                  { value: "facebook", label: "Facebook Live" },
+                  { value: "twitch", label: "Twitch" },
+                  { value: "rtmp", label: "Custom RTMP/HLS" },
+                ],
+              },
+              { key: "embed_url", label: "Embed URL", placeholder: "See supabase/streams_schema.sql for the required format per source" },
+              {
+                key: "race_id", label: "Race (optional)", type: "select",
+                options: races.map((r) => ({ value: r.id, label: r.name })),
+              },
+              {
+                key: "status", label: "Status", type: "select",
+                options: [
+                  { value: "scheduled", label: "Scheduled" },
+                  { value: "active", label: "Active (shows on /live)" },
+                  { value: "ended", label: "Ended" },
+                ],
+              },
+            ]}
+          />
         )}
 
         {section === "stats" && (
