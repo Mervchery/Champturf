@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { RefSummary } from "@/lib/horses";
 
 export type Race = {
   id: string;
@@ -14,21 +15,22 @@ export type Race = {
 
 // A "runner" is a horse joined with race-specific details (gate/jockey/
 // weight for entries, or position/time for results) plus the horse's own
-// record (stable/trainer/owner/age/sex) — this is what the race card and
-// results table actually display, per horse.
+// connections (owner/trainer/stable are each nested joins in turn, since
+// the horse itself only stores their ids — see relational_links_migration.sql).
 export type HorseSummary = {
   id: string;
   name: string;
-  trainer: string | null;
-  stable: string | null;
-  owner: string | null;
   age: number | null;
   sex: string | null;
+  owner: RefSummary | null;
+  trainer: RefSummary | null;
+  stable: RefSummary | null;
 };
 
 export type RaceEntry = {
   id: string;
   race_id: string;
+  runner_no: number | null;
   gate: number | null;
   weight_kg: number | null;
   horse_id: string;
@@ -47,8 +49,9 @@ export type RaceResult = {
   horses: HorseSummary | null; // joined
 };
 
-const ENTRY_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex), jockeys(id, name)";
-const RESULT_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex)";
+const HORSE_JOIN = "horses(id, name, age, sex, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name))";
+const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
+const RESULT_SELECT = `*, ${HORSE_JOIN}`;
 
 export async function getRaces(): Promise<Race[]> {
   const supabase = createClient();

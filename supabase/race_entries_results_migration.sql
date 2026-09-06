@@ -16,15 +16,27 @@ alter table public.race_entries add column if not exists jockey_id uuid referenc
 alter table public.race_entries add column if not exists weight_kg numeric;
 
 -- Best-effort backfill for any entries created before this migration,
--- matching by name. Safe to run even with zero existing rows.
-update public.race_entries e
-set horse_id = h.id
-from public.horses h
-where e.horse_id is null and h.name = e.horse_name;
+-- matching by name. Wrapped in a column-existence check since some setups
+-- never had a horse_name column to begin with (e.g. table already empty
+-- or created after a partial earlier run) — this makes the migration safe
+-- to run regardless of that history.
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'race_entries' and column_name = 'horse_name'
+  ) then
+    update public.race_entries e
+    set horse_id = h.id
+    from public.horses h
+    where e.horse_id is null and h.name = e.horse_name;
+  end if;
+end $$;
 
 -- Any entry that couldn't be matched (typo'd/free-text name with no
--- matching horse) is now orphaned — remove it rather than leave invalid
--- data, since going forward entries can only be created for real horses.
+-- matching horse, or no horse_name column existed to match from at all)
+-- is now orphaned — remove it rather than leave invalid data, since going
+-- forward entries can only be created for real horses.
 delete from public.race_entries where horse_id is null;
 
 alter table public.race_entries alter column horse_id set not null;
@@ -37,10 +49,18 @@ alter table public.race_entries drop column if exists trainer; -- now derived fr
 
 alter table public.race_results add column if not exists horse_id uuid references public.horses (id) on delete cascade;
 
-update public.race_results r
-set horse_id = h.id
-from public.horses h
-where r.horse_id is null and h.name = r.horse_name;
+do $$
+begin
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'race_results' and column_name = 'horse_name'
+  ) then
+    update public.race_results r
+    set horse_id = h.id
+    from public.horses h
+    where r.horse_id is null and h.name = r.horse_name;
+  end if;
+end $$;
 
 delete from public.race_results where horse_id is null;
 

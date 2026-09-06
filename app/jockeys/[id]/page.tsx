@@ -19,7 +19,7 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
           <div>
             <span className="text-xs font-semibold text-gold2">{j.apprentice ? "APPRENTICE JOCKEY" : "JOCKEY PROFILE"}</span>
             <h1 className="text-3xl font-display mt-1">{j.name}</h1>
-            <div className="text-white/70 text-sm mt-1.5">{j.nationality}</div>
+            <div className="text-white/70 text-sm mt-1.5">{j.nationality ?? "N/A"}</div>
           </div>
         </div>
       </div>
@@ -39,18 +39,18 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
               <h4 className="text-sm font-semibold mb-3">Apprenticeship</h4>
               <table>
                 <tbody>
-                  <tr><td>Mentor trainer</td><td>{j.mentor ?? "—"}</td></tr>
-                  <tr><td>Apprentice allowance</td><td>{j.allowance ?? "—"}</td></tr>
-                  <tr><td>Progress report</td><td>{j.progress ?? "—"}</td></tr>
+                  <tr><td>Mentor jockey</td><td>{j.mentor ? <Link href={`/jockeys/${j.mentor.id}`} className="font-semibold">{j.mentor.name}</Link> : "Unknown"}</td></tr>
+                  <tr><td>Apprentice allowance</td><td>{j.allowance ?? "N/A"}</td></tr>
+                  <tr><td>Progress report</td><td>{j.progress ?? "N/A"}</td></tr>
                 </tbody>
               </table>
             </div>
           ) : (
             <div className="panel mt-6">
               <h4 className="text-sm font-semibold mb-2">Biography</h4>
-              <p className="text-sm opacity-70">{j.bio ?? "—"}</p>
+              <p className="text-sm opacity-70">{j.bio ?? "N/A"}</p>
               <h4 className="text-sm font-semibold mt-4 mb-1">Achievements</h4>
-              <p className="text-sm opacity-70">{j.achievements ?? "—"}</p>
+              <p className="text-sm opacity-70">{j.achievements ?? "N/A"}</p>
             </div>
           )}
         </div>

@@ -10,7 +10,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
   const [sort, setSort] = useState<"wins" | "earnings" | "name">("wins");
 
   const list = useMemo(() => {
-    let l = horses.filter((h) => (h.name + (h.owner ?? "") + (h.stable ?? "")).toLowerCase().includes(q.toLowerCase()));
+    let l = horses.filter((h) => (h.name + (h.owner?.name ?? "") + (h.stable?.name ?? "")).toLowerCase().includes(q.toLowerCase()));
     l = [...l].sort((a, b) => (sort === "name" ? a.name.localeCompare(b.name) : (b as any)[sort] - (a as any)[sort]));
     return l;
   }, [horses, q, sort]);
@@ -39,7 +39,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
             </div>
             <div className="p-4">
               <h4 className="font-semibold">{h.name}</h4>
-              <div className="text-xs opacity-60 mt-1">{h.age}yo {h.sex} · {h.color}</div>
+              <div className="text-xs opacity-60 mt-1">{h.age ? `${h.age}yo` : "N/A"} {h.sex ?? "N/A"} · {h.color ?? "N/A"}</div>
               <div className="flex gap-3.5 mt-3 text-xs">
                 <div><b className="block font-mono text-sm">{h.wins}</b>Wins</div>
                 <div><b className="block font-mono text-sm">{h.seconds + h.thirds}</b>Placed</div>

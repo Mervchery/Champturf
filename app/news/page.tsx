@@ -36,7 +36,7 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
                 <div className="p-4">
                   <span className="pill">{n.category}</span>
                   <h4 className="mt-2 font-semibold">{n.title}</h4>
-                  <p className="text-sm opacity-60 mt-1.5">{n.excerpt}</p>
+                  <p className="text-sm opacity-60 mt-1.5">{n.excerpt ?? "N/A"}</p>
                   <div className="text-xs opacity-55 mt-2.5">{n.article_date}</div>
                 </div>
               </div>

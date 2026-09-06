@@ -132,7 +132,7 @@ export default function AdminDashboard({
             rows={horses}
             columns={[
               { key: "name", label: "Horse" },
-              { key: "trainer", label: "Trainer" },
+              { key: "trainer", label: "Trainer", render: (row) => row.trainer?.name ?? "Unknown" },
               { key: "starts", label: "Starts" },
               { key: "wins", label: "Wins" },
             ]}
@@ -143,15 +143,15 @@ export default function AdminDashboard({
               { key: "breed", label: "Breed" },
               { key: "color", label: "Color" },
               { key: "origin", label: "Country of origin" },
-              { key: "owner", label: "Owner" },
-              { key: "trainer", label: "Trainer" },
-              { key: "stable", label: "Stable" },
+              { key: "owner_id", label: "Owner", type: "select", options: owners.map((o) => ({ value: o.id, label: o.name })) },
+              { key: "trainer_id", label: "Trainer", type: "select", options: trainers.map((t) => ({ value: t.id, label: t.name })) },
+              { key: "stable_id", label: "Stable", type: "select", options: stables.map((s) => ({ value: s.id, label: s.name })) },
               { key: "medical_status", label: "Medical status" },
             ]}
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "horses" && "Wins/places/starts/earnings aren't editable here — they're computed automatically from entered race results."}
+          {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer/Stable are picked from existing records, not typed — renaming one updates every horse that references it."}
         </p>
 
         {section === "jockeys" && (
@@ -161,7 +161,7 @@ export default function AdminDashboard({
             rows={proJockeys}
             columns={[
               { key: "name", label: "Jockey" },
-              { key: "nationality", label: "Nationality" },
+              { key: "nationality", label: "Nationality", render: (row) => row.nationality ?? "N/A" },
               { key: "wins", label: "Wins" },
             ]}
             fields={[
@@ -186,13 +186,13 @@ export default function AdminDashboard({
             rows={apprentices}
             columns={[
               { key: "name", label: "Apprentice" },
-              { key: "mentor", label: "Mentor" },
-              { key: "allowance", label: "Allowance" },
+              { key: "mentor", label: "Mentor", render: (row) => row.mentor?.name ?? "Unknown" },
+              { key: "allowance", label: "Allowance", render: (row) => row.allowance ?? "N/A" },
             ]}
             fields={[
               { key: "name", label: "Name" },
               { key: "nationality", label: "Nationality" },
-              { key: "mentor", label: "Mentor trainer" },
+              { key: "mentor_id", label: "Mentor jockey", type: "select", options: proJockeys.map((j) => ({ value: j.id, label: j.name })) },
               { key: "allowance", label: "Allowance", placeholder: "e.g. 3kg" },
               { key: "progress", label: "Progress report", type: "textarea" },
               { key: "wins", label: "Wins", type: "number" },
@@ -202,20 +202,23 @@ export default function AdminDashboard({
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "apprentices" && "Mentor is picked from existing professional jockeys, not typed — renaming a jockey updates every apprentice that references them as mentor."}
+        </p>
 
         {section === "trainers" && (
           <EntityAdminPanel
             table="trainers" title="Trainers" addLabel="Add trainer" notify={notify}
-            paths={["/admin", "/trainers"]}
+            paths={["/admin", "/trainers", "/horses", "/stats"]}
             rows={trainers}
             columns={[
               { key: "name", label: "Trainer" },
-              { key: "stable", label: "Stable" },
+              { key: "stable", label: "Stable", render: (row) => row.stable?.name ?? "Unknown" },
               { key: "wins", label: "Wins" },
             ]}
             fields={[
               { key: "name", label: "Name" },
-              { key: "stable", label: "Stable" },
+              { key: "stable_id", label: "Stable", type: "select", options: stables.map((s) => ({ value: s.id, label: s.name })) },
               { key: "wins", label: "Wins", type: "number" },
               { key: "horses", label: "Horses trained", type: "number" },
               { key: "ranking", label: "Ranking", type: "number" },
@@ -223,6 +226,9 @@ export default function AdminDashboard({
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "trainers" && "Stable is picked from existing records, not typed — renaming a stable updates every trainer (and horse) that references it."}
+        </p>
 
         {section === "stables" && (
           <EntityAdminPanel

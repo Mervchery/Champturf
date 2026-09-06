@@ -26,7 +26,7 @@ export default async function OwnersPage() {
                   <div><b className="block font-mono text-sm">{o.horses}</b>Horses</div>
                   <div><b className="block font-mono text-sm">{o.wins}</b>Career wins</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">{o.achievements}</div>
+                <div className="text-xs opacity-60 mt-2.5">{o.achievements ?? "N/A"}</div>
               </div>
             </div>
           ))}

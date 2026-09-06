@@ -109,7 +109,7 @@ export default async function HomePage() {
                   <div className="font-mono text-sm text-coral font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{h.name}</div>
-                    <div className="text-xs opacity-60">{h.trainer}</div>
+                    <div className="text-xs opacity-60">{h.trainer?.name ?? "Unknown"}</div>
                   </div>
                   <div className="font-mono font-semibold text-right">{h.wins}W</div>
                 </Link>
@@ -127,7 +127,7 @@ export default async function HomePage() {
                   <div className="font-mono text-sm text-coral font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{j.name}</div>
-                    <div className="text-xs opacity-60">{j.nationality}</div>
+                    <div className="text-xs opacity-60">{j.nationality ?? "N/A"}</div>
                   </div>
                   <div className="font-mono font-semibold text-right">{j.wins}W</div>
                 </Link>

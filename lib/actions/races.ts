@@ -94,6 +94,7 @@ export async function deleteResult(id: string, raceId: string) {
 
 export type EntryInput = {
   race_id: string;
+  runner_no: number | null;
   gate: number | null;
   horse_id: string;
   jockey_id: string | null;

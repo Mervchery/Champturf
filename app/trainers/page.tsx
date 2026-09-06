@@ -22,13 +22,13 @@ export default async function TrainersPage() {
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{t.name}</h4>
-                <div className="text-xs opacity-60 mt-1">{t.stable}</div>
+                <div className="text-xs opacity-60 mt-1">{t.stable?.name ?? "Unknown"}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{t.wins}</b>Wins</div>
                   <div><b className="block font-mono text-sm">{t.horses}</b>Horses</div>
-                  <div><b className="block font-mono text-sm">#{t.ranking ?? "—"}</b>Rank</div>
+                  <div><b className="block font-mono text-sm">{t.ranking ? `#${t.ranking}` : "N/A"}</b>Rank</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">{t.achievements}</div>
+                <div className="text-xs opacity-60 mt-2.5">{t.achievements ?? "N/A"}</div>
               </div>
             </div>
           ))}

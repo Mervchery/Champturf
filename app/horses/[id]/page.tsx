@@ -22,7 +22,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             <span className="text-xs font-semibold text-gold2">HORSE PROFILE</span>
             <h1 className="text-3xl font-display mt-1">{h.name}</h1>
             <div className="text-white/70 text-sm mt-1.5">
-              {h.age}yo {h.sex} · {h.breed} · {h.color} · Born {h.origin}
+              {h.age ? `${h.age}yo` : "N/A"} {h.sex ?? "N/A"} · {h.breed ?? "N/A"} · {h.color ?? "N/A"} · Born {h.origin ?? "N/A"}
             </div>
           </div>
         </div>
@@ -46,10 +46,10 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               <h4 className="text-sm font-semibold mb-3">Connections</h4>
               <table>
                 <tbody>
-                  <tr><td>Owner</td><td>{h.owner ?? "—"}</td></tr>
-                  <tr><td>Trainer</td><td>{h.trainer ?? "—"}</td></tr>
-                  <tr><td>Stable</td><td>{h.stable ?? "—"}</td></tr>
-                  <tr><td>Medical status</td><td><span className="pill pill-gold">{h.medical_status ?? "Cleared to race"}</span></td></tr>
+                  <tr><td>Owner</td><td>{h.owner ? <Link href="/owners" className="font-semibold">{h.owner.name}</Link> : "Unknown"}</td></tr>
+                  <tr><td>Trainer</td><td>{h.trainer ? <Link href="/trainers" className="font-semibold">{h.trainer.name}</Link> : "Unknown"}</td></tr>
+                  <tr><td>Stable</td><td>{h.stable ? <Link href="/stables" className="font-semibold">{h.stable.name}</Link> : "Unknown"}</td></tr>
+                  <tr><td>Medical status</td><td><span className="pill pill-gold">{h.medical_status ?? "N/A"}</span></td></tr>
                 </tbody>
               </table>
             </div>

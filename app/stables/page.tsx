@@ -22,13 +22,13 @@ export default async function StablesPage() {
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{s.name}</h4>
-                <div className="text-xs opacity-60 mt-1">{s.location} · Owner: {s.owner}</div>
+                <div className="text-xs opacity-60 mt-1">{s.location ?? "N/A"} · Owner: {s.owner ?? "Unknown"}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{s.horses}</b>Horses</div>
                   <div><b className="block font-mono text-sm">{s.staff}</b>Staff</div>
                   <div><b className="block font-mono text-sm">{s.gallery}</b>Gallery</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">Trainer(s): {s.trainers}</div>
+                <div className="text-xs opacity-60 mt-2.5">Trainer(s): {s.trainers || "Unknown"}</div>
               </div>
             </div>
           ))}

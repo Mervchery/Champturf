@@ -237,9 +237,10 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
 
 function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
-  onAdd: (input: { race_id: string; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
+  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
   onDelete: (id: string) => void;
 }) {
+  const [runnerNo, setRunnerNo] = useState("");
   const [gate, setGate] = useState("");
   const [horseId, setHorseId] = useState("");
   const [jockeyId, setJockeyId] = useState("");
@@ -252,23 +253,28 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th /></tr></thead>
+        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id}>
-              <td>{e.gate ?? "—"}</td>
-              <td className="font-semibold">{e.horses?.name ?? "—"}</td>
-              <td>{e.horses?.stable ?? "—"}</td>
-              <td>{e.horses?.trainer ?? "—"}</td>
-              <td>{e.jockeys?.name ?? "—"}</td>
-              <td>{e.weight_kg ? `${e.weight_kg}kg` : "—"}</td>
+              <td>{e.runner_no ?? "N/A"}</td>
+              <td>{e.gate ?? "N/A"}</td>
+              <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
+              <td>{e.horses?.stable?.name ?? "Unknown"}</td>
+              <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
+              <td>{e.jockeys?.name ?? "Unknown"}</td>
+              <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={7} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={8} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
+        <div>
+          <label className="text-xs opacity-65 block mb-1">No.</label>
+          <input type="number" className="admin-input w-20" value={runnerNo} onChange={(e) => setRunnerNo(e.target.value)} />
+        </div>
         <div>
           <label className="text-xs opacity-65 block mb-1">Gate</label>
           <input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} />
@@ -297,12 +303,13 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
             if (!horseId) return;
             onAdd({
               race_id: raceId,
+              runner_no: runnerNo ? Number(runnerNo) : null,
               gate: gate ? Number(gate) : null,
               horse_id: horseId,
               jockey_id: jockeyId || null,
               weight_kg: weight ? Number(weight) : null,
             });
-            setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
+            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
           }}
         >
           Add entry
@@ -333,7 +340,7 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
         <tbody>
           {results.map((r) => (
             <tr key={r.id}>
-              <td>{r.position}</td><td>{r.horses?.name ?? "—"}</td><td>{r.jockey}</td><td className="font-mono">{r.finish_time}</td>
+              <td>{r.position}</td><td>{r.horses?.name ?? "Unknown"}</td><td>{r.jockey || "Unknown"}</td><td className="font-mono">{r.finish_time ?? "N/A"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}

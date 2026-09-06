@@ -40,10 +40,10 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
           <div className="panel">
             {tab === "horses" && (
               <table>
-                <thead><tr><th>#</th><th>Horse</th><th>Trainer</th><th>Starts</th><th>Wins</th><th>Places</th><th>Earnings</th></tr></thead>
+                <thead><tr><th>#</th><th>Horse</th><th>Trainer</th><th>Starts</th><th>Wins</th><th>Placed</th><th>Earnings</th></tr></thead>
                 <tbody>
                   {[...horses].sort((a, b) => b.wins - a.wins).map((h, i) => (
-                    <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.seconds + h.thirds}</td><td>{fmtMoney(h.earnings)}</td></tr>
+                    <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer?.name ?? "Unknown"}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.seconds + h.thirds}</td><td>{fmtMoney(h.earnings)}</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -53,7 +53,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
                 <thead><tr><th>#</th><th>Jockey</th><th>Nationality</th><th>Rides</th><th>Wins</th><th>Win %</th></tr></thead>
                 <tbody>
                   {[...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).map((j, i) => (
-                    <tr key={j.id}><td>{i + 1}</td><td>{j.name}</td><td>{j.nationality}</td><td>{j.rides}</td><td>{j.wins}</td><td>{j.win_pct}%</td></tr>
+                    <tr key={j.id}><td>{i + 1}</td><td>{j.name}</td><td>{j.nationality ?? "N/A"}</td><td>{j.rides}</td><td>{j.wins}</td><td>{j.win_pct}%</td></tr>
                   ))}
                 </tbody>
               </table>
@@ -63,7 +63,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
                 <thead><tr><th>#</th><th>Trainer</th><th>Stable</th><th>Horses</th><th>Wins</th></tr></thead>
                 <tbody>
                   {[...trainers].sort((a, b) => b.wins - a.wins).map((t, i) => (
-                    <tr key={t.id}><td>{i + 1}</td><td>{t.name}</td><td>{t.stable}</td><td>{t.horses}</td><td>{t.wins}</td></tr>
+                    <tr key={t.id}><td>{i + 1}</td><td>{t.name}</td><td>{t.stable?.name ?? "Unknown"}</td><td>{t.horses}</td><td>{t.wins}</td></tr>
                   ))}
                 </tbody>
               </table>
