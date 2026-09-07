@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "scrape": "node scraper/scrape.mjs"
+    "scrape": "node --env-file=.env.local scraper/scrape.mjs"
+
   },
   "dependencies": {
     "next": "14.2.5",
