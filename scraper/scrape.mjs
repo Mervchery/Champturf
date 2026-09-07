@@ -1,3 +1,4 @@
+import { writeFile, mkdir } from "node:fs/promises";
 import { fetchHtml } from "./lib/fetchHtml.mjs";
 import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
@@ -12,6 +13,14 @@ if (!date) {
 
 const BASE = "https://supertote.mu";
 const horseProfileCache = new Map(); // slug -> parsed profile, so each horse is only fetched once per run
+
+async function dumpDebugHtml(url, html) {
+  await mkdir("scraper/debug", { recursive: true });
+  const safeName = url.replace(/[^a-z0-9]/gi, "_").slice(-80);
+  const path = `scraper/debug/${safeName}.html`;
+  await writeFile(path, html, "utf-8");
+  console.warn(`    Saved the raw page to ${path} — share this file's content to get the parser fixed for real.`);
+}
 
 async function getHorseProfile(slug) {
   if (horseProfileCache.has(slug)) return horseProfileCache.get(slug);
@@ -29,10 +38,12 @@ async function scrapeRace(raceUrl) {
 
   if (!parsed.raceNo || !parsed.name) {
     console.warn(`  Could not parse race meta from ${raceUrl} — skipping. Inspect this page manually.`);
+    await dumpDebugHtml(raceUrl, html);
     return;
   }
   if (parsed.entries.length === 0) {
     console.warn(`  No entries parsed from ${raceUrl} — selectors may need adjusting for this page. Skipping.`);
+    await dumpDebugHtml(raceUrl, html);
     return;
   }
 
