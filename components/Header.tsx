@@ -9,15 +9,15 @@ import ThemeToggle from "./ThemeToggle";
 const NAV_ITEMS = [
   ["/", "Home"],
   ["/races", "Races"],
-  ["/horses", "Horses"],
-  ["/jockeys", "Jockeys"],
-  ["/trainers", "Trainers"],
-  ["/stables", "Stables"],
-  ["/owners", "Owners"],
   ["/news", "News"],
+  ["/live", "Live"],
   ["/stats", "Statistics"],
   ["/results", "Results"],
-  ["/live", "Live"],
+  ["/horses", "Horses"],
+  ["/jockeys", "Jockeys"],
+  ["/stables", "Stables"],
+  ["/trainers", "Trainers"],
+  ["/owners", "Owners"],
 ];
 
 export default function Header() {
