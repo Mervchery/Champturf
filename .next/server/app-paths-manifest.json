@@ -1,0 +1,21 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/admin/login/page": "app/admin/login/page.js",
+  "/auth/callback/route": "app/auth/callback/route.js",
+  "/horses/page": "app/horses/page.js",
+  "/jockeys/page": "app/jockeys/page.js",
+  "/jockeys/[id]/page": "app/jockeys/[id]/page.js",
+  "/horses/[id]/page": "app/horses/[id]/page.js",
+  "/live/page": "app/live/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/news/page": "app/news/page.js",
+  "/owners/page": "app/owners/page.js",
+  "/page": "app/page.js",
+  "/results/page": "app/results/page.js",
+  "/search/page": "app/search/page.js",
+  "/races/page": "app/races/page.js",
+  "/trainers/page": "app/trainers/page.js",
+  "/races/[id]/page": "app/races/[id]/page.js",
+  "/stables/page": "app/stables/page.js",
+  "/stats/page": "app/stats/page.js"
+}
