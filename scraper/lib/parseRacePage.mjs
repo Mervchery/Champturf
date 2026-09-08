@@ -1,73 +1,65 @@
 import * as cheerio from "cheerio";
 
-// Splits the page on each entry's leading "N.  <pos-or-no> <gate>" marker
-// (e.g. "1.  1st 5" once the race has run, or "1.  1 5" beforehand), then
-// pulls the rest of each entry's fields out of the text between one
-// marker and the next. Jockey is intentionally NOT parsed here — it's
-// mashed together with the trainer's name with no separator on this page,
-// so it's sourced from the horse's own profile page instead (see
-// parseHorseProfile.mjs), which shows it cleanly.
-const ENTRY_START = /(\d+)\.\s+(\d+)(st|nd|rd|th)?\s+(\d+)/g;
+// Rebuilt from real page HTML (not just text extraction) after the first
+// version's text-pattern guessing failed on live pages. These selectors
+// are verified against 8 real race result pages — see the project's
+// commit history / conversation for the validation.
+//
+// Weight sometimes carries an adjustment with no space before "kg", e.g.
+// "52+1kg" (overweight) or "57.5-4kg" (apprentice claim) — this is parsed
+// as base weight adjusted by that amount, giving the total weight carried.
+//
+// A runner's placing is "-" (not a number) when they were scratched or
+// didn't finish — this correctly comes out as position: null; the caller
+// (scrape.mjs) is responsible for not writing a race_results row in that
+// case, since the database requires a position.
 
 export function parseRacePage(html) {
   const $ = cheerio.load(html);
-  const text = $("body").text().replace(/[ \t]+/g, " ").replace(/\n{2,}/g, "\n");
 
-  const headerMatch = text.match(/Race\s+(\d+)\s*:\s*([\d.]+)/);
+  const headerText = $(".box-out .one-line-only").first().text().trim(); // "Race 7 : 4.05"
+  const headerMatch = headerText.match(/Race\s+(\d+)\s*:\s*([\d.]+)/);
   const raceNo = headerMatch ? Number(headerMatch[1]) : null;
   const timeOfDay = headerMatch ? headerMatch[2] : null;
 
-  const nameMatch = text.match(/###\s*([^\n]+?)\n\s*(\d+)m/) || text.match(/([A-Z][^\n]{4,80})\n\s*(\d+)m/);
-  const name = nameMatch ? nameMatch[1].trim() : null;
-  const distance = nameMatch ? `${nameMatch[2]}m` : null;
+  const name = $(".racecard-name").first().text().trim() || null;
+  const distance = $(".racecard-distance").first().text().trim() || null;
 
-  const isResult = /^Result\b/m.test(text) || /\d+(st|nd|rd|th)\s+\d+/.test(text);
+  const list = $("ol.racecard");
+  const isResult = (list.attr("class") || "").includes("result") || $(".r-placing").length > 0;
 
-  const starts = [...text.matchAll(ENTRY_START)];
   const entries = [];
+  $("li.runner").each((_, el) => {
+    const $el = $(el);
 
-  for (let i = 0; i < starts.length; i++) {
-    const m = starts[i];
-    const listNo = Number(m[1]);
-    const firstNum = Number(m[2]);
-    const ordinalSuffix = m[3] || null;
-    const gate = Number(m[4]);
-    const chunkStart = m.index;
-    const chunkEnd = i + 1 < starts.length ? starts[i + 1].index : text.indexOf("Racing data from", chunkStart);
-    const chunk = text.slice(chunkStart, chunkEnd === -1 ? undefined : chunkEnd);
+    const placingText = $el.find(".r-placing").text().trim(); // "1st", "7th", or "-"
+    const posMatch = placingText.match(/(\d+)/);
+    const position = posMatch ? Number(posMatch[1]) : null;
 
-    // Horse link isn't reliably present in the plain-text extraction, so
-    // pull the i-th "/horse/<slug>" link from the raw HTML in document
-    // order instead — this assumes entries appear in the same order as
-    // the horse links on the page, which held in every example checked.
-    const allHorseLinks = [...html.matchAll(/href="\/horse\/([a-z0-9-]+)"[^>]*>([^<]+)</g)];
-    const horseSlug = allHorseLinks[i] ? allHorseLinks[i][1] : null;
-    const horseName = allHorseLinks[i] ? allHorseLinks[i][2].trim() : null;
+    const gateText = $el.find(".r-number").first().text().trim();
+    const gate = gateText ? Number(gateText) : null;
 
-    const ageMatch = chunk.match(/Age\s+(\d+)/);
+    const horseLink = $el.find(".r-name a").first();
+    const horseName = horseLink.text().trim() || null;
+    const horseHref = horseLink.attr("href") || "";
+    const horseSlug = horseHref.replace("/horse/", "") || null;
+
+    const statsText = $el.find(".r-stats").text().trim(); // "Age 7 | 60.5kg" or "Age 7 | 52+1kg"
+    const ageMatch = statsText.match(/Age\s+(\d+)/);
     const age = ageMatch ? Number(ageMatch[1]) : null;
+    const weightMatch = statsText.match(/([\d.]+)([+-][\d.]+)?\s*kg/);
+    const weight = weightMatch
+      ? parseFloat(weightMatch[1]) + (weightMatch[2] ? parseFloat(weightMatch[2]) : 0)
+      : null;
 
-    const weightMatch = chunk.match(/(\d+(?:[.-]\d+)?)\s*kg/);
-    const weight = weightMatch ? parseFloat(weightMatch[1].replace("-", ".")) : null;
+    const timeText = $el.find(".r-time").text().trim(); // "1:23:98s" or "-s"
+    const finishTime = /^\d/.test(timeText) ? timeText.replace(/s$/, "") : null;
 
-    // Stored verbatim as shown on the page (e.g. "1:31:86") rather than
-    // reformatted — the source's own separator convention (colon between
-    // seconds and hundredths, not a decimal point) isn't fully certain
-    // from text extraction alone, so this avoids guessing wrong.
-    const timeMatch = chunk.match(/(\d+:\d+(?::\d+)?)s\b/);
-    const finishTime = timeMatch ? timeMatch[1] : null;
+    const jockey = $el.find(".r-jockey").text().trim() || null;
+    const trainer = $el.find(".r-trainer").text().trim() || null;
 
-    entries.push({
-      position: ordinalSuffix ? firstNum : null,
-      runnerNo: ordinalSuffix ? null : firstNum,
-      gate,
-      horseName,
-      horseSlug,
-      age,
-      weight,
-      finishTime,
-    });
-  }
+    entries.push({ position, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer });
+  });
 
   return { raceNo, timeOfDay, name, distance, isResult, entries };
 }
