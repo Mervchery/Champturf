@@ -63,25 +63,31 @@ async function scrapeRace(raceUrl) {
       continue;
     }
 
+    // Jockey/trainer come straight from the race page (verified reliable
+    // against real pages) — the horse profile fetch below is only for
+    // origin/owner, which aren't shown on the race page at all.
     const profile = await getHorseProfile(entry.horseSlug);
     const horseId = await upsertHorse({
-      name: profile.name,
+      name: entry.horseName ?? profile.name,
       age: entry.age ?? profile.age,
       origin: profile.origin,
-      trainerName: profile.trainerName,
+      trainerName: entry.trainer ?? profile.trainerName,
       ownerName: profile.ownerName,
     });
 
-    const timelineEntry = profile.timeline[raceUrl];
-    const jockeyName = timelineEntry?.jockey ?? null;
-    const weight = entry.weight ?? timelineEntry?.weight ?? null;
-
     if (parsed.isResult) {
-      await upsertResult({ raceId, horseId, position: entry.position, jockeyName, finishTime: entry.finishTime });
-      console.log(`    ${entry.position ?? "?"}. ${profile.name} (${jockeyName ?? "jockey unknown"})`);
+      if (entry.position == null) {
+        // Placing shown as "-" on the page — scratched or did not finish.
+        // The horse record above is still updated, but there's no result
+        // row to write (race_results.position can't be null).
+        console.log(`    Scratched/DNF: ${entry.horseName} — horse record updated, no result row written.`);
+        continue;
+      }
+      await upsertResult({ raceId, horseId, position: entry.position, jockeyName: entry.jockey, finishTime: entry.finishTime });
+      console.log(`    ${entry.position}. ${entry.horseName} (${entry.jockey ?? "jockey unknown"})`);
     } else {
-      await upsertEntry({ raceId, horseId, jockeyName, gate: entry.gate, weightKg: weight });
-      console.log(`    Gate ${entry.gate}: ${profile.name} (${jockeyName ?? "jockey unknown"})`);
+      await upsertEntry({ raceId, horseId, jockeyName: entry.jockey, gate: entry.gate, weightKg: entry.weight });
+      console.log(`    Gate ${entry.gate}: ${entry.horseName} (${entry.jockey ?? "jockey unknown"})`);
     }
   }
 }
