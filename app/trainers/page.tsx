@@ -1,5 +1,7 @@
+import Link from "next/link";
 import { Target } from "lucide-react";
 import { getTrainers } from "@/lib/trainers";
+import Silk from "@/components/Silk";
 
 export const revalidate = 0;
 
@@ -16,9 +18,15 @@ export default async function TrainersPage() {
       <section className="py-14">
         <div className="wrap grid grid-cols-2 md:grid-cols-4 gap-5">
           {trainers.map((t) => (
-            <div key={t.id} className="card">
-              <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
-                <Target size={30} />
+            <Link key={t.id} href={`/trainers/${t.id}`} className="card">
+              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center gap-3">
+                {t.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={t.photo_url} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-gold2" />
+                ) : (
+                  <Target size={26} className="text-white/60" />
+                )}
+                {t.stable && <Silk primary={t.stable.silk_primary} secondary={t.stable.silk_secondary} cap={t.stable.silk_cap} pattern={t.stable.silk_pattern} size={30} title={t.stable.name} />}
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{t.name}</h4>
@@ -28,11 +36,9 @@ export default async function TrainersPage() {
                   <div><b className="block font-mono text-sm">{t.horses}</b>Horses</div>
                   <div><b className="block font-mono text-sm">{t.ranking ? `#${t.ranking}` : "N/A"}</b>Rank</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">{t.achievements ?? "N/A"}</div>
               </div>
-            </div>
+            </Link>
           ))}
-          {trainers.length === 0 && <p className="text-sm opacity-60">No trainers yet.</p>}
         </div>
       </section>
     </div>

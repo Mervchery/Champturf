@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { RefSummary } from "@/lib/horses";
+import type { StableSummary } from "@/lib/trainers";
 
 export type Race = {
   id: string;
@@ -22,9 +23,10 @@ export type HorseSummary = {
   name: string;
   age: number | null;
   sex: string | null;
+  rating: number | null;
   owner: RefSummary | null;
   trainer: RefSummary | null;
-  stable: RefSummary | null;
+  stable: StableSummary | null;
 };
 
 export type RaceEntry = {
@@ -33,6 +35,7 @@ export type RaceEntry = {
   runner_no: number | null;
   gate: number | null;
   weight_kg: number | null;
+  odds: string | null;
   horse_id: string;
   horses: HorseSummary | null; // joined
   jockey_id: string | null;
@@ -45,13 +48,21 @@ export type RaceResult = {
   position: number;
   jockey: string;
   finish_time: string | null;
+  margin: string | null;
+  weight_kg: number | null;
+  starting_price: string | null;
+  performance_rating: number | null;
   horse_id: string;
   horses: HorseSummary | null; // joined
+  jockey_id: string | null;
+  jockeys: { id: string; name: string } | null; // joined
+  trainer_id: string | null;
+  trainers: RefSummary | null; // joined
 };
 
-const HORSE_JOIN = "horses(id, name, age, sex, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name))";
+const HORSE_JOIN = "horses(id, name, age, sex, rating, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern))";
 const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
-const RESULT_SELECT = `*, ${HORSE_JOIN}`;
+const RESULT_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name), trainers(id, name)`;
 
 export async function getRaces(): Promise<Race[]> {
   const supabase = createClient();
@@ -68,6 +79,17 @@ export async function getRaceById(id: string): Promise<Race | null> {
   const { data, error } = await supabase.from("races").select("*").eq("id", id).single();
   if (error) return null;
   return data;
+}
+
+export async function getRacesForDate(raceDate: string): Promise<Race[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("races")
+    .select("*")
+    .eq("race_date", raceDate)
+    .order("race_time", { ascending: true });
+  if (error) throw error;
+  return data ?? [];
 }
 
 export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {

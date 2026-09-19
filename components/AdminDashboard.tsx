@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard, Flag, Users, GraduationCap, Target, Building2, Newspaper,
-  Image as ImageIcon, Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus,
+  Image as ImageIcon, Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus, CalendarDays,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { HorseIcon } from "@/components/RacingIcons";
@@ -19,10 +19,12 @@ import type { Stable } from "@/lib/stables";
 import type { Owner } from "@/lib/owners";
 import type { NewsArticle } from "@/lib/news";
 import type { Stream } from "@/lib/streams";
+import type { Meeting } from "@/lib/meetings";
 import type { Profile } from "@/lib/users";
 
 const SECTIONS = [
   ["overview", "Overview", LayoutDashboard],
+  ["raceDays", "Race Days", CalendarDays],
   ["races", "Races", Flag],
   ["horses", "Horses", HorseIcon],
   ["jockeys", "Jockeys", Users],
@@ -40,11 +42,11 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number][0];
 
 export default function AdminDashboard({
-  role, email, races, horses, jockeys, trainers, stables, owners, news, streams, profiles,
+  role, email, races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles,
 }: {
   role: string; email: string;
   races: Race[]; horses: Horse[]; jockeys: Jockey[]; trainers: Trainer[];
-  stables: Stable[]; owners: Owner[]; news: NewsArticle[]; streams: Stream[]; profiles: Profile[];
+  stables: Stable[]; owners: Owner[]; news: NewsArticle[]; streams: Stream[]; meetings: Meeting[]; profiles: Profile[];
 }) {
   const [section, setSection] = useState<SectionId>("overview");
   const [toast, setToast] = useState("");
@@ -123,6 +125,30 @@ export default function AdminDashboard({
           </div>
         )}
 
+        {section === "raceDays" && (
+          <EntityAdminPanel
+            table="meetings" title="Race Days" addLabel="Add race day" notify={notify}
+            paths={["/admin", "/race-days"]}
+            rows={meetings}
+            columns={[
+              { key: "race_date", label: "Date" },
+              { key: "course", label: "Course" },
+              { key: "weather", label: "Weather", render: (row) => row.weather ?? "N/A" },
+              { key: "track_condition", label: "Track", render: (row) => row.track_condition ?? "N/A" },
+            ]}
+            fields={[
+              { key: "race_date", label: "Race date (YYYY-MM-DD)", placeholder: "2026-09-12" },
+              { key: "course", label: "Course" },
+              { key: "weather", label: "Weather", placeholder: "e.g. Sunny, 27°C" },
+              { key: "track_condition", label: "Track condition", placeholder: "e.g. Good, Soft, Firm" },
+              { key: "notes", label: "Notes", type: "textarea" },
+            ]}
+          />
+        )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "raceDays" && "Add a row here for any date that already has races to attach weather and track condition to that meeting — races themselves are still managed under Races."}
+        </p>
+
         {section === "races" && <RacesAdminPanel races={races} horses={horses} jockeys={jockeys} notify={notify} />}
 
         {section === "horses" && (
@@ -133,6 +159,7 @@ export default function AdminDashboard({
             columns={[
               { key: "name", label: "Horse" },
               { key: "trainer", label: "Trainer", render: (row) => row.trainer?.name ?? "Unknown" },
+              { key: "rating", label: "Rating", render: (row) => row.rating ?? "N/A" },
               { key: "starts", label: "Starts" },
               { key: "wins", label: "Wins" },
             ]}
@@ -143,6 +170,8 @@ export default function AdminDashboard({
               { key: "breed", label: "Breed" },
               { key: "color", label: "Color" },
               { key: "origin", label: "Country of origin" },
+              { key: "rating", label: "Rating", type: "number" },
+              { key: "photo_url", label: "Photo URL", placeholder: "https://…" },
               { key: "owner_id", label: "Owner", type: "select", options: owners.map((o) => ({ value: o.id, label: o.name })) },
               { key: "trainer_id", label: "Trainer", type: "select", options: trainers.map((t) => ({ value: t.id, label: t.name })) },
               { key: "stable_id", label: "Stable", type: "select", options: stables.map((s) => ({ value: s.id, label: s.name })) },
@@ -167,10 +196,7 @@ export default function AdminDashboard({
             fields={[
               { key: "name", label: "Name" },
               { key: "nationality", label: "Nationality" },
-              { key: "wins", label: "Wins", type: "number" },
-              { key: "places", label: "Places", type: "number" },
-              { key: "win_pct", label: "Win %", type: "number" },
-              { key: "rides", label: "Rides", type: "number" },
+              { key: "photo_url", label: "Photo URL", placeholder: "https://…" },
               { key: "suspensions", label: "Suspensions", type: "number" },
               { key: "bio", label: "Biography", type: "textarea" },
               { key: "achievements", label: "Achievements", type: "textarea" },
@@ -178,6 +204,9 @@ export default function AdminDashboard({
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "jockeys" && "Wins/places/win %/rides aren't editable here — they're computed automatically from entered race results."}
+        </p>
 
         {section === "apprentices" && (
           <EntityAdminPanel
@@ -192,18 +221,16 @@ export default function AdminDashboard({
             fields={[
               { key: "name", label: "Name" },
               { key: "nationality", label: "Nationality" },
+              { key: "photo_url", label: "Photo URL", placeholder: "https://…" },
               { key: "mentor_id", label: "Mentor jockey", type: "select", options: proJockeys.map((j) => ({ value: j.id, label: j.name })) },
               { key: "allowance", label: "Allowance", placeholder: "e.g. 3kg" },
               { key: "progress", label: "Progress report", type: "textarea" },
-              { key: "wins", label: "Wins", type: "number" },
-              { key: "places", label: "Places", type: "number" },
-              { key: "rides", label: "Rides", type: "number" },
               { key: "apprentice", label: "Apprentice", type: "checkbox" },
             ]}
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "apprentices" && "Mentor is picked from existing professional jockeys, not typed — renaming a jockey updates every apprentice that references them as mentor."}
+          {section === "apprentices" && "Mentor is picked from existing professional jockeys, not typed — renaming a jockey updates every apprentice that references them as mentor. Wins/places/rides aren't editable here — computed automatically from race results, same as professional jockeys."}
         </p>
 
         {section === "trainers" && (
@@ -219,15 +246,13 @@ export default function AdminDashboard({
             fields={[
               { key: "name", label: "Name" },
               { key: "stable_id", label: "Stable", type: "select", options: stables.map((s) => ({ value: s.id, label: s.name })) },
-              { key: "wins", label: "Wins", type: "number" },
-              { key: "horses", label: "Horses trained", type: "number" },
-              { key: "ranking", label: "Ranking", type: "number" },
+              { key: "photo_url", label: "Photo URL", placeholder: "https://…" },
               { key: "achievements", label: "Achievements", type: "textarea" },
             ]}
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "trainers" && "Stable is picked from existing records, not typed — renaming a stable updates every trainer (and horse) that references it."}
+          {section === "trainers" && "Stable is picked from existing records, not typed — renaming a stable updates every trainer (and horse) that references it. Wins/horses trained/ranking aren't editable here — computed automatically from race results and each horse's current trainer."}
         </p>
 
         {section === "stables" && (
@@ -238,19 +263,34 @@ export default function AdminDashboard({
             columns={[
               { key: "name", label: "Stable" },
               { key: "location", label: "Location" },
+              { key: "silk_pattern", label: "Silk" },
               { key: "horses", label: "Horses" },
             ]}
             fields={[
               { key: "name", label: "Name" },
               { key: "owner", label: "Owner" },
               { key: "location", label: "Location" },
-              { key: "horses", label: "Horses", type: "number" },
               { key: "staff", label: "Staff", type: "number" },
               { key: "gallery", label: "Gallery items", type: "number" },
               { key: "trainers", label: "Trainer(s)", placeholder: "Comma-separated" },
+              { key: "silk_pattern", label: "Silk pattern", type: "select", options: [
+                { value: "plain", label: "Plain" },
+                { value: "hoops", label: "Hoops" },
+                { value: "stripes", label: "Stripes" },
+                { value: "quarters", label: "Quarters" },
+                { value: "spots", label: "Spots" },
+                { value: "sash", label: "Sash" },
+                { value: "chevron", label: "Chevron" },
+              ] },
+              { key: "silk_primary", label: "Silk primary color", placeholder: "#123C2E" },
+              { key: "silk_secondary", label: "Silk secondary color", placeholder: "#E4C878" },
+              { key: "silk_cap", label: "Cap color", placeholder: "#123C2E" },
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned."}
+        </p>
 
         {section === "owners" && (
           <EntityAdminPanel
@@ -264,12 +304,13 @@ export default function AdminDashboard({
             ]}
             fields={[
               { key: "name", label: "Name" },
-              { key: "horses", label: "Horses owned", type: "number" },
-              { key: "wins", label: "Career wins", type: "number" },
               { key: "achievements", label: "Achievements", type: "textarea" },
             ]}
           />
         )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "owners" && "Horses (count) and wins aren't editable here — computed automatically from the horses currently assigned to this owner and their race results."}
+        </p>
 
         {section === "news" && (
           <EntityAdminPanel

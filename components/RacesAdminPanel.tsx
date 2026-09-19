@@ -237,7 +237,7 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
 
 function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
-  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
+  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [runnerNo, setRunnerNo] = useState("");
@@ -245,6 +245,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   const [horseId, setHorseId] = useState("");
   const [jockeyId, setJockeyId] = useState("");
   const [weight, setWeight] = useState("");
+  const [odds, setOdds] = useState("");
 
   // A horse already entered in this race can't be entered again.
   const enteredHorseIds = new Set(entries.map((e) => e.horse_id));
@@ -253,7 +254,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th /></tr></thead>
+        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>Odds</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id}>
@@ -264,10 +265,11 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
+              <td>{e.odds ?? "N/A"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={8} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={9} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
@@ -297,6 +299,10 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
           <label className="text-xs opacity-65 block mb-1">Weight (kg)</label>
           <input type="number" className="admin-input w-24" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Odds</label>
+          <input className="admin-input w-24" placeholder="5/2" value={odds} onChange={(e) => setOdds(e.target.value)} />
+        </div>
         <button
           className="btn btn-dark"
           onClick={() => {
@@ -308,8 +314,9 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               horse_id: horseId,
               jockey_id: jockeyId || null,
               weight_kg: weight ? Number(weight) : null,
+              odds: odds || null,
             });
-            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
+            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds("");
           }}
         >
           Add entry
@@ -325,26 +332,33 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
 
 function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
   raceId: string; results: RaceResult[]; horseOptions: { id: string; name: string }[];
-  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string }) => void;
+  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string; margin: string | null; starting_price: string | null; performance_rating: number | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [position, setPosition] = useState("");
   const [horseId, setHorseId] = useState("");
   const [jockey, setJockey] = useState("");
   const [finishTime, setFinishTime] = useState("");
+  const [margin, setMargin] = useState("");
+  const [startingPrice, setStartingPrice] = useState("");
+  const [performanceRating, setPerformanceRating] = useState("");
 
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>Pos</th><th>Horse</th><th>Jockey</th><th>Time</th><th /></tr></thead>
+        <thead><tr><th>Pos</th><th>Horse</th><th>Jockey</th><th>Time</th><th>Margin</th><th>SP</th><th>Perf.</th><th /></tr></thead>
         <tbody>
           {results.map((r) => (
             <tr key={r.id}>
-              <td>{r.position}</td><td>{r.horses?.name ?? "Unknown"}</td><td>{r.jockey || "Unknown"}</td><td className="font-mono">{r.finish_time ?? "N/A"}</td>
+              <td>{r.position}</td><td>{r.horses?.name ?? "Unknown"}</td><td>{r.jockey || "Unknown"}</td>
+              <td className="font-mono">{r.finish_time ?? "N/A"}</td>
+              <td>{r.margin ?? "N/A"}</td>
+              <td>{r.starting_price ?? "N/A"}</td>
+              <td>{r.performance_rating ?? "N/A"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {results.length === 0 && <tr><td colSpan={5} className="opacity-60 text-sm">No result entered yet.</td></tr>}
+          {results.length === 0 && <tr><td colSpan={8} className="opacity-60 text-sm">No result entered yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
@@ -367,12 +381,29 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
           <label className="text-xs opacity-65 block mb-1">Time</label>
           <input className="admin-input" placeholder="1:24.10" value={finishTime} onChange={(e) => setFinishTime(e.target.value)} />
         </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Margin</label>
+          <input className="admin-input w-24" placeholder="1.5L" value={margin} onChange={(e) => setMargin(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Starting price</label>
+          <input className="admin-input w-24" placeholder="5/2" value={startingPrice} onChange={(e) => setStartingPrice(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Perf. rating</label>
+          <input type="number" className="admin-input w-24" value={performanceRating} onChange={(e) => setPerformanceRating(e.target.value)} />
+        </div>
         <button
           className="btn btn-dark"
           onClick={() => {
             if (!position || !horseId || !jockey) return;
-            onSave({ race_id: raceId, position: Number(position), horse_id: horseId, jockey, finish_time: finishTime });
+            onSave({
+              race_id: raceId, position: Number(position), horse_id: horseId, jockey, finish_time: finishTime,
+              margin: margin || null, starting_price: startingPrice || null,
+              performance_rating: performanceRating ? Number(performanceRating) : null,
+            });
             setPosition(""); setHorseId(""); setJockey(""); setFinishTime("");
+            setMargin(""); setStartingPrice(""); setPerformanceRating("");
           }}
         >
           Save result

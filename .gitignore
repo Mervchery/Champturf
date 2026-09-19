@@ -1,2 +1,8 @@
 node_modules
-node_modules
+.next
+out
+.env*.local
+.DS_Store
+*.pem
+npm-debug.log*
+scraper/debug/

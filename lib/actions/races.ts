@@ -62,6 +62,10 @@ export type ResultInput = {
   horse_id: string;
   jockey: string;
   finish_time: string;
+  margin?: string | null;
+  starting_price?: string | null;
+  performance_rating?: number | null;
+  weight_kg?: number | null;
 };
 
 /** Creates or overwrites the result row for a given race+position
@@ -99,6 +103,7 @@ export type EntryInput = {
   horse_id: string;
   jockey_id: string | null;
   weight_kg: number | null;
+  odds?: string | null;
 };
 
 export async function createEntry(input: EntryInput) {

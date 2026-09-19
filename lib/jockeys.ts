@@ -17,6 +17,7 @@ export type Jockey = {
   mentor: RefSummary | null; // joined — always read this for display
   allowance: string | null;
   progress: string | null;
+  photo_url: string | null;
 };
 
 const JOCKEY_SELECT = "*, mentor:jockeys!mentor_id(id, name)";

@@ -1,5 +1,6 @@
-import { StableIcon } from "@/components/RacingIcons";
+import Link from "next/link";
 import { getStables } from "@/lib/stables";
+import Silk from "@/components/Silk";
 
 export const revalidate = 0;
 
@@ -16,21 +17,17 @@ export default async function StablesPage() {
       <section className="py-14">
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
-            <div key={s.id} className="card">
-              <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
-                <StableIcon size={32} />
-              </div>
-              <div className="p-4">
-                <h4 className="font-semibold">{s.name}</h4>
+            <Link key={s.id} href={`/stables/${s.id}`} className="card p-5 flex items-start gap-4">
+              <Silk primary={s.silk_primary} secondary={s.silk_secondary} cap={s.silk_cap} pattern={s.silk_pattern} size={44} title={s.name} />
+              <div className="min-w-0 flex-1">
+                <h4 className="font-semibold truncate">{s.name}</h4>
                 <div className="text-xs opacity-60 mt-1">{s.location ?? "N/A"} · Owner: {s.owner ?? "Unknown"}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{s.horses}</b>Horses</div>
                   <div><b className="block font-mono text-sm">{s.staff}</b>Staff</div>
-                  <div><b className="block font-mono text-sm">{s.gallery}</b>Gallery</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">Trainer(s): {s.trainers || "Unknown"}</div>
               </div>
-            </div>
+            </Link>
           ))}
           {stables.length === 0 && <p className="text-sm opacity-60">No stables yet.</p>}
         </div>

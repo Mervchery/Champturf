@@ -3,6 +3,7 @@ import { fetchHtml } from "./lib/fetchHtml.mjs";
 import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
+import { resolveTrainerName } from "./lib/trainerOverrides.mjs";
 import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult } from "./upsert.mjs";
 
 const args = process.argv.slice(2);
@@ -131,12 +132,16 @@ async function scrapeRace(raceUrl) {
     try {
       // Jockey/trainer come straight from the race page. The horse
       // profile fetch is only for origin/owner, which aren't on this page.
+      // Trainer name is resolved through the manual override map first —
+      // some real trainers are displayed identically on the source site
+      // with no distinguishing detail at all (see trainerOverrides.mjs).
+      const resolvedTrainerName = resolveTrainerName(entry.horseSlug, entry.trainer);
       const profile = await getHorseProfile(entry.horseSlug);
       const horse = await upsertHorse({
         name: entry.horseName ?? profile.name,
         age: entry.age ?? profile.age,
         origin: profile.origin,
-        trainerName: entry.trainer ?? profile.trainerName,
+        trainerName: resolvedTrainerName ?? profile.trainerName,
         ownerName: profile.ownerName,
       });
       track("horses", horse);
@@ -150,7 +155,7 @@ async function scrapeRace(raceUrl) {
         }
         const result = await upsertResult({
           raceId: race.id, horseId: horse.id, position: entry.position,
-          jockeyName: entry.jockey, trainerName: entry.trainer,
+          jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           finishTime: entry.finishTime, margin: null, weightKg: entry.weight,
         });
         track("jockeys", result.jockey);
@@ -160,7 +165,7 @@ async function scrapeRace(raceUrl) {
       } else {
         const result = await upsertEntry({
           raceId: race.id, horseId: horse.id,
-          jockeyName: entry.jockey, trainerName: entry.trainer,
+          jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           gate: entry.gate, weightKg: entry.weight,
         });
         track("jockeys", result.jockey);

@@ -23,7 +23,7 @@ const config: Config = {
         mono: ["'IBM Plex Mono'", "monospace"],
       },
       borderRadius: {
-        card: "4px",
+        card: "16px",
       },
       maxWidth: {
         wrap: "1180px",

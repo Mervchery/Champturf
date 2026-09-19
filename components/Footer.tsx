@@ -12,7 +12,7 @@ export default function Footer() {
         </div>
         <div>
           <h4 className="text-white text-sm mb-2.5">Explore</h4>
-          <Link href="/races" className="block text-sm py-1 text-white/60">Race calendar</Link>
+          <Link href="/race-days" className="block text-sm py-1 text-white/60">Race calendar</Link>
           <Link href="/horses" className="block text-sm py-1 text-white/60">Horses</Link>
           <Link href="/jockeys" className="block text-sm py-1 text-white/60">Jockeys</Link>
           <Link href="/stats" className="block text-sm py-1 text-white/60">Statistics</Link>

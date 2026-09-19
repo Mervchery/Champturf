@@ -41,7 +41,7 @@ export default async function HomePage() {
             </p>
             <div className="flex gap-3 mt-7 flex-wrap">
               <Link href="/live" className="btn btn-gold"><Play size={15} /> Watch live</Link>
-              <Link href="/races" className="btn btn-ghost">Race calendar</Link>
+              <Link href="/race-days" className="btn btn-ghost">Race calendar</Link>
             </div>
           </div>
           {feature ? (
@@ -142,7 +142,7 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">Upcoming race days</h2>
-            <Link href="/races" className="text-sm border-b border-ink pb-0.5">See calendar →</Link>
+            <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">See calendar →</Link>
           </div>
           {upcoming.length === 0 ? (
             <p className="text-sm opacity-60">No upcoming races scheduled.</p>

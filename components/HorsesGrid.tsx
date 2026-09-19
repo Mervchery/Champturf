@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { HorseIcon } from "@/components/RacingIcons";
+import Silk from "@/components/Silk";
 import type { Horse } from "@/lib/horses";
 
 export default function HorsesGrid({ horses }: { horses: Horse[] }) {
@@ -34,8 +35,18 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {list.map((h) => (
           <Link key={h.id} href={`/horses/${h.id}`} className="card">
-            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
-              <HorseIcon size={36} />
+            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50 relative">
+              {h.photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
+              ) : (
+                <HorseIcon size={36} />
+              )}
+              {h.stable && (
+                <div className="absolute top-2.5 right-2.5 bg-surface/90 rounded-full p-1 shadow-md">
+                  <Silk primary={h.stable.silk_primary} secondary={h.stable.silk_secondary} cap={h.stable.silk_cap} pattern={h.stable.silk_pattern} size={22} title={h.stable.name} />
+                </div>
+              )}
             </div>
             <div className="p-4">
               <h4 className="font-semibold">{h.name}</h4>
