@@ -57,16 +57,15 @@ export default async function LivePage() {
                       <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> LIVE
                     </div>
 
-                    {/* Bottom-Right TV Channel Logo (Watermark) */}
-                    {/* pointer-events-none ensures you can still click video controls underneath it */}
-                    <div className="absolute bottom-6 right-6 z-10 pointer-events-none opacity-60 hover:opacity-100 transition-opacity drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
-                      <div className="font-display text-2xl md:text-3xl font-black italic tracking-tighter leading-none flex flex-col">
+                    {/* Top-Left TV Channel Logo (Watermark) - Now smaller! */}
+                    <div className="absolute top-4 left-4 z-10 pointer-events-none opacity-80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
+                      <div className="font-display text-base md:text-lg font-black italic tracking-tighter leading-none flex flex-col">
                         <div>
                           <span className="text-white">CHAMP</span>
                           <span className="text-yellow-400">TURF</span>
                         </div>
-                        {/* Green accent bar to complete the White, Gold, and Green theme */}
-                        <div className="h-1.5 w-full bg-green-500 mt-1 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.3)]"></div>
+                        {/* Thinner Green accent bar */}
+                        <div className="h-[3px] w-full bg-green-500 mt-1 rounded-full shadow-[0_0_3px_rgba(34,197,94,0.3)]"></div>
                       </div>
                     </div>
 
@@ -85,7 +84,6 @@ export default async function LivePage() {
           </div>
 
           {/* 2. LIVE CHAT */}
-          {/* md:sticky md:top-6 ensures it ONLY stays fixed on desktop, and scrolls normally on mobile! */}
           <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:sticky md:top-6">
              <LiveChat />
           </div>
