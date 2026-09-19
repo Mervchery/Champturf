@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Play, MonitorUp } from "lucide-react";
+import { Play } from "lucide-react";
 import { getActiveStream, type Stream } from "@/lib/streams";
 import { getRaces } from "@/lib/races";
 import LiveChat from "@/components/LiveChat";
@@ -43,21 +43,33 @@ export default async function LivePage() {
       </div>
       
       <section className="py-8 md:py-14">
-        {/* RESPONSIVE GRID: 
-            Mobile: Stacks as 1 column (1. Video -> 2. Chat -> 3. Replays)
-            Desktop: Splits into 2 columns (Video & Replays left, Chat right) */}
+        {/* RESPONSIVE GRID */}
         <div className="wrap grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-6 md:gap-8 items-start">
           
           {/* 1. VIDEO PLAYER */}
           <div className="md:col-start-1 md:row-start-1">
-            <div className="rounded-xl overflow-hidden shadow-sm border border-line bg-surface">
-              {/* aspect-video makes it perfectly scale to any screen size */}
+            <div className="rounded-xl overflow-hidden shadow-md border border-line bg-black">
               <div className="relative w-full aspect-video bg-black">
                 {stream ? (
                   <>
+                    {/* Top-Right LIVE Badge */}
                     <div className="absolute top-4 right-4 bg-red-600 text-white text-[10px] font-bold px-2 py-1 rounded shadow-[0_0_10px_rgba(220,38,38,0.5)] tracking-widest flex items-center gap-1.5 z-10 pointer-events-none">
                       <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" /> LIVE
                     </div>
+
+                    {/* Bottom-Right TV Channel Logo (Watermark) */}
+                    {/* pointer-events-none ensures you can still click video controls underneath it */}
+                    <div className="absolute bottom-6 right-6 z-10 pointer-events-none opacity-60 hover:opacity-100 transition-opacity drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
+                      <div className="font-display text-2xl md:text-3xl font-black italic tracking-tighter leading-none flex flex-col">
+                        <div>
+                          <span className="text-white">CHAMP</span>
+                          <span className="text-yellow-400">TURF</span>
+                        </div>
+                        {/* Green accent bar to complete the White, Gold, and Green theme */}
+                        <div className="h-1.5 w-full bg-green-500 mt-1 rounded-full shadow-[0_0_5px_rgba(34,197,94,0.3)]"></div>
+                      </div>
+                    </div>
+
                     {renderEmbed(stream)}
                   </>
                 ) : (
@@ -69,31 +81,12 @@ export default async function LivePage() {
                   </div>
                 )}
               </div>
-
-              {/* Player Footer */}
-              <div className="px-4 py-3 bg-background flex flex-wrap gap-4 items-center justify-between border-t border-line">
-                <div className="flex items-center gap-3">
-                  <div className="font-display text-xl font-black italic tracking-tight">
-                    CHAMP<span className="text-coral">TURF</span>
-                  </div>
-                  <span className="text-xs opacity-50 border-l border-line pl-3 py-0.5 hidden sm:inline-block">
-                    Official Broadcast
-                  </span>
-                </div>
-                
-                {/* Native Picture-in-Picture indicator */}
-                <div className="text-[11px] text-gray-500 font-medium flex items-center gap-1.5 bg-line/30 px-2.5 py-1 rounded">
-                  <MonitorUp size={12} />
-                  <span className="hidden sm:inline">Supports Picture-in-Picture</span>
-                  <span className="sm:hidden">PiP Supported</span>
-                </div>
-              </div>
             </div>
           </div>
 
           {/* 2. LIVE CHAT */}
-          {/* sticky top-6 keeps it visible on desktop as you scroll down the replays */}
-          <div className="md:col-start-2 md:row-start-1 md:row-span-2 sticky top-6">
+          {/* md:sticky md:top-6 ensures it ONLY stays fixed on desktop, and scrolls normally on mobile! */}
+          <div className="md:col-start-2 md:row-start-1 md:row-span-2 md:sticky md:top-6">
              <LiveChat />
           </div>
 
@@ -104,7 +97,6 @@ export default async function LivePage() {
             </div>
             {replays.length === 0 && <p className="text-sm opacity-60">No completed races yet.</p>}
             
-            {/* Replay grid adapts from 1 column on mobile to 3 on desktop */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {replays.map((r) => (
                 <Link key={r.id} href={`/races/${r.id}`} className="card hover:border-coral transition-colors">
