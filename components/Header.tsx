@@ -45,7 +45,7 @@ export default function Header() {
 
         <Link href="/" className="flex items-baseline font-display italic tracking-tighter leading-none text-xl font-bold shrink-0">
          <span className="text-white">CHAMP</span>
-         <span className="text-yellow-400">TURF</span>
+         <span className="text fill="currentColor"">TURF</span>
           
         </Link>
 
