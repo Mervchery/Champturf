@@ -44,8 +44,9 @@ export default function Header() {
         </button>
 
         <Link href="/" className="flex items-baseline gap-2 font-display text-xl font-bold shrink-0">
-          <CircleDot size={16} className="text-gold2" />
-          Champ&nbsp;Turf
+         <span className="text-white">CHAMP</span>
+         <span className="text-yellow-400">TURF</span>
+          
         </Link>
 
         <nav className="hidden md:flex flex-1 gap-0.5 overflow-x-auto no-scrollbar min-w-0">
