@@ -43,7 +43,7 @@ export default function Header() {
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
 
-        <Link href="/" className="flex items-baseline gap-2 font-display text-xl font-bold shrink-0">
+        <Link href="/" className="flex items-baseline gap-2 font-display italic tracking-tighter leading-none text-xl font-bold shrink-0">
          <span className="text-white">CHAMP</span>
          <span className="text-yellow-400">TURF</span>
           
