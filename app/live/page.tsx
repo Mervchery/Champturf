@@ -59,13 +59,13 @@ export default async function LivePage() {
 
                     {/* Top-Left TV Channel Logo (Watermark) - Now smaller! */}
                     <div className="absolute top-4 left-4 z-10 pointer-events-none opacity-80 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]">
-                      <div className="font-display text-base md:text-lg font-black italic tracking-tighter leading-none flex flex-col">
+                      <div className="font-display text-xs md:text-sm font-black italic tracking-tighter leading-none flex flex-col">
                         <div>
                           <span className="text-white">CHAMP</span>
                           <span className="text-yellow-400">TURF</span>
                         </div>
                         {/* Thinner Green accent bar */}
-                        <div className="h-[3px] w-full bg-green-500 mt-1 rounded-full shadow-[0_0_3px_rgba(34,197,94,0.3)]"></div>
+                        <div className="h-1.5px] w-full bg-green-500 mt-0.5 rounded-full shadow-[0_0_3px_rgba(34,197,94,0.3)]"></div>
                       </div>
                     </div>
 
