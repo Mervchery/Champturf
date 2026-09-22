@@ -148,7 +148,7 @@ function parseIsoDuration(iso: string): number {
   return (Number(h) || 0) * 3600 + (Number(min) || 0) * 60 + (Number(s) || 0);
 }
 
-const MAX_REPLAY_SECONDS = 5 * 60;
+const MAX_REPLAY_SECONDS = 16 * 60;
 const PUBLISH_WINDOW_DAYS_AFTER = 14;
 
 /** Searches YouTube for a race's replay and saves the best match, then
