@@ -5,6 +5,7 @@ import { getHorses } from "@/lib/horses";
 import { getTrainers } from "@/lib/trainers";
 import { getCareerStatsForStable } from "@/lib/careerStats";
 import Silk from "@/components/Silk";
+import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
 
@@ -69,7 +70,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
                 <div className="grid grid-cols-2 gap-3">
                   {horses.map((h) => (
                     <Link key={h.id} href={`/horses/${h.id}`} className="card p-3 flex items-center gap-2.5">
-                      <Silk primary={stable.silk_primary} secondary={stable.silk_secondary} cap={stable.silk_cap} pattern={stable.silk_pattern} size={26} />
+                      <SilkImage url={h.silk_image_url} size={26} title={h.name} />
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate">{h.name}</div>
                         <div className="text-xs opacity-60">{h.wins}W · {h.starts} starts</div>
