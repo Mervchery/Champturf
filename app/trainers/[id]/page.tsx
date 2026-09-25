@@ -5,6 +5,7 @@ import { getTrainerById } from "@/lib/trainers";
 import { getHorses } from "@/lib/horses";
 import { getCareerStatsForTrainer } from "@/lib/careerStats";
 import Silk from "@/components/Silk";
+import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
 
@@ -80,7 +81,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
                 <div className="grid grid-cols-2 gap-3">
                   {horses.map((h) => (
                     <Link key={h.id} href={`/horses/${h.id}`} className="card p-3 flex items-center gap-2.5">
-                      <Silk primary={h.stable?.silk_primary} secondary={h.stable?.silk_secondary} cap={h.stable?.silk_cap} pattern={h.stable?.silk_pattern} size={26} />
+                      <SilkImage url={h.silk_image_url} size={26} title={h.name} />
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate">{h.name}</div>
                         <div className="text-xs opacity-60">{h.wins}W · {h.starts} starts</div>
