@@ -8,7 +8,7 @@ import { isAdminRole } from "@/lib/roles";
 // prevents a crafted client call from targeting e.g. `profiles` even though
 // RLS would already block that (defense in depth, not the only barrier).
 const ALLOWED_TABLES = new Set([
-  "horses", "jockeys", "trainers", "stables", "owners", "news", "streams", "meetings",
+  "horses", "jockeys", "trainers", "stables", "owners", "news", "streams", "meetings", "ticker_items",
 ]);
 
 function assertAllowed(table: string) {
