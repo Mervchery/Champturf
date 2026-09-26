@@ -21,7 +21,7 @@ export type Trainer = {
   photo_url: string | null;
 };
 
-const TRAINER_SELECT = "*, stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern)";
+const TRAINER_SELECT = "*, stable:stables!trainers_stable_id_fkey(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern)";
 
 export async function getTrainers(): Promise<Trainer[]> {
   const supabase = createClient();

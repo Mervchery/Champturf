@@ -24,7 +24,7 @@ export type Stable = {
   silk_pattern: SilkPattern;
 };
 
-const STABLE_SELECT = "*, trainer:trainers(id, name)";
+const STABLE_SELECT = "*, trainer:trainers!stables_trainer_id_fkey(id, name)";
 
 export async function getStables(): Promise<Stable[]> {
   const supabase = createClient();
