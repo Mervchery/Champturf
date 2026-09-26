@@ -1,15 +1,17 @@
 import { Diamond } from "lucide-react";
+import { getTickerItems } from "@/lib/ticker";
 
-const ITEMS = [
-  "R7 Race 3 — Île Royale wins by 1¾L",
-  "Weights declared — Coupe d'Or de Maurice, Sat 15:30",
-  "T. Govinden tops jockey standings this month",
-  "Track condition: Good — Champ de Mars",
-  "Domaine Coralie confirms 3 entries for Trophée Vallée Verte",
-];
+// Content is managed in the admin panel's "Ticker" section (see
+// components/AdminDashboard.tsx / lib/ticker.ts) rather than hardcoded
+// here — this component just renders whatever's currently in
+// ticker_items, in order.
+const FALLBACK = "Champ Turf — Mauritius horse racing";
 
-export default function Ticker() {
-  const doubled = [...ITEMS, ...ITEMS];
+export default async function Ticker() {
+  const items = await getTickerItems();
+  const texts = items.length > 0 ? items.map((i) => i.text) : [FALLBACK];
+  const doubled = [...texts, ...texts];
+
   return (
     <div className="bg-gold2 text-ink overflow-hidden whitespace-nowrap border-y border-black/5">
       <div className="inline-flex gap-10 py-2.5 animate-[scroll_32s_linear_infinite]">

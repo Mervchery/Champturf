@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard, Flag, Users, GraduationCap, Target, Building2, Newspaper,
-  Image as ImageIcon, Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus, CalendarDays,
+  Image as ImageIcon, Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus, CalendarDays, Megaphone,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { HorseIcon } from "@/components/RacingIcons";
@@ -21,6 +21,7 @@ import type { NewsArticle } from "@/lib/news";
 import type { Stream } from "@/lib/streams";
 import type { Meeting } from "@/lib/meetings";
 import type { Profile } from "@/lib/users";
+import type { TickerItem } from "@/lib/ticker";
 
 const SECTIONS = [
   ["overview", "Overview", LayoutDashboard],
@@ -35,6 +36,7 @@ const SECTIONS = [
   ["news", "News", Newspaper],
   ["media", "Media library", ImageIcon],
   ["stream", "Live streams", Radio],
+  ["ticker", "Ticker", Megaphone],
   ["stats", "Statistics", BarChart3],
   ["users", "Users & roles", ShieldCheck],
 ] as const;
@@ -42,11 +44,12 @@ const SECTIONS = [
 type SectionId = (typeof SECTIONS)[number][0];
 
 export default function AdminDashboard({
-  role, email, races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles,
+  role, email, races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles, tickerItems,
 }: {
   role: string; email: string;
   races: Race[]; horses: Horse[]; jockeys: Jockey[]; trainers: Trainer[];
   stables: Stable[]; owners: Owner[]; news: NewsArticle[]; streams: Stream[]; meetings: Meeting[]; profiles: Profile[];
+  tickerItems: TickerItem[];
 }) {
   const [section, setSection] = useState<SectionId>("overview");
   const [toast, setToast] = useState("");
@@ -181,7 +184,7 @@ export default function AdminDashboard({
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer/Stable are picked from existing records, not typed — renaming one updates every horse that references it. Silk image is normally set by the scraper the first time this horse runs; only fill it in by hand if a horse has never been scraped yet (e.g. a new arrival) or the scraped one needs correcting."}
+          {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer are picked from existing records, not typed — renaming one updates every horse that references it. Stable is normally derived automatically from the horse's trainer (see the Stables tab) — only set it by hand for a horse whose trainer isn't linked to a stable yet. Silk image is normally set by the scraper the first time this horse runs; only fill it in by hand if a horse has never been scraped yet (e.g. a new arrival) or the scraped one needs correcting."}
         </p>
 
         {section === "jockeys" && (
@@ -273,7 +276,10 @@ export default function AdminDashboard({
               { key: "location", label: "Location" },
               { key: "staff", label: "Staff", type: "number" },
               { key: "gallery", label: "Gallery items", type: "number" },
-              { key: "trainers", label: "Trainer(s)", placeholder: "Comma-separated" },
+              { key: "trainer_id", label: "Trainer", type: "select", options: [
+                { value: "", label: "None" },
+                ...trainers.map((t) => ({ value: t.id, label: t.name })),
+              ] },
               { key: "silk_pattern", label: "Silk pattern", type: "select", options: [
                 { value: "plain", label: "Plain" },
                 { value: "hoops", label: "Hoops" },
@@ -290,7 +296,7 @@ export default function AdminDashboard({
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned."}
+          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here immediately pulls in every horse that trainer has, and any horse assigned to that trainer afterwards (here or via the scraper) follows automatically — you shouldn't need to set a horse's stable by hand anymore."}
         </p>
 
         {section === "owners" && (
@@ -382,6 +388,25 @@ export default function AdminDashboard({
             ]}
           />
         )}
+
+        {section === "ticker" && (
+          <EntityAdminPanel
+            table="ticker_items" title="Ticker" addLabel="New ticker item" notify={notify}
+            paths={["/"]}
+            rows={tickerItems}
+            columns={[
+              { key: "text", label: "Text" },
+              { key: "sort_order", label: "Order" },
+            ]}
+            fields={[
+              { key: "text", label: "Text", type: "textarea", placeholder: "e.g. R7 Race 3 — Île Royale wins by 1¾L" },
+              { key: "sort_order", label: "Order (lower shows first)", type: "number" },
+            ]}
+          />
+        )}
+        <p className="text-xs opacity-50 mt-3">
+          {section === "ticker" && "This feeds the scrolling ticker shown at the top of every page. If the list is empty, a single default message shows instead. Order controls left-to-right position — items with the same order fall back to creation order."}
+        </p>
 
         {section === "stats" && (
           <div>
