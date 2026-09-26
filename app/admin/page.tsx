@@ -11,6 +11,7 @@ import { getNews } from "@/lib/news";
 import { getStreams } from "@/lib/streams";
 import { getMeetingsRaw } from "@/lib/meetings";
 import { getProfiles } from "@/lib/users";
+import { getTickerItems } from "@/lib/ticker";
 import AdminDashboard from "@/components/AdminDashboard";
 
 export const revalidate = 0;
@@ -34,7 +35,7 @@ export default async function AdminPage() {
     redirect("/admin/login?error=not_authorized");
   }
 
-  const [races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles] = await Promise.all([
+  const [races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles, tickerItems] = await Promise.all([
     getRaces(),
     getHorses(),
     getJockeys(),
@@ -45,6 +46,7 @@ export default async function AdminPage() {
     getStreams(),
     getMeetingsRaw(),
     getProfiles(),
+    getTickerItems(),
   ]);
 
   return (
@@ -61,6 +63,7 @@ export default async function AdminPage() {
       streams={streams}
       meetings={meetings}
       profiles={profiles}
+      tickerItems={tickerItems}
     />
   );
 }
