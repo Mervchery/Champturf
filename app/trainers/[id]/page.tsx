@@ -4,7 +4,6 @@ import { Target, User } from "lucide-react";
 import { getTrainerById } from "@/lib/trainers";
 import { getHorses } from "@/lib/horses";
 import { getCareerStatsForTrainer } from "@/lib/careerStats";
-import Silk from "@/components/Silk";
 import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
@@ -37,7 +36,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
             <div className="text-white/70 text-sm mt-1.5 flex items-center gap-2">
               {trainer.stable ? (
                 <>
-                  <Silk primary={trainer.stable.silk_primary} secondary={trainer.stable.silk_secondary} cap={trainer.stable.silk_cap} pattern={trainer.stable.silk_pattern} size={22} title={trainer.stable.name} />
+                  <SilkImage url={trainer.stable.silk_image_url} size={22} title={trainer.stable.name} />
                   <Link href={`/stables/${trainer.stable.id}`} className="hover:underline">{trainer.stable.name}</Link>
                 </>
               ) : "Unknown stable"}
