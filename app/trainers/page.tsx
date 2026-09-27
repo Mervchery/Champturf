@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Target } from "lucide-react";
 import { getTrainers } from "@/lib/trainers";
-import Silk from "@/components/Silk";
+import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
 
@@ -26,7 +26,7 @@ export default async function TrainersPage() {
                 ) : (
                   <Target size={26} className="text-white/60" />
                 )}
-                {t.stable && <Silk primary={t.stable.silk_primary} secondary={t.stable.silk_secondary} cap={t.stable.silk_cap} pattern={t.stable.silk_pattern} size={30} title={t.stable.name} />}
+                {t.stable && <SilkImage url={t.stable.silk_image_url} size={30} title={t.stable.name} />}
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{t.name}</h4>
