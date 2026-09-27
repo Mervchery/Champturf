@@ -48,7 +48,12 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
 
           {race.status === "completed" ? (
             <div className="mt-8">
-              <h3 className="font-display text-xl mb-4">Official result</h3>
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                <h3 className="font-display text-xl">Official result</h3>
+                {results.length > 0 && (
+                  <span className="text-xs opacity-50 hidden sm:block">No. · Jockey · Trainer&nbsp;&nbsp;|&nbsp;&nbsp;Gate · Weight · SP</span>
+                )}
+              </div>
               {results.length === 0 ? (
                 <p className="text-sm opacity-60">No result has been entered for this race yet.</p>
               ) : (
@@ -56,10 +61,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                   {results.map((row) => (
                     <ResultRow
                       key={row.id}
-                      number={row.position}
+                      number={row.runner_no}
                       horse={row.horses}
                       jockeyName={row.jockeys?.name ?? row.jockey}
                       weight={row.weight_kg}
+                      gate={row.gate}
                       position={row.position}
                       finishTime={row.finish_time}
                       margin={row.margin}
@@ -107,7 +113,12 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             </div>
           ) : (
             <div className="mt-8">
-              <h3 className="font-display text-xl mb-4">Entries &amp; starting positions</h3>
+              <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
+                <h3 className="font-display text-xl">Entries</h3>
+                {entries.length > 0 && (
+                  <span className="text-xs opacity-50 hidden sm:block">No. · Horse · Stable · Trainer&nbsp;&nbsp;|&nbsp;&nbsp;Gate · Weight · Rating</span>
+                )}
+              </div>
               {entries.length === 0 ? (
                 <p className="text-sm opacity-60">Entries haven&apos;t been declared for this race yet.</p>
               ) : (
@@ -115,7 +126,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                   {entries.map((e) => (
                     <EntryRow
                       key={e.id}
-                      number={e.runner_no ?? e.gate ?? 0}
+                      number={e.runner_no}
                       horse={e.horses}
                       jockeyName={e.jockeys?.name ?? null}
                       weight={e.weight_kg}
