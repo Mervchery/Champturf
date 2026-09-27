@@ -63,6 +63,12 @@ export type RaceResult = {
   jockeys: { id: string; name: string } | null; // joined
   trainer_id: string | null;
   trainers: RefSummary | null; // joined
+  // Not a race_results column — race_results only records the finish order,
+  // not the barrier draw. Carried over from this horse's race_entries row
+  // for the same race (see attachEntryInfo) purely for display, so the
+  // result card can still show gate/racecard-no alongside the result.
+  runner_no: number | null;
+  gate: number | null;
 };
 
 const HORSE_JOIN = "horses(id, name, age, sex, rating, silk_image_url, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern))";
@@ -102,10 +108,34 @@ export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
   const { data, error } = await supabase
     .from("race_entries")
     .select(ENTRY_SELECT)
-    .eq("race_id", raceId)
-    .order("gate", { ascending: true });
+    // Racecard order: the declared "No", not the gate/barrier draw —
+    // nulls (no number assigned yet) sort to the end instead of the top.
+    .order("runner_no", { ascending: true, nullsFirst: false })
+    .eq("race_id", raceId);
   if (error) throw error;
   return (data as any) ?? [];
+}
+
+/** race_results has no gate/runner_no of its own (see the RaceResult type
+ *  comment) — this looks up each result's matching race_entries row, by
+ *  the same (race_id, horse_id) pair entries and results both key off of,
+ *  and stamps runner_no/gate onto the result for display. */
+async function attachEntryInfo<T extends { race_id: string; horse_id: string }>(
+  results: T[]
+): Promise<(T & { runner_no: number | null; gate: number | null })[]> {
+  if (results.length === 0) return [];
+  const supabase = createClient();
+  const raceIds = [...new Set(results.map((r) => r.race_id))];
+  const { data: entries, error } = await supabase
+    .from("race_entries")
+    .select("race_id, horse_id, runner_no, gate")
+    .in("race_id", raceIds);
+  if (error) throw error;
+  const byKey = new Map((entries ?? []).map((e) => [`${e.race_id}:${e.horse_id}`, e]));
+  return results.map((r) => {
+    const entry = byKey.get(`${r.race_id}:${r.horse_id}`);
+    return { ...r, runner_no: entry?.runner_no ?? null, gate: entry?.gate ?? null };
+  });
 }
 
 export async function getResultsForRace(raceId: string): Promise<RaceResult[]> {
@@ -116,7 +146,7 @@ export async function getResultsForRace(raceId: string): Promise<RaceResult[]> {
     .eq("race_id", raceId)
     .order("position", { ascending: true });
   if (error) throw error;
-  return (data as any) ?? [];
+  return attachEntryInfo((data as any) ?? []);
 }
 
 /** Races with status='completed', each pre-loaded with its result rows —
@@ -138,8 +168,9 @@ export async function getCompletedRacesWithResults(): Promise<(Race & { results:
     .order("position", { ascending: true });
   if (resultsError) throw resultsError;
 
+  const withEntryInfo = await attachEntryInfo((results as any) ?? []);
   return races.map((r) => ({
     ...r,
-    results: ((results as any) ?? []).filter((row: RaceResult) => row.race_id === r.id),
+    results: withEntryInfo.filter((row: RaceResult) => row.race_id === r.id),
   }));
 }
