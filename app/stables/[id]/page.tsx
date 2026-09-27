@@ -4,7 +4,6 @@ import { getStableById } from "@/lib/stables";
 import { getHorses } from "@/lib/horses";
 import { getTrainers } from "@/lib/trainers";
 import { getCareerStatsForStable } from "@/lib/careerStats";
-import Silk from "@/components/Silk";
 import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
@@ -26,9 +25,9 @@ export default async function StableDetailPage({ params }: { params: { id: strin
       <div className="detail-hero">
         <div className="wrap flex gap-6 items-center flex-wrap">
           <div className="p-2 bg-white/10 rounded-2xl border border-white/15">
-            <Silk primary={stable.silk_primary} secondary={stable.silk_secondary} cap={stable.silk_cap} pattern={stable.silk_pattern} size={72} title={stable.name} />
+            <SilkImage url={stable.silk_image_url} size={72} title={stable.name} />
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="text-xs font-semibold text-gold2">STABLE PROFILE</span>
             <h1 className="text-3xl font-display mt-1">{stable.name}</h1>
             <div className="text-white/70 text-sm mt-1.5">{stable.location ?? "N/A"} · Owner: {stable.owner ?? "Unknown"}</div>
@@ -61,13 +60,13 @@ export default async function StableDetailPage({ params }: { params: { id: strin
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-8">
             <div>
               <h2 className="font-display text-xl mb-4">Horses in this stable</h2>
               {horses.length === 0 ? (
                 <p className="text-sm opacity-60">No horses currently assigned to this stable.</p>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {horses.map((h) => (
                     <Link key={h.id} href={`/horses/${h.id}`} className="card p-3 flex items-center gap-2.5">
                       <SilkImage url={h.silk_image_url} size={26} title={h.name} />
