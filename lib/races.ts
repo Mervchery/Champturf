@@ -120,9 +120,7 @@ export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
  *  comment) — this looks up each result's matching race_entries row, by
  *  the same (race_id, horse_id) pair entries and results both key off of,
  *  and stamps runner_no/gate onto the result for display. */
-async function attachEntryInfo<T extends { race_id: string; horse_id: string }>(
-  results: T[]
-): Promise<(T & { runner_no: number | null; gate: number | null })[]> {
+async function attachEntryInfo(results: RaceResult[]): Promise<RaceResult[]> {
   if (results.length === 0) return [];
   const supabase = createClient();
   const raceIds = [...new Set(results.map((r) => r.race_id))];
@@ -171,6 +169,6 @@ export async function getCompletedRacesWithResults(): Promise<(Race & { results:
   const withEntryInfo = await attachEntryInfo((results as any) ?? []);
   return races.map((r) => ({
     ...r,
-    results: withEntryInfo.filter((row: RaceResult) => row.race_id === r.id),
+    results: withEntryInfo.filter((row) => row.race_id === r.id),
   }));
 }
