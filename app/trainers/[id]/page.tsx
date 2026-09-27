@@ -30,10 +30,10 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
               <Target size={38} />
             )}
           </div>
-          <div>
+          <div className="min-w-0">
             <span className="text-xs font-semibold text-gold2">TRAINER PROFILE</span>
             <h1 className="text-3xl font-display mt-1">{trainer.name}</h1>
-            <div className="text-white/70 text-sm mt-1.5 flex items-center gap-2">
+            <div className="text-white/70 text-sm mt-1.5 flex items-center gap-2 flex-wrap">
               {trainer.stable ? (
                 <>
                   <SilkImage url={trainer.stable.silk_image_url} size={22} title={trainer.stable.name} />
@@ -71,13 +71,13 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
             </div>
           )}
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-8">
             <div>
               <h2 className="font-display text-xl mb-4">Horses currently trained</h2>
               {horses.length === 0 ? (
                 <p className="text-sm opacity-60">No horses currently assigned to this trainer.</p>
               ) : (
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {horses.map((h) => (
                     <Link key={h.id} href={`/horses/${h.id}`} className="card p-3 flex items-center gap-2.5">
                       <SilkImage url={h.silk_image_url} size={26} title={h.name} />
