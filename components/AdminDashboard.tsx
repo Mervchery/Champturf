@@ -267,7 +267,6 @@ export default function AdminDashboard({
             columns={[
               { key: "name", label: "Stable" },
               { key: "location", label: "Location" },
-              { key: "silk_pattern", label: "Silk" },
               { key: "horses", label: "Horses" },
             ]}
             fields={[
@@ -280,23 +279,12 @@ export default function AdminDashboard({
                 { value: "", label: "None" },
                 ...trainers.map((t) => ({ value: t.id, label: t.name })),
               ] },
-              { key: "silk_pattern", label: "Silk pattern", type: "select", options: [
-                { value: "plain", label: "Plain" },
-                { value: "hoops", label: "Hoops" },
-                { value: "stripes", label: "Stripes" },
-                { value: "quarters", label: "Quarters" },
-                { value: "spots", label: "Spots" },
-                { value: "sash", label: "Sash" },
-                { value: "chevron", label: "Chevron" },
-              ] },
-              { key: "silk_primary", label: "Silk primary color", placeholder: "#123C2E" },
-              { key: "silk_secondary", label: "Silk secondary color", placeholder: "#E4C878" },
-              { key: "silk_cap", label: "Cap color", placeholder: "#123C2E" },
+              { key: "silk_image_url", label: "Silk image URL", placeholder: "https://…" },
             ]}
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here immediately pulls in every horse that trainer has, and any horse assigned to that trainer afterwards (here or via the scraper) follows automatically — you shouldn't need to set a horse's stable by hand anymore."}
+          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here immediately pulls in every horse that trainer has, and any horse assigned to that trainer afterwards (here or via the scraper) follows automatically — you shouldn't need to set a horse's stable by hand anymore. Silk image isn't scraped for stables (only per-horse) — set it by hand."}
         </p>
 
         {section === "owners" && (
