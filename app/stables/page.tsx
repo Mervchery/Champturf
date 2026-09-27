@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getStables } from "@/lib/stables";
-import Silk from "@/components/Silk";
+import SilkImage from "@/components/SilkImage";
 
 export const revalidate = 0;
 
@@ -18,7 +18,7 @@ export default async function StablesPage() {
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
             <Link key={s.id} href={`/stables/${s.id}`} className="card p-5 flex items-start gap-4">
-              <Silk primary={s.silk_primary} secondary={s.silk_secondary} cap={s.silk_cap} pattern={s.silk_pattern} size={44} title={s.name} />
+              <SilkImage url={s.silk_image_url} size={44} title={s.name} />
               <div className="min-w-0 flex-1">
                 <h4 className="font-semibold truncate">{s.name}</h4>
                 <div className="text-xs opacity-60 mt-1">{s.location ?? "N/A"} · Owner: {s.owner ?? "Unknown"}</div>
