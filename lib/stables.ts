@@ -22,6 +22,7 @@ export type Stable = {
   silk_secondary: string;
   silk_cap: string;
   silk_pattern: SilkPattern;
+  silk_image_url: string | null;
 };
 
 const STABLE_SELECT = "*, trainer:trainers!stables_trainer_id_fkey(id, name)";

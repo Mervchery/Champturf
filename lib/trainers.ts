@@ -7,6 +7,7 @@ export type StableSummary = RefSummary & {
   silk_secondary: string;
   silk_cap: string;
   silk_pattern: SilkPattern;
+  silk_image_url: string | null;
 };
 
 export type Trainer = {
@@ -21,7 +22,7 @@ export type Trainer = {
   photo_url: string | null;
 };
 
-const TRAINER_SELECT = "*, stable:stables!trainers_stable_id_fkey(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern)";
+const TRAINER_SELECT = "*, stable:stables!trainers_stable_id_fkey(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern, silk_image_url)";
 
 export async function getTrainers(): Promise<Trainer[]> {
   const supabase = createClient();
