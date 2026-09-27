@@ -61,7 +61,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
           )}
 
           <div className="grid lg:grid-cols-2 gap-8">
-            <div>
+            <div className="min-w-0">
               <h2 className="font-display text-xl mb-4">Horses in this stable</h2>
               {horses.length === 0 ? (
                 <p className="text-sm opacity-60">No horses currently assigned to this stable.</p>
@@ -94,12 +94,12 @@ export default async function StableDetailPage({ params }: { params: { id: strin
               )}
             </div>
 
-            <div>
+            <div className="min-w-0">
               <h2 className="font-display text-xl mb-4">Recent results</h2>
               {stats.recentResults.length === 0 ? (
                 <p className="text-sm opacity-60">No results recorded yet.</p>
               ) : (
-                <div className="panel !p-0 overflow-hidden">
+                <div className="panel !p-0 overflow-x-auto">
                   <table>
                     <thead><tr><th>Pos</th><th>Horse</th><th>Race</th><th>Date</th></tr></thead>
                     <tbody>
