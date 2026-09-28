@@ -51,7 +51,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                 <h3 className="font-display text-xl">Official result</h3>
                 {results.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">No. · Jockey · Trainer&nbsp;&nbsp;|&nbsp;&nbsp;Gate · Weight · SP</span>
+                  <span className="text-xs opacity-50 hidden sm:block">Jockey · Trainer&nbsp;&nbsp;|&nbsp;&nbsp;No. · Weight · SP</span>
                 )}
               </div>
               {results.length === 0 ? (
@@ -65,7 +65,6 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       horse={row.horses}
                       jockeyName={row.jockeys?.name ?? row.jockey}
                       weight={row.weight_kg}
-                      gate={row.gate}
                       position={row.position}
                       finishTime={row.finish_time}
                       margin={row.margin}
