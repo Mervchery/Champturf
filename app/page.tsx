@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Play, Trophy, Newspaper } from "lucide-react";
 import Countdown from "@/components/Countdown";
-import { getRaces, getCompletedRacesWithResults } from "@/lib/races";
+import { getRaces, getCompletedRacesWithResults, pickFeaturedRace } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
 import { getHorses } from "@/lib/horses";
 import { getJockeys } from "@/lib/jockeys";
@@ -18,7 +18,13 @@ export default async function HomePage() {
     getNews(),
   ]);
   const upcoming = races.filter((r) => r.status === "upcoming");
-  const feature = upcoming[0];
+  // Featured race = Race 6 of the next meeting, by local convention (see
+  // pickFeaturedRace) — not just the very next race chronologically.
+  const nextMeetingDate = upcoming[0]?.race_date;
+  const nextMeetingCard = upcoming
+    .filter((r) => r.race_date === nextMeetingDate)
+    .sort((a, b) => a.race_time.localeCompare(b.race_time));
+  const feature = pickFeaturedRace(nextMeetingCard);
   const completedWithResults = completedWithResultsAll.slice(0, 3);
 
   const topHorses = [...horses].sort((a, b) => b.wins - a.wins).slice(0, 5);
