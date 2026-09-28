@@ -32,6 +32,14 @@ export type HorseSummary = {
   owner: RefSummary | null;
   trainer: RefSummary | null;
   stable: StableSummary | null;
+  // Career record — trigger-maintained on the horses table itself (see
+  // supabase/race_entries_results_migration.sql), so no extra query needed
+  // to show a form snapshot alongside a declared runner.
+  wins: number;
+  seconds: number;
+  thirds: number;
+  starts: number;
+  earnings: number;
 };
 
 export type RaceEntry = {
@@ -63,15 +71,15 @@ export type RaceResult = {
   jockeys: { id: string; name: string } | null; // joined
   trainer_id: string | null;
   trainers: RefSummary | null; // joined
-  // Not a race_results column — race_results only records the finish order,
-  // not the barrier draw. Carried over from this horse's race_entries row
-  // for the same race (see attachEntryInfo) purely for display, so the
-  // result card can still show gate/racecard-no alongside the result.
+  // Gate/racecard-No for this result. A real race_results column (see
+  // supabase/race_results_gate_migration.sql) written directly by the
+  // scraper/admin — not derived from race_entries at request time, since a
+  // race scraped as already-completed never gets an entries row at all.
   runner_no: number | null;
   gate: number | null;
 };
 
-const HORSE_JOIN = "horses(id, name, age, sex, rating, silk_image_url, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern))";
+const HORSE_JOIN = "horses(id, name, age, sex, rating, silk_image_url, wins, seconds, thirds, starts, earnings, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern))";
 const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
 const RESULT_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name), trainers(id, name)`;
 
@@ -103,6 +111,17 @@ export async function getRacesForDate(raceDate: string): Promise<Race[]> {
   return data ?? [];
 }
 
+/** Mauritian meetings run to a fixed card, and by local convention the
+ *  featured race of the day is always Race 6 — not whichever race happens
+ *  to carry the biggest purse. `races` must already be ordered by
+ *  race_time for one meeting (as getRacesForDate returns them), so index 5
+ *  is the 6th race of the day; falls back to the day's last race if fewer
+ *  than six are scheduled. */
+export function pickFeaturedRace(races: Race[]): Race | null {
+  if (races.length === 0) return null;
+  return races[5] ?? races[races.length - 1];
+}
+
 export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
   const supabase = createClient();
   const { data, error } = await supabase
@@ -116,12 +135,15 @@ export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
   return (data as any) ?? [];
 }
 
-/** race_results has no gate/runner_no of its own (see the RaceResult type
- *  comment) — this looks up each result's matching race_entries row, by
- *  the same (race_id, horse_id) pair entries and results both key off of,
- *  and stamps runner_no/gate onto the result for display. */
+/** Fallback only: fills in gate/runner_no from a matching race_entries row
+ *  (same race_id + horse_id) wherever a result doesn't already have its own
+ *  value. Since the migration in supabase/race_results_gate_migration.sql,
+ *  race_results carries these directly (populated by the scraper/admin at
+ *  write time) — this just covers any older rows saved before that. */
 async function attachEntryInfo(results: RaceResult[]): Promise<RaceResult[]> {
   if (results.length === 0) return [];
+  if (results.every((r) => r.gate != null && r.runner_no != null)) return results;
+
   const supabase = createClient();
   const raceIds = [...new Set(results.map((r) => r.race_id))];
   const { data: entries, error } = await supabase
@@ -131,8 +153,13 @@ async function attachEntryInfo(results: RaceResult[]): Promise<RaceResult[]> {
   if (error) throw error;
   const byKey = new Map((entries ?? []).map((e) => [`${e.race_id}:${e.horse_id}`, e]));
   return results.map((r) => {
+    if (r.gate != null && r.runner_no != null) return r;
     const entry = byKey.get(`${r.race_id}:${r.horse_id}`);
-    return { ...r, runner_no: entry?.runner_no ?? null, gate: entry?.gate ?? null };
+    return {
+      ...r,
+      runner_no: r.runner_no ?? entry?.runner_no ?? null,
+      gate: r.gate ?? entry?.gate ?? null,
+    };
   });
 }
 
