@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Trophy } from "lucide-react";
 import { getMeetingInfo } from "@/lib/meetings";
-import { getRacesForDate } from "@/lib/races";
+import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
 
 export const revalidate = 0;
@@ -19,7 +19,9 @@ export default async function RaceDayPage({ params }: { params: { date: string }
     weekday: "long", day: "numeric", month: "long", year: "numeric",
   });
   const totalPrize = races.reduce((sum, r) => sum + (r.prize ?? 0), 0);
-  const featured = [...races].sort((a, b) => b.prize - a.prize)[0];
+  // races is already ordered by race_time (see getRacesForDate) — Race 6
+  // of the day, by local convention, not the biggest purse.
+  const featured = pickFeaturedRace(races);
 
   return (
     <div>
