@@ -243,7 +243,7 @@ tr:hover td {
 
 .runner-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 14px;
   padding: 14px 16px;
   background: var(--surface);
@@ -272,6 +272,17 @@ tr:hover td {
   font-weight: 700;
   font-size: 0.78rem;
   flex-shrink: 0;
+}
+/* Soft grouping box for a runner's career-record snapshot (form ring +
+   starts/wins/places/earnings) so it reads as one module instead of
+   floating text between the horse's name and its recent-form pills. */
+.form-panel {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+.dark .form-panel {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 /* ---------- Hero ---------- */
