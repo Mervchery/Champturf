@@ -1,5 +1,4 @@
 import Link from "next/link";
-import type { ReactNode } from "react";
 import SilkImage from "@/components/SilkImage";
 import { fmtMoney } from "@/lib/format";
 import type { HorseSummary } from "@/lib/races";
@@ -40,17 +39,6 @@ type BaseProps = {
   weight: number | null;
 };
 
-// Shared right-hand info column, so entries and results read consistently.
-// Every row gets the same fixed label width too, so the whole column of
-// values lines up regardless of digit count.
-function InfoStat({ label, value }: { label: string; value: ReactNode }) {
-  return (
-    <div className="text-xs opacity-60 tabular-nums">
-      <span className="inline-block w-9 opacity-70">{label}</span>{value}
-    </div>
-  );
-}
-
 // Small career-record ring, inspired by the win/place donut on French
 // racecard apps — gold arc for wins, outline arc for places (2nd+3rd),
 // remaining track for everything else, with total starts in the middle.
@@ -86,45 +74,54 @@ export function EntryRow({
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
     <div className="runner-row">
-      <div className="runner-number">{number ?? "N/A"}</div>
-      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} />
+      <div className="runner-number mt-0.5">{number ?? "N/A"}</div>
+      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} className="mt-0.5" />
       <div className="flex-1 min-w-0">
-        {horse ? (
-          <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
-        ) : (
-          <span className="font-semibold opacity-50">Unknown</span>
-        )}
-        <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
-          <span>{horse?.age ? `${horse.age}yo` : "N/A"} {horse?.sex ?? ""}</span>
-          <span>·</span>
-          <span>{horse?.stable ? <Link href={`/stables/${horse.stable.id}`} className="hover:underline">{horse.stable.name}</Link> : "Unknown stable"}</span>
-          <span>·</span>
-          <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
+        {/* Name + jockey/odds share one header line so nothing floats off
+            on its own with a big empty gap when either side is short. */}
+        <div className="flex justify-between items-start gap-3 flex-wrap">
+          <div className="min-w-0">
+            {horse ? (
+              <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
+            ) : (
+              <span className="font-semibold opacity-50">Unknown</span>
+            )}
+            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
+              <span>{horse?.age ? `${horse.age}yo` : "N/A"} {horse?.sex ?? ""}</span>
+              <span>·</span>
+              <span>{horse?.stable ? <Link href={`/stables/${horse.stable.id}`} className="hover:underline">{horse.stable.name}</Link> : "Unknown stable"}</span>
+              <span>·</span>
+              <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="text-sm">{jockeyName ?? "Unknown"}</div>
+            {odds && <div className="pill pill-outline mt-1 !text-[0.62rem]">{odds}</div>}
+          </div>
         </div>
+
+        {/* Gate/weight/rating — always visible now, at every screen size. */}
+        <div className="text-xs opacity-60 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+          <span>Gate {gate ?? "N/A"}</span>
+          <span>{weight ? `${weight}kg` : "N/A"}</span>
+          <span>Rtg {horse?.rating ?? "N/A"}</span>
+        </div>
+
         {horse && horse.starts > 0 && (
-          <div className="flex items-center gap-2 mt-1.5">
+          <div className="form-panel flex items-center gap-2.5 mt-2">
             <FormRing wins={horse.wins} places={places} starts={horse.starts} />
-            <div className="text-xs opacity-70">
+            <div className="text-xs opacity-70 leading-snug">
               <span className="font-semibold">{horse.wins}</span>W-<span className="font-semibold">{places}</span>P
-              <span className="opacity-50"> from {horse.starts}</span>
-              <span className="opacity-50"> · </span>{fmtMoney(horse.earnings)}
+              <span className="opacity-50"> from {horse.starts} · </span>
+              <span className="whitespace-nowrap">{fmtMoney(horse.earnings)}</span>
             </div>
           </div>
         )}
         {form && form.length > 0 && (
-          <div className="flex gap-1 mt-1.5">
+          <div className="flex gap-1 mt-2">
             {form.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"} !text-[0.6rem] !py-0.5`}>{f}</span>)}
           </div>
         )}
-      </div>
-      <div className="text-right shrink-0 hidden sm:block space-y-0.5">
-        <InfoStat label="Gate" value={gate ?? "N/A"} />
-        <InfoStat label="Wgt" value={weight ? `${weight}kg` : "N/A"} />
-        <InfoStat label="Rtg" value={horse?.rating ?? "N/A"} />
-      </div>
-      <div className="text-right shrink-0">
-        <div className="text-sm">{jockeyName ?? "Unknown"}</div>
-        {odds && <div className="pill pill-outline mt-1 !text-[0.62rem]">{odds}</div>}
       </div>
     </div>
   );
@@ -144,29 +141,33 @@ export function ResultRow({
         <div className={`runner-number ${podiumClass(position)}`}>{position}</div>
         <span className="text-[0.6rem] font-semibold opacity-55 leading-none">{ordinal(position)}</span>
       </div>
-      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} />
+      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} className="mt-0.5" />
       <div className="flex-1 min-w-0">
-        {horse ? (
-          <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
-        ) : (
-          <span className="font-semibold opacity-50">Unknown</span>
-        )}
-        <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
-          <span>{jockeyName ?? "Unknown"}</span>
-          <span>·</span>
-          <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
-          {margin && <><span>·</span><span>{margin}</span></>}
+        <div className="flex justify-between items-start gap-3 flex-wrap">
+          <div className="min-w-0">
+            {horse ? (
+              <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
+            ) : (
+              <span className="font-semibold opacity-50">Unknown</span>
+            )}
+            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
+              <span>{jockeyName ?? "Unknown"}</span>
+              <span>·</span>
+              <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
+              {margin && <><span>·</span><span>{margin}</span></>}
+            </div>
+          </div>
+          <div className="text-right shrink-0">
+            <div className="font-mono text-sm">{finishTime ?? "N/A"}</div>
+            <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} /></div>
+          </div>
         </div>
-      </div>
-      <div className="text-right shrink-0 hidden sm:block space-y-0.5">
-        <InfoStat label="No." value={number ?? "N/A"} />
-        <InfoStat label="Wgt" value={weight ? `${weight}kg` : "N/A"} />
-        <InfoStat label="SP" value={startingPrice ?? "N/A"} />
-        {performanceRating != null && <InfoStat label="Perf" value={performanceRating} />}
-      </div>
-      <div className="text-right shrink-0">
-        <div className="font-mono text-sm">{finishTime ?? "N/A"}</div>
-        <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} /></div>
+        <div className="text-xs opacity-60 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
+          <span>No. {number ?? "N/A"}</span>
+          <span>{weight ? `${weight}kg` : "N/A"}</span>
+          <span>SP {startingPrice ?? "N/A"}</span>
+          {performanceRating != null && <span>Perf {performanceRating}</span>}
+        </div>
       </div>
     </div>
   );
