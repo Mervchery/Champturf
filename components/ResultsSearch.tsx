@@ -6,6 +6,16 @@ import type { Race, RaceResult } from "@/lib/races";
 
 type RaceWithResults = Race & { results: RaceResult[] };
 
+// "1st", "2nd", "3rd", "4th"… — handles the 11th/12th/13th exceptions.
+function ordinal(n: number): string {
+  const j = n % 10;
+  const k = n % 100;
+  if (j === 1 && k !== 11) return `${n}st`;
+  if (j === 2 && k !== 12) return `${n}nd`;
+  if (j === 3 && k !== 13) return `${n}rd`;
+  return `${n}th`;
+}
+
 export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
   const [q, setQ] = useState("");
 
@@ -43,15 +53,14 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
             <p className="text-sm opacity-60 mt-2">No result entered yet.</p>
           ) : (
             <table className="mt-3">
-              <thead><tr><th>Pos</th><th>No.</th><th>Horse</th><th>Jockey</th><th>Gate</th><th>Time</th></tr></thead>
+              <thead><tr><th>Pos</th><th>No.</th><th>Horse</th><th>Jockey</th><th>Time</th></tr></thead>
               <tbody>
                 {r.results.map((row) => (
                   <tr key={row.id}>
-                    <td>{row.position}</td>
+                    <td>{ordinal(row.position)}</td>
                     <td className="tabular-nums opacity-70">{row.runner_no ?? "N/A"}</td>
                     <td>{row.horses?.name ?? "—"}</td>
                     <td>{row.jockey}</td>
-                    <td className="tabular-nums opacity-70">{row.gate ?? "N/A"}</td>
                     <td className="font-mono">{row.finish_time}</td>
                   </tr>
                 ))}
