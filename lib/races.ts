@@ -48,7 +48,11 @@ export type RaceEntry = {
   runner_no: number | null;
   gate: number | null;
   weight_kg: number | null;
+  // Two Mauritian tote/wagering channels, shown side by side on the
+  // racecard — `odds` is the MTC tote price, `sms_odds` the SMS Pariaz
+  // price (see supabase/entries_sms_odds_migration.sql).
   odds: string | null;
+  sms_odds: string | null;
   horse_id: string;
   horses: HorseSummary | null; // joined
   jockey_id: string | null;
