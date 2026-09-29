@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { RefSummary } from "@/lib/horses";
 import type { StableSummary } from "@/lib/trainers";
+import { HORSE_JOIN } from "@/lib/horseSelect";
 
 export type Race = {
   id: string;
@@ -86,7 +87,7 @@ export type RaceResult = {
 // Exported so any other query embedding horses (the admin panel, most
 // notably) stays in lockstep with this shape instead of keeping its own
 // copy that can silently drift out of sync with the schema.
-export const HORSE_JOIN = "horses(id, name, age, sex, rating, silk_image_url, wins, seconds, thirds, starts, earnings, owner:owners(id, name), trainer:trainers(id, name), stable:stables(id, name, silk_primary, silk_secondary, silk_cap, silk_pattern))";
+export { HORSE_JOIN };
 const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
 const RESULT_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name), trainers(id, name)`;
 
