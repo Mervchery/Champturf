@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Plus, ChevronDown, ChevronUp, Trash2, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Race, RaceEntry, RaceResult } from "@/lib/races";
+import { HORSE_JOIN } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
 import type { Horse } from "@/lib/horses";
 import type { Jockey } from "@/lib/jockeys";
@@ -16,8 +17,8 @@ import {
 } from "@/lib/actions/races";
 import { extractYoutubeId } from "@/lib/youtube";
 
-const ENTRY_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex), jockeys(id, name)";
-const RESULT_SELECT = "*, horses(id, name, trainer, stable, owner, age, sex)";
+const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
+const RESULT_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name), trainers(id, name)`;
 
 export default function RacesAdminPanel({
   races, horses, jockeys, notify,
@@ -368,8 +369,8 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               <td>{e.runner_no ?? "N/A"}</td>
               <td>{e.gate ?? "N/A"}</td>
               <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
-              <td>{(e.horses as any)?.stable || "Unknown"}</td>
-              <td>{(e.horses as any)?.trainer || "Unknown"}</td>
+              <td>{e.horses?.stable?.name ?? "Unknown"}</td>
+              <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td>{e.odds ?? "N/A"}</td>
