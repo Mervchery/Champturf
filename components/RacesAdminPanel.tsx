@@ -175,10 +175,12 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
     setLoading(true);
     const supabase = createClient();
     if (race.status === "upcoming") {
-      const { data } = await supabase.from("race_entries").select(ENTRY_SELECT).eq("race_id", race.id).order("gate");
+      const { data, error } = await supabase.from("race_entries").select(ENTRY_SELECT).eq("race_id", race.id).order("gate");
+      if (error) notify(`Couldn't load entries: ${error.message}`);
       setEntries((data as any) ?? []);
     } else {
-      const { data } = await supabase.from("race_results").select(RESULT_SELECT).eq("race_id", race.id).order("position");
+      const { data, error } = await supabase.from("race_results").select(RESULT_SELECT).eq("race_id", race.id).order("position");
+      if (error) notify(`Couldn't load results: ${error.message}`);
       setResults((data as any) ?? []);
     }
     setLoading(false);
@@ -366,8 +368,8 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               <td>{e.runner_no ?? "N/A"}</td>
               <td>{e.gate ?? "N/A"}</td>
               <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
-              <td>{e.horses?.stable?.name ?? "Unknown"}</td>
-              <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
+              <td>{(e.horses as any)?.stable || "Unknown"}</td>
+              <td>{(e.horses as any)?.trainer || "Unknown"}</td>
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td>{e.odds ?? "N/A"}</td>
