@@ -68,17 +68,38 @@ function FormRing({ wins, places, starts }: { wins: number; places: number; star
   );
 }
 
+// A tote/wagering price badge, filling the space under the number+silk
+// that's otherwise empty once the row grows taller than that column.
+// Two providers, two brand gradients, so they read as distinct at a
+// glance rather than two identical grey pills.
+function OddsBadge({ label, value, gradient }: { label: string; value: string | null; gradient: string }) {
+  if (!value) return null;
+  return (
+    <div
+      className="w-full rounded-md px-1.5 py-1 text-center text-white shadow-sm"
+      style={{ background: gradient }}
+    >
+      <div className="text-[0.5rem] font-semibold uppercase tracking-wide opacity-85 leading-none">{label}</div>
+      <div className="text-xs font-bold leading-tight mt-0.5 tabular-nums">{value}</div>
+    </div>
+  );
+}
+
 export function EntryRow({
-  number, horse, jockeyName, weight, gate, odds, form,
-}: BaseProps & { gate: number | null; odds: string | null; form?: string[] }) {
+  number, horse, jockeyName, weight, gate, odds, smsOdds, form,
+}: BaseProps & { gate: number | null; odds: string | null; smsOdds: string | null; form?: string[] }) {
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
     <div className="runner-row">
-      <div className="runner-number mt-0.5">{number ?? "N/A"}</div>
-      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} className="mt-0.5" />
+      <div className="flex flex-col items-center gap-1.5 shrink-0 w-[38px]">
+        <div className="runner-number mt-0.5">{number ?? "N/A"}</div>
+        <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} />
+        <OddsBadge label="MTC" value={odds} gradient="linear-gradient(135deg, #0f5c46, #2f9e78)" />
+        <OddsBadge label="SMS" value={smsOdds} gradient="linear-gradient(135deg, #b3471f, #f2994a)" />
+      </div>
       <div className="flex-1 min-w-0">
-        {/* Name + jockey/odds share one header line so nothing floats off
-            on its own with a big empty gap when either side is short. */}
+        {/* Name + jockey share one header line so nothing floats off on
+            its own with a big empty gap when either side is short. */}
         <div className="flex justify-between items-start gap-3 flex-wrap">
           <div className="min-w-0">
             {horse ? (
@@ -96,7 +117,6 @@ export function EntryRow({
           </div>
           <div className="text-right shrink-0">
             <div className="text-sm">{jockeyName ?? "Unknown"}</div>
-            {odds && <div className="pill pill-outline mt-1 !text-[0.62rem]">{odds}</div>}
           </div>
         </div>
 

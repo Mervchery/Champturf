@@ -320,7 +320,7 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
 
 function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
-  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null }) => void;
+  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null; sms_odds: string | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [runnerNo, setRunnerNo] = useState("");
@@ -329,6 +329,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   const [jockeyId, setJockeyId] = useState("");
   const [weight, setWeight] = useState("");
   const [odds, setOdds] = useState("");
+  const [smsOdds, setSmsOdds] = useState("");
 
   // A horse already entered in this race can't be entered again.
   const enteredHorseIds = new Set(entries.map((e) => e.horse_id));
@@ -337,7 +338,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>Odds</th><th /></tr></thead>
+        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>MTC odds</th><th>SMS odds</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id}>
@@ -349,10 +350,11 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td>{e.odds ?? "N/A"}</td>
+              <td>{e.sms_odds ?? "N/A"}</td>
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={9} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={10} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
@@ -383,8 +385,12 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
           <input type="number" className="admin-input w-24" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Odds</label>
+          <label className="text-xs opacity-65 block mb-1">MTC tote odds</label>
           <input className="admin-input w-24" placeholder="5/2" value={odds} onChange={(e) => setOdds(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">SMS Pariaz odds</label>
+          <input className="admin-input w-24" placeholder="5/2" value={smsOdds} onChange={(e) => setSmsOdds(e.target.value)} />
         </div>
         <button
           className="btn btn-dark"
@@ -398,8 +404,9 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               jockey_id: jockeyId || null,
               weight_kg: weight ? Number(weight) : null,
               odds: odds || null,
+              sms_odds: smsOdds || null,
             });
-            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds("");
+            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds(""); setSmsOdds("");
           }}
         >
           Add entry
@@ -415,10 +422,12 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
 
 function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
   raceId: string; results: RaceResult[]; horseOptions: { id: string; name: string }[];
-  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string; margin: string | null; starting_price: string | null; performance_rating: number | null }) => void;
+  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string; margin: string | null; starting_price: string | null; performance_rating: number | null; gate: number | null; runner_no: number | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [position, setPosition] = useState("");
+  const [runnerNo, setRunnerNo] = useState("");
+  const [gate, setGate] = useState("");
   const [horseId, setHorseId] = useState("");
   const [jockey, setJockey] = useState("");
   const [finishTime, setFinishTime] = useState("");
@@ -429,11 +438,14 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>Pos</th><th>Horse</th><th>Jockey</th><th>Time</th><th>Margin</th><th>SP</th><th>Perf.</th><th /></tr></thead>
+        <thead><tr><th>Pos</th><th>No.</th><th>Gate</th><th>Horse</th><th>Jockey</th><th>Time</th><th>Margin</th><th>SP</th><th>Perf.</th><th /></tr></thead>
         <tbody>
           {results.map((r) => (
             <tr key={r.id}>
-              <td>{r.position}</td><td>{r.horses?.name ?? "Unknown"}</td><td>{r.jockey || "Unknown"}</td>
+              <td>{r.position}</td>
+              <td>{r.runner_no ?? "N/A"}</td>
+              <td>{r.gate ?? "N/A"}</td>
+              <td className="font-semibold">{r.horses?.name ?? "Unknown"}</td><td>{r.jockey || "Unknown"}</td>
               <td className="font-mono">{r.finish_time ?? "N/A"}</td>
               <td>{r.margin ?? "N/A"}</td>
               <td>{r.starting_price ?? "N/A"}</td>
@@ -441,13 +453,21 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
               <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button></td>
             </tr>
           ))}
-          {results.length === 0 && <tr><td colSpan={8} className="opacity-60 text-sm">No result entered yet.</td></tr>}
+          {results.length === 0 && <tr><td colSpan={10} className="opacity-60 text-sm">No result entered yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
         <div>
           <label className="text-xs opacity-65 block mb-1">Position</label>
           <input type="number" className="admin-input w-20" value={position} onChange={(e) => setPosition(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">No.</label>
+          <input type="number" className="admin-input w-20" value={runnerNo} onChange={(e) => setRunnerNo(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Gate</label>
+          <input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} />
         </div>
         <div>
           <label className="text-xs opacity-65 block mb-1">Horse</label>
@@ -484,8 +504,10 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
               race_id: raceId, position: Number(position), horse_id: horseId, jockey, finish_time: finishTime,
               margin: margin || null, starting_price: startingPrice || null,
               performance_rating: performanceRating ? Number(performanceRating) : null,
+              gate: gate ? Number(gate) : null,
+              runner_no: runnerNo ? Number(runnerNo) : null,
             });
-            setPosition(""); setHorseId(""); setJockey(""); setFinishTime("");
+            setPosition(""); setRunnerNo(""); setGate(""); setHorseId(""); setJockey(""); setFinishTime("");
             setMargin(""); setStartingPrice(""); setPerformanceRating("");
           }}
         >
