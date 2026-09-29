@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { Plus, ChevronDown, ChevronUp, Trash2, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Race, RaceEntry, RaceResult } from "@/lib/races";
-import { HORSE_JOIN } from "@/lib/races";
+import { HORSE_JOIN } from "@/lib/horseSelect";
 import { fmtMoney } from "@/lib/format";
 import type { Horse } from "@/lib/horses";
 import type { Jockey } from "@/lib/jockeys";
