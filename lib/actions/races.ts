@@ -66,6 +66,8 @@ export type ResultInput = {
   starting_price?: string | null;
   performance_rating?: number | null;
   weight_kg?: number | null;
+  gate?: number | null;
+  runner_no?: number | null;
 };
 
 /** Creates or overwrites the result row for a given race+position
@@ -104,6 +106,7 @@ export type EntryInput = {
   jockey_id: string | null;
   weight_kg: number | null;
   odds?: string | null;
+  sms_odds?: string | null;
 };
 
 export async function createEntry(input: EntryInput) {
@@ -148,7 +151,7 @@ function parseIsoDuration(iso: string): number {
   return (Number(h) || 0) * 3600 + (Number(min) || 0) * 60 + (Number(s) || 0);
 }
 
-const MAX_REPLAY_SECONDS = 16 * 60;
+const MAX_REPLAY_SECONDS = 5 * 60;
 const PUBLISH_WINDOW_DAYS_AFTER = 14;
 
 /** Searches YouTube for a race's replay and saves the best match, then
