@@ -117,6 +117,17 @@ export async function createEntry(input: EntryInput) {
   revalidatePath(`/races/${input.race_id}`);
 }
 
+/** Edits an already-declared entry in place (weight, odds, jockey, gate,
+ *  No…) rather than requiring a delete-and-re-add — the horse/race pairing
+ *  (id) never changes here, only the fields around it. */
+export async function updateEntry(id: string, raceId: string, input: Partial<EntryInput>) {
+  const supabase = await requireAdmin();
+  const { error } = await supabase.from("race_entries").update(input).eq("id", id);
+  if (error) throw new Error(error.message);
+  revalidatePath("/admin");
+  revalidatePath(`/races/${raceId}`);
+}
+
 export async function deleteEntry(id: string, raceId: string) {
   const supabase = await requireAdmin();
   const { error } = await supabase.from("race_entries").delete().eq("id", id);
