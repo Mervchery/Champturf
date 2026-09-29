@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Plus, ChevronDown, ChevronUp, Trash2 } from "lucide-react";
+import { Plus, ChevronDown, ChevronUp, Trash2, Pencil } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { Race, RaceEntry, RaceResult } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
@@ -10,7 +10,7 @@ import type { Horse } from "@/lib/horses";
 import type { Jockey } from "@/lib/jockeys";
 import {
   createRace, deleteRace, updateRace,
-  createEntry, deleteEntry,
+  createEntry, updateEntry, deleteEntry,
   upsertResult, deleteResult,
   setRaceVideo, findRaceVideoOnYoutube,
 } from "@/lib/actions/races";
@@ -222,6 +222,7 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
           horses={horses}
           jockeys={jockeys}
           onAdd={(input) => handle(() => createEntry(input), "Entry added")}
+          onUpdate={(id, input) => handle(() => updateEntry(id, race.id, input), "Entry updated")}
           onDelete={(id) => handle(() => deleteEntry(id, race.id), "Entry removed")}
         />
       ) : (
@@ -318,11 +319,13 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
   );
 }
 
-function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
+function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
   onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null; sms_odds: string | null }) => void;
+  onUpdate: (id: string, input: { runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null; sms_odds: string | null }) => void;
   onDelete: (id: string) => void;
 }) {
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [runnerNo, setRunnerNo] = useState("");
   const [gate, setGate] = useState("");
   const [horseId, setHorseId] = useState("");
@@ -331,9 +334,27 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
   const [odds, setOdds] = useState("");
   const [smsOdds, setSmsOdds] = useState("");
 
-  // A horse already entered in this race can't be entered again.
+  function resetForm() {
+    setEditingId(null);
+    setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds(""); setSmsOdds("");
+  }
+
+  function startEdit(e: RaceEntry) {
+    setEditingId(e.id);
+    setRunnerNo(e.runner_no?.toString() ?? "");
+    setGate(e.gate?.toString() ?? "");
+    setHorseId(e.horse_id);
+    setJockeyId(e.jockey_id ?? "");
+    setWeight(e.weight_kg?.toString() ?? "");
+    setOdds(e.odds ?? "");
+    setSmsOdds(e.sms_odds ?? "");
+  }
+
+  // A horse already entered in this race can't be entered again — except
+  // the entry currently being edited, which needs its own horse to stay
+  // selectable in the dropdown.
   const enteredHorseIds = new Set(entries.map((e) => e.horse_id));
-  const availableHorses = horses.filter((h) => !enteredHorseIds.has(h.id));
+  const availableHorses = horses.filter((h) => !enteredHorseIds.has(h.id) || h.id === horseId);
 
   return (
     <div>
@@ -341,7 +362,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
         <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>MTC odds</th><th>SMS odds</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
-            <tr key={e.id}>
+            <tr key={e.id} className={e.id === editingId ? "bg-black/[0.03]" : undefined}>
               <td>{e.runner_no ?? "N/A"}</td>
               <td>{e.gate ?? "N/A"}</td>
               <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
@@ -351,12 +372,20 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td>{e.odds ?? "N/A"}</td>
               <td>{e.sms_odds ?? "N/A"}</td>
-              <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button></td>
+              <td className="flex gap-1.5">
+                <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => startEdit(e)}><Pencil size={12} /></button>
+                <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button>
+              </td>
             </tr>
           ))}
           {entries.length === 0 && <tr><td colSpan={10} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
+      {editingId && (
+        <p className="text-xs opacity-70 mb-2">
+          Editing {entries.find((e) => e.id === editingId)?.horses?.name ?? "this entry"} — change the fields below and save, or cancel.
+        </p>
+      )}
       <div className="flex gap-2 flex-wrap items-end">
         <div>
           <label className="text-xs opacity-65 block mb-1">No.</label>
@@ -396,8 +425,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
           className="btn btn-dark"
           onClick={() => {
             if (!horseId) return;
-            onAdd({
-              race_id: raceId,
+            const shared = {
               runner_no: runnerNo ? Number(runnerNo) : null,
               gate: gate ? Number(gate) : null,
               horse_id: horseId,
@@ -405,12 +433,20 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onDelete }: {
               weight_kg: weight ? Number(weight) : null,
               odds: odds || null,
               sms_odds: smsOdds || null,
-            });
-            setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds(""); setSmsOdds("");
+            };
+            if (editingId) {
+              onUpdate(editingId, shared);
+            } else {
+              onAdd({ race_id: raceId, ...shared });
+            }
+            resetForm();
           }}
         >
-          Add entry
+          {editingId ? "Save changes" : "Add entry"}
         </button>
+        {editingId && (
+          <button className="btn btn-outline" onClick={resetForm}>Cancel</button>
+        )}
       </div>
       {horses.length === 0 && (
         <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
