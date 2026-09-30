@@ -18,7 +18,11 @@ export default async function StablesPage() {
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
             <Link key={s.id} href={`/stables/${s.id}`} className="card p-5 flex items-start gap-4">
-              <SilkImage url={s.silk_image_url} size={44} title={s.name} />
+              {s.silk_image_url && (
+                <div className="silk-frame">
+                  <SilkImage url={s.silk_image_url} size={38} title={s.name} />
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <h4 className="font-semibold truncate">{s.name}</h4>
                 <div className="text-xs opacity-60 mt-1">{s.location ?? "N/A"} · Owner: {s.owner ?? "Unknown"}</div>
