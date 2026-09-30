@@ -16,17 +16,23 @@ export default async function TrainersPage() {
         </div>
       </div>
       <section className="py-14">
-        <div className="wrap grid grid-cols-2 md:grid-cols-4 gap-5">
+        <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
           {trainers.map((t) => (
             <Link key={t.id} href={`/trainers/${t.id}`} className="card">
-              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center gap-3">
-                {t.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={t.photo_url} alt={t.name} className="w-14 h-14 rounded-full object-cover border-2 border-gold2" />
-                ) : (
-                  <Target size={26} className="text-white/60" />
+              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center gap-2.5">
+                <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-white/60 shrink-0 overflow-hidden">
+                  {t.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={t.photo_url} alt={t.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <Target size={24} />
+                  )}
+                </div>
+                {t.stable?.silk_image_url && (
+                  <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-white/25 flex items-center justify-center">
+                    <SilkImage url={t.stable.silk_image_url} size={30} title={t.stable.name} />
+                  </div>
                 )}
-                {t.stable && <SilkImage url={t.stable.silk_image_url} size={30} title={t.stable.name} />}
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{t.name}</h4>
