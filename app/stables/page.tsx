@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Shirt } from "lucide-react";
 import { getStables } from "@/lib/stables";
 import SilkImage from "@/components/SilkImage";
 
@@ -17,13 +18,24 @@ export default async function StablesPage() {
       <section className="py-14">
         <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
-            <Link key={s.id} href={`/stables/${s.id}`} className="card p-5 flex items-start gap-4">
-              {s.silk_image_url && (
-                <div className="silk-frame">
-                  <SilkImage url={s.silk_image_url} size={38} title={s.name} />
-                </div>
-              )}
-              <div className="min-w-0 flex-1">
+            <Link key={s.id} href={`/stables/${s.id}`} className="card">
+              {/* Same banner-header shape as the trainers grid, so the two
+                  database listings read as one family of card rather than
+                  two different layouts — the silk is the stable's whole
+                  identity here, so it gets the prominent spot a trainer's
+                  photo takes on the other page. */}
+              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center">
+                {s.silk_image_url ? (
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-white/25 flex items-center justify-center overflow-hidden shrink-0">
+                    <SilkImage url={s.silk_image_url} size={48} title={s.name} />
+                  </div>
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-white/25 flex items-center justify-center text-white/60 shrink-0">
+                    <Shirt size={26} />
+                  </div>
+                )}
+              </div>
+              <div className="p-4">
                 <h4 className="font-semibold truncate">{s.name}</h4>
                 <div className="text-xs opacity-60 mt-1">{s.location ?? "N/A"} · Owner: {s.owner ?? "Unknown"}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
