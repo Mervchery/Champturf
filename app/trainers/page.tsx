@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { Target } from "lucide-react";
 import { getTrainers } from "@/lib/trainers";
 import SilkImage from "@/components/SilkImage";
@@ -18,21 +17,26 @@ export default async function TrainersPage() {
       <section className="py-14">
         <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
           {trainers.map((t) => (
-            <Link key={t.id} href={`/trainers/${t.id}`} className="card">
-              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center gap-2.5">
-                <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-white/60 shrink-0 overflow-hidden">
-                  {t.photo_url ? (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img src={t.photo_url} alt={t.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <Target size={24} />
+            <div key={t.id} className="card no-hover">
+              <div className="h-[100px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center">
+                {/* Avatar with the stable's silk as a small badge riding its
+                    bottom-right edge — one integrated emblem instead of two
+                    separate circles floating side by side. */}
+                <div className="relative w-16 h-16 shrink-0">
+                  <div className="w-full h-full rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-white/60 overflow-hidden">
+                    {t.photo_url ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img src={t.photo_url} alt={t.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <Target size={26} />
+                    )}
+                  </div>
+                  {t.stable?.silk_image_url && (
+                    <div className="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-turf border-2 border-[#fbf8f0] flex items-center justify-center overflow-hidden shadow-sm">
+                      <SilkImage url={t.stable.silk_image_url} size={16} title={t.stable.name} />
+                    </div>
                   )}
                 </div>
-                {t.stable?.silk_image_url && (
-                  <div className="w-14 h-14 rounded-full bg-white/10 border-2 border-white/25 flex items-center justify-center">
-                    <SilkImage url={t.stable.silk_image_url} size={30} title={t.stable.name} />
-                  </div>
-                )}
               </div>
               <div className="p-4">
                 <h4 className="font-semibold">{t.name}</h4>
@@ -43,7 +47,7 @@ export default async function TrainersPage() {
                   <div><b className="block font-mono text-sm">{t.ranking ? `#${t.ranking}` : "N/A"}</b>Rank</div>
                 </div>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </section>
