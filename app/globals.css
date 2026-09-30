@@ -285,6 +285,26 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.05);
 }
 
+/* Soft rounded frame for a silk on a light/card surface — the dark-hero
+   equivalent (used on stable/trainer profile headers) is the inline
+   bg-white/10 border-white/15 combo, since that only ever sits on the
+   dark turf gradient; this is the same idea for everywhere else, so a
+   bare silk icon doesn't float unframed next to photos/badges that do
+   have a border. */
+.silk-frame {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 5px;
+  flex-shrink: 0;
+}
+.dark .silk-frame {
+  background: rgba(255, 255, 255, 0.06);
+}
+
 /* ---------- Hero ---------- */
 
 .detail-hero {
