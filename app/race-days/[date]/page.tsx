@@ -60,8 +60,8 @@ export default async function RaceDayPage({ params }: { params: { date: string }
           <h2 className="font-display text-2xl mb-5">Races on this card</h2>
           <div className="grid sm:grid-cols-2 gap-4">
             {races.map((r, i) => (
-              <Link key={r.id} href={`/races/${r.id}`} className="card p-5 flex items-center gap-4">
-                <div className="runner-number !w-10 !h-10 !text-sm shrink-0">{i + 1}</div>
+              <Link key={r.id} href={`/races/${r.id}`} className="card p-5 flex items-start gap-4">
+                <div className="runner-number !w-10 !h-10 !text-sm shrink-0 mt-0.5">{i + 1}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className={`pill ${r.status === "upcoming" ? "pill-gold" : "pill-outline"}`}>{r.race_time}</span>
