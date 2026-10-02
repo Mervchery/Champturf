@@ -106,14 +106,14 @@ export async function setRaceStatus(raceId, status) {
 /** Race entries store horse_id/jockey_id/trainer_id — never names — as
  *  the actual relationship. jockeyName/trainerName here are just the
  *  scraped text used to resolve (or create) the linked row. */
-export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg }) {
+export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
   const { error } = await supabaseAdmin
     .from("race_entries")
     .upsert(
-      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg },
+      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg, runner_no: runnerNo ?? null },
       { onConflict: "race_id,horse_id" }
     );
   if (error) throw new Error(`Failed to upsert entry: ${error.message}`);
@@ -124,8 +124,11 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
  *  relationship (per the same principle as entries). The legacy `jockey`
  *  text column is also kept populated — several existing pages read it
  *  directly, and there's no need to touch that frontend code to get the
- *  real relational data recorded correctly at the same time. */
-export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg }) {
+ *  real relational data recorded correctly at the same time. `gate` is
+ *  stored directly on the result row (not just on race_entries) since a
+ *  race scraped as already-completed never gets a race_entries row at
+ *  all — see scrape.mjs's `isResult` branch. */
+export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg, gate }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
@@ -137,6 +140,7 @@ export async function upsertResult({ raceId, horseId, position, jockeyName, trai
         jockey_id: jockey.id, trainer_id: trainer.id,
         jockey: jockeyName ?? "Unknown",
         finish_time: finishTime, margin: margin ?? null, weight_kg: weightKg,
+        gate: gate ?? null,
       },
       { onConflict: "race_id,position" }
     );

@@ -1,3 +1,4 @@
+import "./lib/loadEnv.mjs"; // must be first — loads .env.local before any other import reads process.env
 import { writeFile, mkdir } from "node:fs/promises";
 import { fetchHtml } from "./lib/fetchHtml.mjs";
 import { parseRacePage } from "./lib/parseRacePage.mjs";
@@ -122,7 +123,7 @@ async function scrapeRace(raceUrl) {
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 
-  for (const entry of parsed.entries) {
+  for (const [entryIndex, entry] of parsed.entries.entries()) {
     if (!entry.horseSlug) {
       console.warn(`    Entry with no horse link found (gate ${entry.gate}) — skipping this runner.`);
       stats.errors.push({ context: raceUrl, message: `No horse link for gate ${entry.gate}` });
@@ -158,16 +159,22 @@ async function scrapeRace(raceUrl) {
           raceId: race.id, horseId: horse.id, position: entry.position,
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           finishTime: entry.finishTime, margin: null, weightKg: entry.weight,
+          gate: entry.gate,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
         stats.resultsImported++;
         console.log(`    ${entry.position}. ${entry.horseName} (${entry.jockey ?? "jockey unknown"})`);
       } else {
+        // Supertote lists runners in actual racecard-No. order, so the
+        // card's own listing position (1-based) *is* the No. — the site
+        // doesn't expose a separate number field to scrape for this, and
+        // this is reliable where that would otherwise sit blank/N/A.
         const result = await upsertEntry({
           raceId: race.id, horseId: horse.id,
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           gate: entry.gate, weightKg: entry.weight,
+          runnerNo: entryIndex + 1,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
