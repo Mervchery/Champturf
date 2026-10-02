@@ -71,7 +71,7 @@ export default function AdminDashboard({
   const apprentices = jockeys.filter((j) => j.apprentice);
 
   return (
-    <div className="grid md:grid-cols-[220px_1fr] min-h-[75vh]">
+    <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] min-h-[75vh]">
       <aside className="bg-turf text-white p-4 md:p-6 flex md:flex-col gap-1 overflow-x-auto">
         <div className="hidden md:block text-xs opacity-60 mb-4">
           Signed in as <b className="text-gold2">{email}</b>

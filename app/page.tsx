@@ -34,7 +34,7 @@ export default async function HomePage() {
     <div>
       {/* HERO */}
       <section className="relative overflow-hidden bg-gradient-to-b from-turf to-turf2 text-surface py-16 md:py-20">
-        <div className="wrap grid md:grid-cols-[1.15fr_0.85fr] gap-10 items-center">
+        <div className="wrap grid grid-cols-1 md:grid-cols-[1.15fr_0.85fr] gap-10 items-center">
           <div>
             <span className="text-xs font-semibold text-gold2 block mb-2.5">CHAMP DE MARS · PORT LOUIS</span>
             <h1 className="font-display text-4xl md:text-6xl leading-[1.02]">
@@ -78,7 +78,7 @@ export default async function HomePage() {
           {completedWithResults.length === 0 ? (
             <p className="text-sm opacity-60">No results yet.</p>
           ) : (
-            <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
               {completedWithResults.map((r) => {
                 const win = r.results[0];
                 return (
@@ -103,7 +103,7 @@ export default async function HomePage() {
 
       {/* LEADERBOARDS */}
       <section className="py-14 bg-parchment2">
-        <div className="wrap grid md:grid-cols-2 gap-10">
+        <div className="wrap grid grid-cols-1 md:grid-cols-2 gap-10">
           <div>
             <div className="flex justify-between items-end mb-4">
               <h2 className="font-display text-xl">Leading horses</h2>
@@ -173,7 +173,7 @@ export default async function HomePage() {
             <h2 className="font-display text-3xl">Latest news</h2>
             <Link href="/news" className="text-sm border-b border-ink pb-0.5">All news →</Link>
           </div>
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {news.slice(0, 3).map((n) => (
               <div key={n.id} className="card">
                 <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">

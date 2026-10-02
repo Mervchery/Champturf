@@ -16,9 +16,13 @@ import { useState } from "react";
 export default function SilkImage({ url, size = 34, title, className }: { url?: string | null; size?: number; title?: string; className?: string }) {
   const [failed, setFailed] = useState(false);
   if (!url || failed) return null;
+  // A local path (e.g. an image saved under /public) is already same-origin
+  // and doesn't need — or benefit from — the proxy hop.
+  const isRemote = /^https?:\/\//i.test(url);
+  const src = isRemote ? `/api/silk-proxy?url=${encodeURIComponent(url)}` : url;
   return (
     <img
-      src={`/api/silk-proxy?url=${encodeURIComponent(url)}`}
+      src={src}
       alt={title ? `${title} silk` : "Silk"}
       title={title}
       width={size}

@@ -1,0 +1,12 @@
+-- Supersedes the earlier owner/cap-override approach: supertote.mu itself
+-- serves the actual silk artwork per runner (an <object data="...png">
+-- inside each li.runner), which already reflects owner colors, cap
+-- variants, and everything else correctly, since it's the real thing —
+-- not an approximation we'd have to maintain by hand. The scraper now
+-- captures that URL directly (see scraper/lib/parseRacePage.mjs and
+-- scraper/upsert.mjs); this just adds somewhere to put it.
+--
+-- Nullable: a horse scraped before this field existed, or added manually
+-- through the admin panel, may not have one yet. Display code should
+-- treat a missing value as "no silk to show" rather than guessing.
+alter table public.horses add column if not exists silk_image_url text;

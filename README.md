@@ -414,6 +414,39 @@ A significant visual and structural pass, delivered in a scoped first phase.
 - **Current-season vs. career stat split** — career totals are shown;
   splitting by season would need a season boundary defined somewhere.
 
+## Race replays (YouTube)
+
+Completed races can show an embedded YouTube replay instead of the
+placeholder box. Run `supabase/youtube_replay_migration.sql` first.
+
+**Two ways to link a replay, both in the admin race panel (Manage → a
+completed race):**
+
+1. **Paste a URL manually** — copy the video's link from YouTube (any
+   format: `youtube.com/watch?v=...`, `youtu.be/...`, etc.) into the field
+   and hit Save. No setup, no API key, works immediately.
+2. **"Auto-find on YouTube"** — searches YouTube for the race by name and
+   date, and saves the top result automatically. Requires `YOUTUBE_API_KEY`
+   (see `.env.example`):
+   1. Go to [console.cloud.google.com](https://console.cloud.google.com),
+      create a project (or use an existing one).
+   2. **APIs & Services → Library** → search "YouTube Data API v3" → Enable.
+   3. **APIs & Services → Credentials** → Create Credentials → API key.
+   4. Add it as `YOUTUBE_API_KEY` in `.env.local` (and in Vercel's
+      environment variables if you want this to work in production, not
+      just locally).
+
+**On quota:** the free tier is 10,000 units/day, and a single search
+costs 100 — about 100 searches per day. This is exactly why "Auto-find"
+only ever runs when an admin clicks the button for one specific race,
+never automatically when a visitor loads a page. If you don't want to
+deal with API quotas at all, the manual-paste option needs no key and no
+quota — just find the video yourself and paste the link.
+
+If no replay is linked yet, visitors see a "Search YouTube" link instead
+of the embed — this needs no API key either, it just opens YouTube's own
+search results in a new tab so anyone can go find it themselves.
+
 ## Project structure
 
 ```

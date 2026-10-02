@@ -86,8 +86,8 @@ function OddsBadge({ label, value, gradient }: { label: string; value: string | 
 }
 
 export function EntryRow({
-  number, horse, jockeyName, weight, gate, odds, smsOdds, form,
-}: BaseProps & { gate: number | null; odds: string | null; smsOdds: string | null; form?: string[] }) {
+  number, horse, jockeyName, weight, gate, odds, smsOdds = null, form,
+}: BaseProps & { gate: number | null; odds: string | null; smsOdds?: string | null; form?: string[] }) {
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
     <div className="runner-row">

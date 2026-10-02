@@ -55,8 +55,8 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             Stats above are computed automatically from entered race results — they can&apos;t be edited directly.
           </p>
 
-          <div className="grid md:grid-cols-2 gap-5 mb-10">
-            <div className="panel">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
+            <div className="panel min-w-0">
               <h4 className="text-sm font-semibold mb-3">Connections</h4>
               <table>
                 <tbody>

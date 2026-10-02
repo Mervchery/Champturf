@@ -154,7 +154,7 @@ function EntityForm({ fields, initial, onSubmit, onCancel }: {
 
   return (
     <div className="panel mb-5">
-      <div className="grid sm:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         {fields.map((f) => (
           <div key={f.key} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
             <label className="text-xs opacity-65 block mb-1.5">{f.label}</label>

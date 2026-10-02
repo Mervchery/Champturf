@@ -60,7 +60,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
             </div>
           )}
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="min-w-0">
               <h2 className="font-display text-xl mb-4">Horses in this stable</h2>
               {horses.length === 0 ? (

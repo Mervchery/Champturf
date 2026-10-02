@@ -27,7 +27,7 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
             ))}
           </div>
           {list.length === 0 && <p className="text-sm opacity-60">No articles yet.</p>}
-          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {list.map((n) => (
               <div key={n.id} className="card">
                 <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">

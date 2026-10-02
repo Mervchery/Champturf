@@ -75,7 +75,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                   ))}
                 </div>
               )}
-              <div className="grid sm:grid-cols-2 gap-5 mt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
                 <div className="panel">
                   <h4 className="text-sm font-semibold flex items-center gap-2"><Camera size={15} /> Photo finish gallery</h4>
                   <div className="h-[120px] mt-2.5 bg-gradient-to-br from-turf to-turf2 rounded-2xl flex items-center justify-center text-white/50">

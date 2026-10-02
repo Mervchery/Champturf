@@ -14,7 +14,7 @@ export default async function OwnersPage() {
         </div>
       </div>
       <section className="py-14">
-        <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {owners.map((o) => (
             <div key={o.id} className="card">
               <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">

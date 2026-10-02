@@ -27,7 +27,7 @@ export default async function RaceDaysPage() {
           {upcoming.length > 0 && (
             <>
               <h2 className="font-display text-2xl mb-5">Upcoming</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
                 {upcoming.map((d) => <RaceDayCard key={d.race_date} day={d} />)}
               </div>
             </>
@@ -36,7 +36,7 @@ export default async function RaceDaysPage() {
           {completed.length > 0 && (
             <>
               <h2 className="font-display text-2xl mb-5">Past meetings</h2>
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
                 {completed.map((d) => <RaceDayCard key={d.race_date} day={d} />)}
               </div>
             </>

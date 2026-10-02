@@ -16,7 +16,7 @@ export default async function StablesPage() {
         </div>
       </div>
       <section className="py-14">
-        <div className="wrap grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+        <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
             <Link key={s.id} href={`/stables/${s.id}`} className="card">
               {/* Same banner-header shape as the trainers grid, so the two

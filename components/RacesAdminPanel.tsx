@@ -124,7 +124,7 @@ function NewRaceForm({ onSubmit, onCancel }: { onSubmit: (input: any) => void; o
 
   return (
     <div className="panel mb-5">
-      <div className="grid sm:grid-cols-2 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         <Field label="Race name"><input className="input" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} /></Field>
         <Field label="Course"><input className="input" value={form.course} onChange={(e) => setForm({ ...form, course: e.target.value })} /></Field>
         <Field label="Date"><input type="date" className="input" value={form.race_date} onChange={(e) => setForm({ ...form, race_date: e.target.value })} /></Field>
