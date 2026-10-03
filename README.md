@@ -514,3 +514,7 @@ has been removed. Run `supabase/scraped_odds_gear_tips_migration.sql` once, then
 ## Languages (EN / FR)
 
 The footer has an EN | FR switch (choice stored in the `ct-lang` cookie). UI text lives in `lib/i18n/fr.ts` — English text is the key, so a missing entry simply shows English. Server components use `getT()` (`lib/i18n/server.ts`), client components use `useT()`. Horse, jockey, trainer, stable, owner and race names are never translated, and neither is free text entered by staff (news, notes, etc.).
+
+## Racing-notes translation
+
+Supertote publishes the notes in French. The scraper stores the original in `races.racing_notes` and an English version in `races.racing_notes_en`, protecting every horse, jockey and trainer name so they are never translated. Run `supabase/racing_notes_en_migration.sql` once, then re-scrape — or `npm run translate-notes` to fill in races already imported. Add `ANTHROPIC_API_KEY` to `.env.local` for best quality (otherwise a free service is used). If a translation can't be produced safely, the original text is shown.

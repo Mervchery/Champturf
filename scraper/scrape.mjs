@@ -5,7 +5,8 @@ import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
 import { resolveTrainerName } from "./lib/trainerOverrides.mjs";
-import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult } from "./upsert.mjs";
+import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes } from "./upsert.mjs";
+import { translateNotes } from "./lib/translateNotes.mjs";
 
 const args = process.argv.slice(2);
 if (args.length === 0 || args.length > 2) {
@@ -119,7 +120,20 @@ async function scrapeRace(raceUrl) {
   const raceDate = toIsoDate(urlDate);
   const raceTime = to24Hour(parsed.timeOfDay);
 
-  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, dangerHorse: parsed.dangerHorse });
+  // English version of the (French) racing notes. Horse/jockey/trainer names
+  // are protected so they never get translated. Skipped when the notes are
+  // unchanged since the last scrape; "" means "tried and failed" — the site
+  // then falls back to the original text.
+  let racingNotesEn;
+  if (parsed.racingNotes) {
+    const existing = await getRaceNotes(parsed.name, raceDate);
+    if (!(existing?.racing_notes === parsed.racingNotes && existing?.racing_notes_en)) {
+      const names = [...parsed.entries.flatMap((e) => [e.horseName, e.jockey, e.trainer]), parsed.dangerHorse];
+      racingNotesEn = (await translateNotes(parsed.racingNotes, names)) ?? "";
+    }
+  }
+
+  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse });
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 

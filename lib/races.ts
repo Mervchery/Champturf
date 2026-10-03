@@ -16,6 +16,8 @@ export type Race = {
   youtube_video_id: string | null;
   // Scraped from Supertote's "Racing Notes" block (see scraper/lib/parseRacePage.mjs).
   racing_notes: string | null;
+  // English translation of racing_notes (names untouched), filled in by the scraper.
+  racing_notes_en: string | null;
   danger_horse: string | null;
 };
 

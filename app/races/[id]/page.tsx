@@ -35,7 +35,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
     ...entries.filter((e) => e.is_tipped).map((e) => ({ name: e.horses?.name ?? "Unknown", id: e.horses?.id ?? null, no: e.runner_no })),
     ...results.filter((r) => r.is_tipped).map((r) => ({ name: r.horses?.name ?? "Unknown", id: r.horses?.id ?? null, no: r.runner_no })),
   ];
-  const hasTips = tipped.length > 0 || !!race.racing_notes || !!race.danger_horse;
+  // Notes are published in French. English readers get the stored translation
+  // (horse/jockey/trainer names protected at scrape time); if there isn't one
+  // yet, the original is shown rather than nothing.
+  const notesText = lang === "en" ? race.racing_notes_en || race.racing_notes : race.racing_notes;
+  const hasTips = tipped.length > 0 || !!notesText || !!race.danger_horse;
 
   const tipsPanel = hasTips ? (
     <div className="panel fade-in mt-8">
@@ -52,9 +56,9 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             ))}
           </div>
         )}
-        {race.racing_notes && (
+        {notesText && (
           <div className="space-y-2 leading-relaxed">
-            {race.racing_notes.split(/\n\n+/).map((para, i) => <p key={i}>{para}</p>)}
+            {notesText.split(/\n\n+/).map((para, i) => <p key={i}>{para}</p>)}
           </div>
         )}
         {race.danger_horse && (

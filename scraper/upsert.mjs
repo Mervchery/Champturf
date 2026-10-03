@@ -73,14 +73,21 @@ export async function upsertHorse({ name, age, origin, trainerName, ownerName, s
   return { id: created.id, created: true, updated: false, trainer, owner };
 }
 
-export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, dangerHorse }) {
+/** Existing notes for a race, so a re-scrape can skip re-translating unchanged text. */
+export async function getRaceNotes(name, raceDate) {
+  const { data } = await supabaseAdmin
+    .from("races").select("racing_notes, racing_notes_en").eq("name", name).eq("race_date", raceDate).maybeSingle();
+  return data ?? null;
+}
+
+export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse }) {
   const { data: existing, error: selectError } = await supabaseAdmin
     .from("races").select("*").eq("name", name).eq("race_date", raceDate).maybeSingle();
   if (selectError) throw new Error(`Failed to look up race "${name}": ${selectError.message}`);
 
   const fields = {
     name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars",
-    racing_notes: racingNotes, danger_horse: dangerHorse,
+    racing_notes: racingNotes, racing_notes_en: racingNotesEn, danger_horse: dangerHorse,
   };
 
   if (existing) {

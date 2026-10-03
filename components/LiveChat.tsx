@@ -151,15 +151,19 @@ export default function LiveChat() {
     setUnseen(0);
   };
 
-  // Cooldown countdown shown on the send button
+  // Cooldown countdown shown on the send button. An interval (keyed only on
+  // "is cooling down") keeps ticking until it reaches zero — re-arming a
+  // timeout on [cooldownLeft] stalls, because rounding up can produce the
+  // same value again and React skips the re-render.
+  const cooling = cooldownLeft > 0;
   useEffect(() => {
-    if (cooldownLeft <= 0) return;
-    const t = setTimeout(() => {
+    if (!cooling) return;
+    const id = setInterval(() => {
       const left = Math.ceil((COOLDOWN_MS - (Date.now() - lastSentRef.current)) / 1000);
       setCooldownLeft(Math.max(0, left));
     }, 250);
-    return () => clearTimeout(t);
-  }, [cooldownLeft]);
+    return () => clearInterval(id);
+  }, [cooling]);
 
   // Errors clear themselves
   useEffect(() => {
