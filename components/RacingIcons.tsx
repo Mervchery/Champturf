@@ -42,3 +42,28 @@ export function FinishFlagIcon({ size = 24, ...props }: IconProps) {
     </svg>
   );
 }
+
+/** Jockey riding cap (peaked helmet with a silk-colour band) — marks a jockey's name. */
+export function JockeyCapIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <path d="M4 15a8 8 0 0 1 16 0" />
+      <path d="M2.5 15h14.5c2.2 0 3.7.6 4.5 1.8" />
+      <path d="M4.2 12.2h15.6" />
+      <path d="M12 7v5" />
+    </svg>
+  );
+}
+
+/** Binoculars — marks a trainer's name (the one watching the gallops). */
+export function BinocularsIcon({ size = 24, ...props }: IconProps) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" {...props}>
+      <circle cx="6.5" cy="16" r="3.5" />
+      <circle cx="17.5" cy="16" r="3.5" />
+      <path d="M10 16h4" />
+      <path d="M4.5 13 6.5 5h2.5v6" />
+      <path d="M19.5 13 17.5 5H15v6" />
+    </svg>
+  );
+}

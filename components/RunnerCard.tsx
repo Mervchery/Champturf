@@ -1,6 +1,8 @@
 import Link from "next/link";
 import SilkImage from "@/components/SilkImage";
 import { fmtMoney } from "@/lib/format";
+import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
+import { Star } from "lucide-react";
 import type { HorseSummary } from "@/lib/races";
 
 function podiumClass(position: number | null) {
@@ -68,10 +70,8 @@ function FormRing({ wins, places, starts }: { wins: number; places: number; star
   );
 }
 
-// A tote/wagering price badge, filling the space under the number+silk
-// that's otherwise empty once the row grows taller than that column.
-// Two providers, two brand gradients, so they read as distinct at a
-// glance rather than two identical grey pills.
+// Tote price badge, filling the space under the number+silk. Win and Place
+// are the only prices shown — both scraped from Supertote's own tote.
 function OddsBadge({ label, value, gradient }: { label: string; value: string | null; gradient: string }) {
   if (!value) return null;
   return (
@@ -85,38 +85,75 @@ function OddsBadge({ label, value, gradient }: { label: string; value: string | 
   );
 }
 
+const WIN_GRADIENT = "linear-gradient(135deg, #0f5c46, #2f9e78)";
+const PLACE_GRADIENT = "linear-gradient(135deg, #1d4e89, #4a90d9)";
+
+/** Jockey name with a riding-cap icon so it's obvious who the jockey is. */
+function JockeyName({ name }: { name: string | null }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <JockeyCapIcon size={15} className="shrink-0 opacity-70" aria-label="Jockey" />
+      <span>{name ?? "Unknown"}</span>
+    </span>
+  );
+}
+
+/** Trainer name (linked when known) with a binoculars icon. */
+function TrainerName({ trainer }: { trainer: { id: string; name: string } | null | undefined }) {
+  return (
+    <span className="inline-flex items-center gap-1.5">
+      <BinocularsIcon size={15} className="shrink-0 opacity-70" aria-label="Trainer" />
+      {trainer ? <Link href={`/trainers/${trainer.id}`} className="hover:underline">{trainer.name}</Link> : <span>Unknown trainer</span>}
+    </span>
+  );
+}
+
+function GearChips({ gear }: { gear: string | null | undefined }) {
+  const items = (gear ?? "").split(",").map((g) => g.trim()).filter(Boolean);
+  if (items.length === 0) return null;
+  return (
+    <span className="inline-flex items-center gap-1">
+      <span className="opacity-70">Gear</span>
+      {items.map((g) => <span key={g} className="pill pill-outline !text-[0.6rem] !py-0 !px-1.5 font-semibold">{g}</span>)}
+    </span>
+  );
+}
+
 export function EntryRow({
-  number, horse, jockeyName, weight, gate, odds, smsOdds = null, form,
-}: BaseProps & { gate: number | null; odds: string | null; smsOdds?: string | null; form?: string[] }) {
+  number, horse, jockeyName, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, form,
+}: BaseProps & { gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean; form?: string[] }) {
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
     <div className="runner-row">
       <div className="flex flex-col items-center gap-1.5 shrink-0 w-[38px]">
         <div className="runner-number mt-0.5">{number ?? "N/A"}</div>
         <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} />
-        <OddsBadge label="MTC" value={odds} gradient="linear-gradient(135deg, #0f5c46, #2f9e78)" />
-        <OddsBadge label="SMS" value={smsOdds} gradient="linear-gradient(135deg, #b3471f, #f2994a)" />
+        <OddsBadge label="Win" value={odds} gradient={WIN_GRADIENT} />
+        <OddsBadge label="Place" value={placeOdds} gradient={PLACE_GRADIENT} />
       </div>
       <div className="flex-1 min-w-0">
         {/* Name + jockey share one header line so nothing floats off on
             its own with a big empty gap when either side is short. */}
         <div className="flex justify-between items-start gap-3 flex-wrap">
           <div className="min-w-0">
-            {horse ? (
-              <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
-            ) : (
-              <span className="font-semibold opacity-50">Unknown</span>
-            )}
-            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
+              {horse ? (
+                <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
+              ) : (
+                <span className="font-semibold opacity-50">Unknown</span>
+              )}
+              {isTipped && (
+                <span className="pill pill-gold !text-[0.6rem] !py-0.5 inline-flex items-center gap-1"><Star size={10} fill="currentColor" /> Tip</span>
+              )}
+            </div>
+            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5 items-center">
               <span>{horse?.age ? `${horse.age}yo` : "N/A"} {horse?.sex ?? ""}</span>
               <span>·</span>
-              <span>{horse?.stable ? <Link href={`/stables/${horse.stable.id}`} className="hover:underline">{horse.stable.name}</Link> : "Unknown stable"}</span>
-              <span>·</span>
-              <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
+              <TrainerName trainer={horse?.trainer} />
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="text-sm">{jockeyName ?? "Unknown"}</div>
+            <div className="text-sm"><JockeyName name={jockeyName} /></div>
           </div>
         </div>
 
@@ -125,6 +162,7 @@ export function EntryRow({
           <span>Gate {gate ?? "N/A"}</span>
           <span>{weight ? `${weight}kg` : "N/A"}</span>
           <span>Rtg {horse?.rating ?? "N/A"}</span>
+          <GearChips gear={gear} />
         </div>
 
         {horse && horse.starts > 0 && (
@@ -148,10 +186,11 @@ export function EntryRow({
 }
 
 export function ResultRow({
-  number, horse, jockeyName, weight, position, finishTime, margin, startingPrice, performanceRating, racePrize,
+  number, horse, jockeyName, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize,
 }: BaseProps & {
   position: number; finishTime: string | null; margin: string | null;
-  startingPrice: string | null; performanceRating: number | null; racePrize: number;
+  winOdds?: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
+  performanceRating: number | null; racePrize: number;
 }) {
   return (
     <div className={`runner-row ${position === 1 ? "is-winner" : ""}`}>
@@ -171,9 +210,9 @@ export function ResultRow({
               <span className="font-semibold opacity-50">Unknown</span>
             )}
             <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
-              <span>{jockeyName ?? "Unknown"}</span>
+              <JockeyName name={jockeyName} />
               <span>·</span>
-              <span>{horse?.trainer ? <Link href={`/trainers/${horse.trainer.id}`} className="hover:underline">{horse.trainer.name}</Link> : "Unknown trainer"}</span>
+              <TrainerName trainer={horse?.trainer} />
               {margin && <><span>·</span><span>{margin}</span></>}
             </div>
           </div>
@@ -185,7 +224,10 @@ export function ResultRow({
         <div className="text-xs opacity-60 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
           <span>No. {number ?? "N/A"}</span>
           <span>{weight ? `${weight}kg` : "N/A"}</span>
-          <span>SP {startingPrice ?? "N/A"}</span>
+          <span>Win {winOdds ?? "N/A"}</span>
+          <span>Place {placeOdds ?? "N/A"}</span>
+          <GearChips gear={gear} />
+          {isTipped && <span className="inline-flex items-center gap-1 text-gold2 font-semibold"><Star size={11} fill="currentColor" /> Tipped</span>}
           {performanceRating != null && <span>Perf {performanceRating}</span>}
         </div>
       </div>

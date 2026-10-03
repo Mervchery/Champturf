@@ -14,6 +14,24 @@ import * as cheerio from "cheerio";
 // (scrape.mjs) is responsible for not writing a race_results row in that
 // case, since the database requires a position.
 
+// Tote prices live in the first plain `.r-bets` block of each runner:
+//   <div class="r-bets"><span class="priceAmount show"><span>Win:</span> 370</span>
+//                       <span class="priceAmount show"><span>Place:</span> 200</span></div>
+// (the second `.r-bets.betting-buttons` block just repeats them as buttons).
+// Anything that isn't a plain number ("-", blank, "SCR") comes back null.
+function parseOdds($, $el) {
+  let win = null, place = null;
+  $el.find(".r-bets:not(.betting-buttons) .priceAmount").each((_, node) => {
+    const $n = $(node);
+    const label = $n.children("span").first().text().trim().toLowerCase(); // "win:" / "place:"
+    const value = $n.clone().children().remove().end().text().trim();      // text outside the label span
+    if (!/^\d+(\.\d+)?$/.test(value)) return;
+    if (label.startsWith("win")) win = value;
+    else if (label.startsWith("place")) place = value;
+  });
+  return { win, place };
+}
+
 export function parseRacePage(html) {
   const $ = cheerio.load(html);
 
@@ -63,8 +81,25 @@ export function parseRacePage(html) {
     // Linked to directly rather than re-hosted — see the migration for why.
     const silkUrl = $el.find("object.silk").attr("data") || null;
 
-    entries.push({ position, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl });
+    // Tote prices, gear letters (e.g. S, B, T) and the "tipped" flag —
+    // Supertote marks its favourite pick with a `tipped` class on the <li>.
+    const { win: winOdds, place: placeOdds } = parseOdds($, $el);
+    const gearItems = $el.find(".r-gear .gear-item").map((_, g) => $(g).text().trim()).get().filter(Boolean);
+    const gear = gearItems.length ? gearItems.join(",") : null;
+    const isTipped = $el.hasClass("tipped");
+
+    entries.push({ position, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl, winOdds, placeOdds, gear, isTipped });
   });
 
-  return { raceNo, timeOfDay, name, distance, isResult, entries };
+  // Racing notes block: an <h4>Racing Notes</h4>, one or more <p> of analysis
+  // (French), then an <h4>Danger : Horse Name</h4>.
+  const notesBlock = $(".racing-notes").first();
+  const racingNotes = notesBlock.find("p").map((_, p) => $(p).text().trim()).get().filter(Boolean).join("\n\n") || null;
+  let dangerHorse = null;
+  notesBlock.find("h4").each((_, h) => {
+    const m = $(h).text().trim().match(/^Danger\s*:\s*(.+)$/i);
+    if (m) dangerHorse = m[1].trim();
+  });
+
+  return { raceNo, timeOfDay, name, distance, isResult, entries, racingNotes, dangerHorse };
 }

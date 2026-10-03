@@ -496,3 +496,11 @@ scraper/
   lib/originCodes.mjs      Country-code -> name mapping
   lib/supabaseAdmin.mjs    Service-role Supabase client (server-only, never used by the app)
 ```
+
+## Scraped odds, gear, tips & racing notes
+
+The scraper now reads the tote **Win/Place** prices, **gear** letters, the **tipped** favourite flag and the
+**Racing Notes / Danger** block from each Supertote race page (upcoming and past). Manual MTC/SMS odds entry
+has been removed. Run `supabase/scraped_odds_gear_tips_migration.sql` once, then re-scrape any date to fill them in:
+
+    node scraper/scrape.mjs 04-oct-2026

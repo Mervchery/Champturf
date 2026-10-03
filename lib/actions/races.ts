@@ -105,8 +105,7 @@ export type EntryInput = {
   horse_id: string;
   jockey_id: string | null;
   weight_kg: number | null;
-  odds?: string | null;
-  sms_odds?: string | null;
+  // Odds, gear and tips are scraper-owned (see scraper/) — not editable here.
 };
 
 export async function createEntry(input: EntryInput) {
@@ -117,7 +116,7 @@ export async function createEntry(input: EntryInput) {
   revalidatePath(`/races/${input.race_id}`);
 }
 
-/** Edits an already-declared entry in place (weight, odds, jockey, gate,
+/** Edits an already-declared entry in place (weight, jockey, gate,
  *  No…) rather than requiring a delete-and-re-add — the horse/race pairing
  *  (id) never changes here, only the fields around it. */
 export async function updateEntry(id: string, raceId: string, input: Partial<EntryInput>) {
@@ -162,7 +161,7 @@ function parseIsoDuration(iso: string): number {
   return (Number(h) || 0) * 3600 + (Number(min) || 0) * 60 + (Number(s) || 0);
 }
 
-const MAX_REPLAY_SECONDS = 20 * 60;
+const MAX_REPLAY_SECONDS = 5 * 60;
 const PUBLISH_WINDOW_DAYS_AFTER = 14;
 
 /** Searches YouTube for a race's replay and saves the best match, then

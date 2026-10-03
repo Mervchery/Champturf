@@ -73,12 +73,15 @@ export async function upsertHorse({ name, age, origin, trainerName, ownerName, s
   return { id: created.id, created: true, updated: false, trainer, owner };
 }
 
-export async function upsertRace({ name, raceDate, raceTime, distance }) {
+export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, dangerHorse }) {
   const { data: existing, error: selectError } = await supabaseAdmin
     .from("races").select("*").eq("name", name).eq("race_date", raceDate).maybeSingle();
   if (selectError) throw new Error(`Failed to look up race "${name}": ${selectError.message}`);
 
-  const fields = { name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars" };
+  const fields = {
+    name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars",
+    racing_notes: racingNotes, danger_horse: dangerHorse,
+  };
 
   if (existing) {
     const updates = {};
@@ -106,14 +109,16 @@ export async function setRaceStatus(raceId, status) {
 /** Race entries store horse_id/jockey_id/trainer_id — never names — as
  *  the actual relationship. jockeyName/trainerName here are just the
  *  scraped text used to resolve (or create) the linked row. */
-export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo }) {
+export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo, winOdds, placeOdds, gear, isTipped }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
   const { error } = await supabaseAdmin
     .from("race_entries")
     .upsert(
-      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg, runner_no: runnerNo ?? null },
+      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg, runner_no: runnerNo ?? null,
+        // Tote prices/gear/tip are re-written on every scrape so late price moves and gear changes are picked up.
+        odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped },
       { onConflict: "race_id,horse_id" }
     );
   if (error) throw new Error(`Failed to upsert entry: ${error.message}`);
@@ -128,7 +133,7 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
  *  stored directly on the result row (not just on race_entries) since a
  *  race scraped as already-completed never gets a race_entries row at
  *  all — see scrape.mjs's `isResult` branch. */
-export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg, gate }) {
+export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg, gate, winOdds, placeOdds, gear, isTipped }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
@@ -141,6 +146,7 @@ export async function upsertResult({ raceId, horseId, position, jockeyName, trai
         jockey: jockeyName ?? "Unknown",
         finish_time: finishTime, margin: margin ?? null, weight_kg: weightKg,
         gate: gate ?? null,
+        win_odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
       },
       { onConflict: "race_id,position" }
     );

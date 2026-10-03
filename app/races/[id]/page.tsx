@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Camera, Video, Search } from "lucide-react";
+import { Camera, Video, Search, Star, AlertTriangle, NotebookPen } from "lucide-react";
 import { getRaceById, getEntriesForRace, getResultsForRace } from "@/lib/races";
 import { getRecentForm } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
@@ -27,6 +27,43 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
     );
   }
 
+  // Supertote's favourite pick(s) for the race — shown in the tips panel.
+  const tipped = [
+    ...entries.filter((e) => e.is_tipped).map((e) => ({ name: e.horses?.name ?? "Unknown", id: e.horses?.id ?? null, no: e.runner_no })),
+    ...results.filter((r) => r.is_tipped).map((r) => ({ name: r.horses?.name ?? "Unknown", id: r.horses?.id ?? null, no: r.runner_no })),
+  ];
+  const hasTips = tipped.length > 0 || !!race.racing_notes || !!race.danger_horse;
+
+  const tipsPanel = hasTips ? (
+    <div className="panel mt-8">
+      <h3 className="font-display text-xl flex items-center gap-2"><NotebookPen size={18} /> Race tips &amp; racing notes</h3>
+      <div className="mt-3 space-y-3 text-sm">
+        {tipped.length > 0 && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="pill pill-gold inline-flex items-center gap-1"><Star size={11} fill="currentColor" /> Tip</span>
+            {tipped.map((t, i) => (
+              <span key={i} className="font-semibold">
+                {t.no != null && <span className="opacity-50 font-normal">No. {t.no} · </span>}
+                {t.id ? <Link href={`/horses/${t.id}`} className="hover:underline">{t.name}</Link> : t.name}
+              </span>
+            ))}
+          </div>
+        )}
+        {race.racing_notes && (
+          <div className="space-y-2 leading-relaxed">
+            {race.racing_notes.split(/\n\n+/).map((para, i) => <p key={i}>{para}</p>)}
+          </div>
+        )}
+        {race.danger_horse && (
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={15} className="text-red-600 shrink-0" />
+            <span><span className="font-semibold">Danger:</span> {race.danger_horse}</span>
+          </div>
+        )}
+      </div>
+    </div>
+  ) : null;
+
   return (
     <div>
       <div className="detail-hero">
@@ -46,12 +83,14 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             <Link href={`/race-days/${race.race_date}`} className="text-sm border-b border-ink pb-0.5">View full race day →</Link>
           </div>
 
+          {tipsPanel}
+
           {race.status === "completed" ? (
             <div className="mt-8">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                 <h3 className="font-display text-xl">Official result</h3>
                 {results.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">Jockey · Trainer · No. · Weight · SP</span>
+                  <span className="text-xs opacity-50 hidden sm:block">Jockey · Trainer · No. · Weight · Win/Place</span>
                 )}
               </div>
               {results.length === 0 ? (
@@ -68,7 +107,10 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       position={row.position}
                       finishTime={row.finish_time}
                       margin={row.margin}
-                      startingPrice={row.starting_price}
+                      winOdds={row.win_odds}
+                      placeOdds={row.place_odds}
+                      gear={row.gear}
+                      isTipped={row.is_tipped}
                       performanceRating={row.performance_rating}
                       racePrize={race.prize}
                     />
@@ -115,7 +157,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                 <h3 className="font-display text-xl">Entries</h3>
                 {entries.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">No. · Horse · Stable · Trainer · Gate · Weight · Rating</span>
+                  <span className="text-xs opacity-50 hidden sm:block">No. · Horse · Trainer · Jockey · Gate · Weight · Gear</span>
                 )}
               </div>
               {entries.length === 0 ? (
@@ -131,7 +173,9 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       weight={e.weight_kg}
                       gate={e.gate}
                       odds={e.odds}
-                      smsOdds={e.sms_odds}
+                      placeOdds={e.place_odds}
+                      gear={e.gear}
+                      isTipped={e.is_tipped}
                       form={e.horses ? formByHorse[e.horses.id] : undefined}
                     />
                   ))}

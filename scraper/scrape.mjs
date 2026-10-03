@@ -119,7 +119,7 @@ async function scrapeRace(raceUrl) {
   const raceDate = toIsoDate(urlDate);
   const raceTime = to24Hour(parsed.timeOfDay);
 
-  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance });
+  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, dangerHorse: parsed.dangerHorse });
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 
@@ -160,6 +160,7 @@ async function scrapeRace(raceUrl) {
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           finishTime: entry.finishTime, margin: null, weightKg: entry.weight,
           gate: entry.gate,
+          winOdds: entry.winOdds, placeOdds: entry.placeOdds, gear: entry.gear, isTipped: entry.isTipped,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
@@ -175,11 +176,12 @@ async function scrapeRace(raceUrl) {
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           gate: entry.gate, weightKg: entry.weight,
           runnerNo: entryIndex + 1,
+          winOdds: entry.winOdds, placeOdds: entry.placeOdds, gear: entry.gear, isTipped: entry.isTipped,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
         stats.entriesImported++;
-        console.log(`    Gate ${entry.gate}: ${entry.horseName} (${entry.jockey ?? "jockey unknown"})`);
+        console.log(`    Gate ${entry.gate}: ${entry.horseName} (${entry.jockey ?? "jockey unknown"}) Win ${entry.winOdds ?? "-"} / Place ${entry.placeOdds ?? "-"}${entry.gear ? ` gear ${entry.gear}` : ""}${entry.isTipped ? " ★ tipped" : ""}`);
       }
     } catch (e) {
       stats.errors.push({ context: `${raceUrl} / ${entry.horseName ?? entry.horseSlug}`, message: e.message });

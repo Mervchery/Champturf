@@ -14,6 +14,9 @@ export type Race = {
   status: "upcoming" | "completed";
   conditions: string | null;
   youtube_video_id: string | null;
+  // Scraped from Supertote's "Racing Notes" block (see scraper/lib/parseRacePage.mjs).
+  racing_notes: string | null;
+  danger_horse: string | null;
 };
 
 // A "runner" is a horse joined with race-specific details (gate/jockey/
@@ -49,11 +52,14 @@ export type RaceEntry = {
   runner_no: number | null;
   gate: number | null;
   weight_kg: number | null;
-  // Two Mauritian tote/wagering channels, shown side by side on the
-  // racecard — `odds` is the MTC tote price, `sms_odds` the SMS Pariaz
-  // price (see supabase/entries_sms_odds_migration.sql).
+  // Tote prices, scraped from Supertote (no manual entry any more — see
+  // supabase/scraped_odds_gear_tips_migration.sql). `odds` is the WIN price.
   odds: string | null;
-  sms_odds: string | null;
+  place_odds: string | null;
+  // Gear letters, comma-separated (e.g. "B,T"), and whether Supertote tips
+  // this runner as its favourite pick of the race.
+  gear: string | null;
+  is_tipped: boolean;
   horse_id: string;
   horses: HorseSummary | null; // joined
   jockey_id: string | null;
@@ -69,6 +75,10 @@ export type RaceResult = {
   margin: string | null;
   weight_kg: number | null;
   starting_price: string | null;
+  win_odds: string | null;
+  place_odds: string | null;
+  gear: string | null;
+  is_tipped: boolean;
   performance_rating: number | null;
   horse_id: string;
   horses: HorseSummary | null; // joined

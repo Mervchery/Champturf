@@ -324,8 +324,8 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
 
 function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
-  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null; sms_odds: string | null }) => void;
-  onUpdate: (id: string, input: { runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null; odds: string | null; sms_odds: string | null }) => void;
+  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
+  onUpdate: (id: string, input: { runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
   onDelete: (id: string) => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -334,12 +334,10 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
   const [horseId, setHorseId] = useState("");
   const [jockeyId, setJockeyId] = useState("");
   const [weight, setWeight] = useState("");
-  const [odds, setOdds] = useState("");
-  const [smsOdds, setSmsOdds] = useState("");
 
   function resetForm() {
     setEditingId(null);
-    setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setOdds(""); setSmsOdds("");
+    setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
   }
 
   function startEdit(e: RaceEntry) {
@@ -349,8 +347,6 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
     setHorseId(e.horse_id);
     setJockeyId(e.jockey_id ?? "");
     setWeight(e.weight_kg?.toString() ?? "");
-    setOdds(e.odds ?? "");
-    setSmsOdds(e.sms_odds ?? "");
   }
 
   // A horse already entered in this race can't be entered again — except
@@ -362,19 +358,20 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Stable</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>MTC odds</th><th>SMS odds</th><th /></tr></thead>
+        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>Gear</th><th>Win</th><th>Place</th><th>Tip</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id} className={e.id === editingId ? "bg-black/[0.03]" : undefined}>
               <td>{e.runner_no ?? "N/A"}</td>
               <td>{e.gate ?? "N/A"}</td>
               <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
-              <td>{e.horses?.stable?.name ?? "Unknown"}</td>
               <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
+              <td>{e.gear ?? "—"}</td>
               <td>{e.odds ?? "N/A"}</td>
-              <td>{e.sms_odds ?? "N/A"}</td>
+              <td>{e.place_odds ?? "N/A"}</td>
+              <td>{e.is_tipped ? "★" : ""}</td>
               <td className="flex gap-1.5">
                 <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => startEdit(e)}><Pencil size={12} /></button>
                 <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button>
@@ -416,14 +413,6 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
           <label className="text-xs opacity-65 block mb-1">Weight (kg)</label>
           <input type="number" className="admin-input w-24" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
-        <div>
-          <label className="text-xs opacity-65 block mb-1">MTC tote odds</label>
-          <input className="admin-input w-24" placeholder="5/2" value={odds} onChange={(e) => setOdds(e.target.value)} />
-        </div>
-        <div>
-          <label className="text-xs opacity-65 block mb-1">SMS Pariaz odds</label>
-          <input className="admin-input w-24" placeholder="5/2" value={smsOdds} onChange={(e) => setSmsOdds(e.target.value)} />
-        </div>
         <button
           className="btn btn-dark"
           onClick={() => {
@@ -434,8 +423,6 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               horse_id: horseId,
               jockey_id: jockeyId || null,
               weight_kg: weight ? Number(weight) : null,
-              odds: odds || null,
-              sms_odds: smsOdds || null,
             };
             if (editingId) {
               onUpdate(editingId, shared);
@@ -451,6 +438,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
           <button className="btn btn-outline" onClick={resetForm}>Cancel</button>
         )}
       </div>
+      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear and tips are pulled automatically by the scraper from Supertote — re-run it for a date to refresh them.</p>
       {horses.length === 0 && (
         <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
       )}
