@@ -44,7 +44,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
               )}
               {h.silk_image_url && (
                 <div className="absolute top-2.5 right-2.5 bg-surface/90 rounded-full p-1 shadow-md">
-                  <SilkImage url={h.silk_image_url} size={22} title={h.name} />
+                  <SilkImage fallback url={h.silk_image_url} size={22} title={h.name} />
                 </div>
               )}
             </div>

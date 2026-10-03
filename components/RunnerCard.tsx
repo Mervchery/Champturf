@@ -38,7 +38,10 @@ type BaseProps = {
   number: number | null;
   horse: HorseSummary | null;
   jockeyName: string | null;
+  jockeyId?: string | null;
   weight: number | null;
+  // Position in the list — only used to stagger the entrance animation.
+  index?: number;
 };
 
 // Small career-record ring, inspired by the win/place donut on French
@@ -70,103 +73,116 @@ function FormRing({ wins, places, starts }: { wins: number; places: number; star
   );
 }
 
-// Tote price badge, filling the space under the number+silk. Win and Place
-// are the only prices shown — both scraped from Supertote's own tote.
-function OddsBadge({ label, value, gradient }: { label: string; value: string | null; gradient: string }) {
-  if (!value) return null;
+// ---------------------------------------------------------------------
+// Small building blocks shared by EntryRow and ResultRow. Everything sits on
+// the same grid (people → stats → odds) so cards line up the same way no
+// matter how long a name is or which fields a runner is missing.
+// ---------------------------------------------------------------------
+
+function Person({ kind, name, href }: { kind: "Jockey" | "Trainer"; name: string | null | undefined; href?: string | null }) {
+  const Icon = kind === "Jockey" ? JockeyCapIcon : BinocularsIcon;
   return (
-    <div
-      className="w-full rounded-md px-1.5 py-1 text-center text-white shadow-sm"
-      style={{ background: gradient }}
-    >
-      <div className="text-[0.5rem] font-semibold uppercase tracking-wide opacity-85 leading-none">{label}</div>
-      <div className="text-xs font-bold leading-tight mt-0.5 tabular-nums">{value}</div>
+    <div className="person">
+      <span className="person-icon" aria-hidden="true"><Icon size={16} /></span>
+      <span className="min-w-0">
+        <span className="person-label">{kind}</span>
+        <span className="person-name">
+          {name ? (href ? <Link href={href} className="hover:underline">{name}</Link> : name) : <span className="opacity-50">Unknown</span>}
+        </span>
+      </span>
     </div>
   );
 }
 
-const WIN_GRADIENT = "linear-gradient(135deg, #0f5c46, #2f9e78)";
-const PLACE_GRADIENT = "linear-gradient(135deg, #1d4e89, #4a90d9)";
-
-/** Jockey name with a riding-cap icon so it's obvious who the jockey is. */
-function JockeyName({ name }: { name: string | null }) {
+function Stat({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <span className="inline-flex items-center gap-1.5">
-      <JockeyCapIcon size={15} className="shrink-0 opacity-70" aria-label="Jockey" />
-      <span>{name ?? "Unknown"}</span>
-    </span>
+    <div className="stat-cell">
+      <div className="stat-label">{label}</div>
+      <div className="stat-value">{children}</div>
+    </div>
   );
 }
 
-/** Trainer name (linked when known) with a binoculars icon. */
-function TrainerName({ trainer }: { trainer: { id: string; name: string } | null | undefined }) {
-  return (
-    <span className="inline-flex items-center gap-1.5">
-      <BinocularsIcon size={15} className="shrink-0 opacity-70" aria-label="Trainer" />
-      {trainer ? <Link href={`/trainers/${trainer.id}`} className="hover:underline">{trainer.name}</Link> : <span>Unknown trainer</span>}
-    </span>
-  );
-}
-
-function GearChips({ gear }: { gear: string | null | undefined }) {
+function GearValue({ gear }: { gear: string | null | undefined }) {
   const items = (gear ?? "").split(",").map((g) => g.trim()).filter(Boolean);
-  if (items.length === 0) return null;
+  if (items.length === 0) return <span className="opacity-40">—</span>;
   return (
-    <span className="inline-flex items-center gap-1">
-      <span className="opacity-70">Gear</span>
-      {items.map((g) => <span key={g} className="pill pill-outline !text-[0.6rem] !py-0 !px-1.5 font-semibold">{g}</span>)}
+    <span className="inline-flex gap-1 flex-wrap">
+      {items.map((g) => <span key={g} className="gear-chip">{g}</span>)}
     </span>
   );
 }
+
+function OddsPill({ kind, value }: { kind: "win" | "place"; value: string | null }) {
+  return (
+    <div className={`odds-pill odds-${kind} ${value ? "" : "is-empty"}`}>
+      <span className="odds-label">{kind === "win" ? "Win" : "Place"}</span>
+      <span className="odds-value">{value ?? "—"}</span>
+    </div>
+  );
+}
+
+function OddsRow({ win, place }: { win: string | null; place: string | null }) {
+  if (!win && !place) return null;
+  return (
+    <div className="odds-row">
+      <OddsPill kind="win" value={win} />
+      <OddsPill kind="place" value={place} />
+    </div>
+  );
+}
+
+function TipPill() {
+  return (
+    <span className="pill pill-gold pill-tip inline-flex items-center gap-1 !text-[0.6rem] !py-0.5">
+      <Star size={10} fill="currentColor" /> Tip
+    </span>
+  );
+}
+
+function HorseName({ horse }: { horse: HorseSummary | null }) {
+  return horse
+    ? <Link href={`/horses/${horse.id}`} className="font-semibold text-[1.02rem] leading-tight hover:underline">{horse.name}</Link>
+    : <span className="font-semibold opacity-50">Unknown</span>;
+}
+
+const delayFor = (index?: number) => ({ "--delay": `${Math.min(index ?? 0, 12) * 55}ms` } as React.CSSProperties);
 
 export function EntryRow({
-  number, horse, jockeyName, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, form,
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, form, index,
 }: BaseProps & { gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean; form?: string[] }) {
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
-    <div className="runner-row">
-      <div className="flex flex-col items-center gap-1.5 shrink-0 w-[38px]">
-        <div className="runner-number mt-0.5">{number ?? "N/A"}</div>
-        <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} />
-        <OddsBadge label="Win" value={odds} gradient={WIN_GRADIENT} />
-        <OddsBadge label="Place" value={placeOdds} gradient={PLACE_GRADIENT} />
+    <div className="runner-row" style={delayFor(index)}>
+      {/* Left rail: number over silk, nothing else, so it never stretches. */}
+      <div className="runner-rail">
+        <div className="runner-number">{number ?? "N/A"}</div>
+        <SilkImage url={horse?.silk_image_url} title={horse?.name} size={40} fallback />
       </div>
+
       <div className="flex-1 min-w-0">
-        {/* Name + jockey share one header line so nothing floats off on
-            its own with a big empty gap when either side is short. */}
-        <div className="flex justify-between items-start gap-3 flex-wrap">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              {horse ? (
-                <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
-              ) : (
-                <span className="font-semibold opacity-50">Unknown</span>
-              )}
-              {isTipped && (
-                <span className="pill pill-gold !text-[0.6rem] !py-0.5 inline-flex items-center gap-1"><Star size={10} fill="currentColor" /> Tip</span>
-              )}
-            </div>
-            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5 items-center">
-              <span>{horse?.age ? `${horse.age}yo` : "N/A"} {horse?.sex ?? ""}</span>
-              <span>·</span>
-              <TrainerName trainer={horse?.trainer} />
-            </div>
-          </div>
-          <div className="text-right shrink-0">
-            <div className="text-sm"><JockeyName name={jockeyName} /></div>
-          </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          <HorseName horse={horse} />
+          {isTipped && <TipPill />}
+        </div>
+        <div className="text-xs opacity-60 mt-0.5">{horse?.age ? `${horse.age}yo` : "N/A"} {horse?.sex ?? ""}</div>
+
+        <div className="people-grid">
+          <Person kind="Jockey" name={jockeyName} href={jockeyId ? `/jockeys/${jockeyId}` : null} />
+          <Person kind="Trainer" name={horse?.trainer?.name} href={horse?.trainer ? `/trainers/${horse.trainer.id}` : null} />
         </div>
 
-        {/* Gate/weight/rating — always visible now, at every screen size. */}
-        <div className="text-xs opacity-60 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
-          <span>Gate {gate ?? "N/A"}</span>
-          <span>{weight ? `${weight}kg` : "N/A"}</span>
-          <span>Rtg {horse?.rating ?? "N/A"}</span>
-          <GearChips gear={gear} />
+        <div className="stats-grid">
+          <Stat label="Gate">{gate ?? "N/A"}</Stat>
+          <Stat label="Weight">{weight ? `${weight}kg` : "N/A"}</Stat>
+          <Stat label="Rating">{horse?.rating ?? "N/A"}</Stat>
+          <Stat label="Gear"><GearValue gear={gear} /></Stat>
         </div>
+
+        <OddsRow win={odds} place={placeOdds} />
 
         {horse && horse.starts > 0 && (
-          <div className="form-panel flex items-center gap-2.5 mt-2">
+          <div className="form-panel flex items-center gap-2.5 mt-3">
             <FormRing wins={horse.wins} places={places} starts={horse.starts} />
             <div className="text-xs opacity-70 leading-snug">
               <span className="font-semibold">{horse.wins}</span>W-<span className="font-semibold">{places}</span>P
@@ -176,7 +192,7 @@ export function EntryRow({
           </div>
         )}
         {form && form.length > 0 && (
-          <div className="flex gap-1 mt-2">
+          <div className="flex gap-1 mt-2.5 flex-wrap">
             {form.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"} !text-[0.6rem] !py-0.5`}>{f}</span>)}
           </div>
         )}
@@ -186,50 +202,48 @@ export function EntryRow({
 }
 
 export function ResultRow({
-  number, horse, jockeyName, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize,
+  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize, index,
 }: BaseProps & {
   position: number; finishTime: string | null; margin: string | null;
   winOdds?: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   performanceRating: number | null; racePrize: number;
 }) {
   return (
-    <div className={`runner-row ${position === 1 ? "is-winner" : ""}`}>
-      {/* Finish position badge stays exactly as before — the ordinal label
-          underneath is purely additive. */}
-      <div className="flex flex-col items-center gap-1 shrink-0">
+    <div className={`runner-row ${position === 1 ? "is-winner" : ""}`} style={delayFor(index)}>
+      <div className="runner-rail">
         <div className={`runner-number ${podiumClass(position)}`}>{position}</div>
-        <span className="text-[0.6rem] font-semibold opacity-55 leading-none">{ordinal(position)}</span>
+        <span className="text-[0.6rem] font-semibold opacity-55 leading-none -mt-0.5">{ordinal(position)}</span>
+        <SilkImage url={horse?.silk_image_url} title={horse?.name} size={40} fallback />
       </div>
-      <SilkImage url={horse?.silk_image_url} title={horse?.name} size={34} className="mt-0.5" />
+
       <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-start gap-3 flex-wrap">
+        <div className="flex justify-between items-start gap-3">
           <div className="min-w-0">
-            {horse ? (
-              <Link href={`/horses/${horse.id}`} className="font-semibold hover:underline">{horse.name}</Link>
-            ) : (
-              <span className="font-semibold opacity-50">Unknown</span>
-            )}
-            <div className="text-xs opacity-60 mt-0.5 flex flex-wrap gap-x-2.5 gap-y-0.5">
-              <JockeyName name={jockeyName} />
-              <span>·</span>
-              <TrainerName trainer={horse?.trainer} />
-              {margin && <><span>·</span><span>{margin}</span></>}
+            <div className="flex items-center gap-2 flex-wrap">
+              <HorseName horse={horse} />
+              {isTipped && <TipPill />}
             </div>
+            {margin && <div className="text-xs opacity-60 mt-0.5">{margin}</div>}
           </div>
           <div className="text-right shrink-0">
-            <div className="font-mono text-sm">{finishTime ?? "N/A"}</div>
+            <div className="font-mono text-sm leading-tight">{finishTime ?? "N/A"}</div>
             <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} /></div>
           </div>
         </div>
-        <div className="text-xs opacity-60 mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5">
-          <span>No. {number ?? "N/A"}</span>
-          <span>{weight ? `${weight}kg` : "N/A"}</span>
-          <span>Win {winOdds ?? "N/A"}</span>
-          <span>Place {placeOdds ?? "N/A"}</span>
-          <GearChips gear={gear} />
-          {isTipped && <span className="inline-flex items-center gap-1 text-gold2 font-semibold"><Star size={11} fill="currentColor" /> Tipped</span>}
-          {performanceRating != null && <span>Perf {performanceRating}</span>}
+
+        <div className="people-grid">
+          <Person kind="Jockey" name={jockeyName} href={jockeyId ? `/jockeys/${jockeyId}` : null} />
+          <Person kind="Trainer" name={horse?.trainer?.name} href={horse?.trainer ? `/trainers/${horse.trainer.id}` : null} />
         </div>
+
+        <div className="stats-grid">
+          <Stat label="No.">{number ?? "N/A"}</Stat>
+          <Stat label="Weight">{weight ? `${weight}kg` : "N/A"}</Stat>
+          <Stat label="Gear"><GearValue gear={gear} /></Stat>
+          {performanceRating != null && <Stat label="Perf">{performanceRating}</Stat>}
+        </div>
+
+        <OddsRow win={winOdds} place={placeOdds} />
       </div>
     </div>
   );

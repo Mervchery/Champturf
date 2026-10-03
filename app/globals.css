@@ -257,10 +257,25 @@ tr:hover td {
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
   transition: transform 0.3s var(--ease), box-shadow 0.3s var(--ease);
+  /* "backwards" (not "both") so the finished animation doesn't pin
+     transform and block the hover lift below. Staggered via --delay. */
+  animation: riseIn 0.55s var(--ease) var(--delay, 0ms) backwards;
 }
 .runner-row:hover {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
+}
+.runner-row:active {
+  transform: scale(0.992);
+}
+.runner-rail {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 44px;
+  flex-shrink: 0;
+  padding-top: 2px;
 }
 .runner-row.is-winner {
   border-color: var(--gold-2);
@@ -280,6 +295,161 @@ tr:hover td {
   font-size: 0.78rem;
   flex-shrink: 0;
 }
+/* Jockey / trainer: two equal columns, icon in a tinted disc, tiny label above the name. */
+.people-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 12px;
+  margin-top: 12px;
+}
+.person {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.person-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: rgba(201, 162, 76, 0.16);
+  color: var(--gold);
+  flex-shrink: 0;
+}
+.dark .person-icon { background: rgba(228, 200, 120, 0.14); color: var(--gold-2); }
+.person-label {
+  display: block;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  line-height: 1.2;
+}
+.person-name {
+  display: block;
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Gate / weight / rating / gear: equal-width cells separated by hairlines. */
+.stats-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  margin-top: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stat-cell {
+  padding: 7px 8px;
+  text-align: center;
+  min-width: 0;
+}
+.stat-cell + .stat-cell { border-left: 1px solid var(--line); }
+.stat-label {
+  font-size: 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.5;
+  line-height: 1.2;
+}
+.stat-value {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  min-height: 1.2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.gear-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 5px;
+  border-radius: 6px;
+  border: 1px solid var(--line);
+  background: rgba(0, 0, 0, 0.04);
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+.dark .gear-chip { background: rgba(255, 255, 255, 0.07); }
+
+/* Tote prices: two equal pills, label left / price right. */
+.odds-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+.odds-pill {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.2s var(--ease), filter 0.2s var(--ease);
+}
+.odds-pill:hover { transform: translateY(-1px); filter: brightness(1.06); }
+.odds-win { background: linear-gradient(135deg, #0f5c46, #2f9e78); }
+.odds-place { background: linear-gradient(135deg, #1d4e89, #4a90d9); }
+.odds-pill.is-empty { filter: grayscale(0.85) opacity(0.55); }
+.odds-label {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+.odds-value {
+  font-size: 1rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Silk: shimmer holds the space while it loads, then the image fades in. */
+.silk-wrap {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.silk-img {
+  object-fit: contain;
+  transition: opacity 0.35s var(--ease);
+}
+
+/* Gold "Tip" pill with a slow sheen sweeping across it. */
+.pill-tip {
+  position: relative;
+  overflow: hidden;
+}
+.pill-tip::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 30%, rgba(255, 255, 255, 0.55) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: sheen 3.2s ease-in-out 1s infinite;
+}
+
 /* Soft grouping box for a runner's career-record snapshot (form ring +
    starts/wins/places/earnings) so it reads as one module instead of
    floating text between the horse's name and its recent-form pills. */
@@ -319,6 +489,106 @@ tr:hover td {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
+
+@keyframes riseIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes sheen {
+  0%, 55% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+@keyframes shimmer {
+  from { background-position: 100% 0; }
+  to { background-position: -100% 0; }
+}
+
+/* Page-to-page fade (see app/template.tsx). Opacity/transform only, and
+   "backwards" fill so nothing stays pinned after it finishes. */
+.page-enter {
+  animation: pageIn 0.42s var(--ease) backwards;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---------- Loading states ---------- */
+
+.skeleton {
+  background: linear-gradient(90deg, rgba(14, 42, 33, 0.06) 25%, rgba(14, 42, 33, 0.13) 37%, rgba(14, 42, 33, 0.06) 63%);
+  background-size: 300% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+.dark .skeleton {
+  background: linear-gradient(90deg, rgba(243, 236, 218, 0.05) 25%, rgba(243, 236, 218, 0.12) 37%, rgba(243, 236, 218, 0.05) 63%);
+  background-size: 300% 100%;
+}
+
+/* Galloping horse over a moving track line. */
+.loader-track {
+  position: relative;
+  width: 120px;
+  height: 44px;
+  overflow: hidden;
+}
+.loader-horse {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  margin-left: -16px;
+  color: var(--gold);
+  animation: gallop 0.55s ease-in-out infinite alternate;
+}
+.loader-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  height: 2px;
+  background-image: repeating-linear-gradient(90deg, var(--gold) 0 14px, transparent 14px 28px);
+  opacity: 0.6;
+  animation: groundRun 0.6s linear infinite;
+}
+@keyframes gallop {
+  from { transform: translateY(2px) rotate(-4deg); }
+  to { transform: translateY(-5px) rotate(4deg); }
+}
+@keyframes groundRun {
+  from { background-position: 0 0; }
+  to { background-position: -28px 0; }
+}
+
+/* Thin gold progress bar across the top while a page navigation loads. */
+.nav-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0;
+  opacity: 0;
+  z-index: 100;
+  pointer-events: none;
+  background: linear-gradient(90deg, var(--gold), var(--gold-2));
+  box-shadow: 0 0 8px var(--gold-2);
+  border-radius: 0 3px 3px 0;
+}
+.nav-progress[data-state="loading"] {
+  opacity: 1;
+  animation: progressGrow 8s cubic-bezier(0.1, 0.6, 0.2, 1) forwards;
+}
+.nav-progress[data-state="done"] {
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.4s var(--ease) 0.1s;
+}
+@keyframes progressGrow {
+  from { width: 0; }
+  to { width: 85%; }
+}
+
+/* Buttons and pills: small press feedback everywhere. */
+.btn:active, .pill:active { transform: scale(0.96); }
 
 @media (prefers-reduced-motion: reduce) {
   * {

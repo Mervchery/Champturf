@@ -26,7 +26,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             )}
             {h.silk_image_url && (
               <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5 shadow-md">
-                <SilkImage url={h.silk_image_url} size={26} title={h.name} />
+                <SilkImage fallback url={h.silk_image_url} size={26} title={h.name} />
               </div>
             )}
           </div>

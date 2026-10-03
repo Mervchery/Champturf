@@ -504,3 +504,9 @@ The scraper now reads the tote **Win/Place** prices, **gear** letters, the **tip
 has been removed. Run `supabase/scraped_odds_gear_tips_migration.sql` once, then re-scrape any date to fill them in:
 
     node scraper/scrape.mjs 04-oct-2026
+
+## Runner card layout, silks & motion
+
+- Runner cards use a fixed grid (jockey/trainer → gate/weight/rating/gear → win/place) so they align regardless of content.
+- Horses with no silk (or a silk that fails to load) fall back to Supertote's own default silk, then to a built-in SVG.
+- `app/loading.tsx` and `app/races/[id]/loading.tsx` give instant skeleton loading screens; `app/template.tsx` fades pages in; `components/NavProgress.tsx` is the top progress bar.

@@ -35,7 +35,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
   const hasTips = tipped.length > 0 || !!race.racing_notes || !!race.danger_horse;
 
   const tipsPanel = hasTips ? (
-    <div className="panel mt-8">
+    <div className="panel fade-in mt-8">
       <h3 className="font-display text-xl flex items-center gap-2"><NotebookPen size={18} /> Race tips &amp; racing notes</h3>
       <div className="mt-3 space-y-3 text-sm">
         {tipped.length > 0 && (
@@ -97,9 +97,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 <p className="text-sm opacity-60">No result has been entered for this race yet.</p>
               ) : (
                 <div className="space-y-3">
-                  {results.map((row) => (
+                  {results.map((row, i) => (
                     <ResultRow
                       key={row.id}
+                      index={i}
+                      jockeyId={row.jockeys?.id ?? null}
                       number={row.runner_no}
                       horse={row.horses}
                       jockeyName={row.jockeys?.name ?? row.jockey}
@@ -164,9 +166,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 <p className="text-sm opacity-60">Entries haven&apos;t been declared for this race yet.</p>
               ) : (
                 <div className="space-y-3">
-                  {entries.map((e) => (
+                  {entries.map((e, i) => (
                     <EntryRow
                       key={e.id}
+                      index={i}
+                      jockeyId={e.jockeys?.id ?? null}
                       number={e.runner_no}
                       horse={e.horses}
                       jockeyName={e.jockeys?.name ?? null}

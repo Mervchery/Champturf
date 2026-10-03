@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Ticker from "@/components/Ticker";
+import NavProgress from "@/components/NavProgress";
 
 export const metadata: Metadata = {
   title: "Champ Turf — Mauritius Horse Racing",
@@ -19,6 +20,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="font-sans">
+        <NavProgress />
         <Header />
         <Ticker />
         <main>{children}</main>
