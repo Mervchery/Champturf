@@ -4,7 +4,7 @@ import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Search, CircleDot, Settings } from "lucide-react";
+import { Menu, X, Search, Settings } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const NAV_ITEMS = [
@@ -50,8 +50,9 @@ export default function Header() {
           {open ? <X size={18} /> : <Menu size={18} />}
         </button>
 
-        <Link href="/" className="flex items-baseline gap-2 font-display text-xl font-bold shrink-0">
-          <CircleDot size={16} className="text-gold2" />
+        <Link href="/" className="flex items-center gap-2.5 font-display text-xl font-bold shrink-0" aria-label="Champ Turf">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/logo.png" alt="" width={38} height={38} className="brand-logo" />
           Champ&nbsp;Turf
         </Link>
 

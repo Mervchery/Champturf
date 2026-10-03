@@ -9,7 +9,11 @@ export default function Footer() {
     <footer className="bg-turf text-white/70 pt-12 pb-7 mt-16">
       <div className="wrap flex flex-wrap gap-8 justify-between">
         <div className="max-w-[260px]">
-          <h4 className="text-white text-sm mb-2.5">Champ Turf</h4>
+          <div className="flex items-center gap-2.5 mb-2.5">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/logo.png" alt="" width={34} height={34} className="brand-logo" />
+            <h4 className="text-white text-sm">Champ Turf</h4>
+          </div>
           <p className="text-sm opacity-75 leading-relaxed">
             {t("The independent home of Mauritian horse racing — race data, profiles, and live coverage from Champ de Mars.")}
           </p>
