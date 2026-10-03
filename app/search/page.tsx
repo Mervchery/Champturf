@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 
@@ -6,21 +7,22 @@ export const revalidate = 0;
 type Result = { type: string; label: string; href: string };
 
 export default async function SearchPage({ searchParams }: { searchParams: { q?: string } }) {
+  const { t, lang } = getT();
   const q = (searchParams.q || "").trim();
   const results = q ? await runSearch(q) : [];
 
   return (
     <section className="py-10">
       <div className="wrap">
-        <h2 className="font-display text-2xl mb-5">Search results for &ldquo;{q}&rdquo;</h2>
+        <h2 className="font-display text-2xl mb-5">{t("Search results for")} &ldquo;{q}&rdquo;</h2>
         {results.length === 0 ? (
-          <p className="text-sm opacity-60">No matches found.</p>
+          <p className="text-sm opacity-60">{t("No matches found.")}</p>
         ) : (
           <div className="panel">
             {results.map((r, i) => (
               <Link key={i} href={r.href} className="grid grid-cols-[1fr_auto] gap-3.5 items-center py-3 border-b border-line last:border-0">
                 <div className="font-semibold text-sm">{r.label}</div>
-                <span className="pill">{r.type}</span>
+                <span className="pill">{t(r.type)}</span>
               </Link>
             ))}
           </div>

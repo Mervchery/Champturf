@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HorseIcon } from "@/components/RacingIcons";
@@ -8,6 +9,7 @@ import SilkImage from "@/components/SilkImage";
 export const revalidate = 0;
 
 export default async function HorseDetailPage({ params }: { params: { id: string } }) {
+  const { t, lang } = getT();
   const h = await getHorseById(params.id);
   if (!h) return notFound();
   const formHistory = await getRecentFormDetailed(h.id);
@@ -31,46 +33,44 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             )}
           </div>
           <div>
-            <span className="text-xs font-semibold text-gold2">HORSE PROFILE</span>
+            <span className="text-xs font-semibold text-gold2">{t("HORSE PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{h.name}</h1>
             <div className="text-white/70 text-sm mt-1.5">
-              {h.age ? `${h.age}yo` : "N/A"} {h.sex ?? "N/A"} · {h.breed ?? "N/A"} · {h.color ?? "N/A"} · Born {h.origin ?? "N/A"}
+              {h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.breed ?? t("N/A")} · {h.color ? t(h.color) : t("N/A")} · {t("Born")} {h.origin ?? t("N/A")}
             </div>
-            {h.rating != null && <span className="pill pill-gold mt-2 inline-block">Rating {h.rating}</span>}
+            {h.rating != null && <span className="pill pill-gold mt-2 inline-block">{t("Rating")} {h.rating}</span>}
           </div>
         </div>
       </div>
       <section className="py-14">
         <div className="wrap">
-          <Link href="/horses" className="text-sm border-b border-ink pb-0.5">← Back to horses</Link>
+          <Link href="/horses" className="text-sm border-b border-ink pb-0.5">← {t("Back to horses")}</Link>
 
-          <h2 className="font-display text-xl mt-7 mb-4">Career record</h2>
+          <h2 className="font-display text-xl mt-7 mb-4">{t("Career record")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
-            <div className="stat-tile"><div className="v">{h.wins}</div><div className="l">Wins</div></div>
-            <div className="stat-tile"><div className="v">{h.seconds + h.thirds}</div><div className="l">Places</div></div>
-            <div className="stat-tile"><div className="v">{h.starts}</div><div className="l">Starts</div></div>
-            <div className="stat-tile"><div className="v">{fmtMoney(h.earnings)}</div><div className="l">Career earnings</div></div>
+            <div className="stat-tile"><div className="v">{h.wins}</div><div className="l">{t("Wins")}</div></div>
+            <div className="stat-tile"><div className="v">{h.seconds + h.thirds}</div><div className="l">{t("Places")}</div></div>
+            <div className="stat-tile"><div className="v">{h.starts}</div><div className="l">{t("Starts")}</div></div>
+            <div className="stat-tile"><div className="v">{fmtMoney(h.earnings, lang)}</div><div className="l">{t("Career earnings")}</div></div>
           </div>
-          <p className="text-xs opacity-50 mb-10">
-            Stats above are computed automatically from entered race results — they can&apos;t be edited directly.
-          </p>
+          <div className="mb-10" />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
             <div className="panel min-w-0">
-              <h4 className="text-sm font-semibold mb-3">Connections</h4>
+              <h4 className="text-sm font-semibold mb-3">{t("Connections")}</h4>
               <table>
                 <tbody>
-                  <tr><td>Owner</td><td>{h.owner ? <Link href="/owners" className="font-semibold hover:underline">{h.owner.name}</Link> : "Unknown"}</td></tr>
-                  <tr><td>Trainer</td><td>{h.trainer ? <Link href={`/trainers/${h.trainer.id}`} className="font-semibold hover:underline">{h.trainer.name}</Link> : "Unknown"}</td></tr>
-                  <tr><td>Stable</td><td>{h.stable ? <Link href={`/stables/${h.stable.id}`} className="font-semibold hover:underline">{h.stable.name}</Link> : "Unknown"}</td></tr>
-                  <tr><td>Medical status</td><td><span className="pill pill-gold">{h.medical_status ?? "N/A"}</span></td></tr>
+                  <tr><td>{t("Owner")}</td><td>{h.owner ? <Link href="/owners" className="font-semibold hover:underline">{h.owner.name}</Link> : t("Unknown")}</td></tr>
+                  <tr><td>{t("Trainer")}</td><td>{h.trainer ? <Link href={`/trainers/${h.trainer.id}`} className="font-semibold hover:underline">{h.trainer.name}</Link> : t("Unknown")}</td></tr>
+                  <tr><td>{t("Stable")}</td><td>{h.stable ? <Link href={`/stables/${h.stable.id}`} className="font-semibold hover:underline">{h.stable.name}</Link> : t("Unknown")}</td></tr>
+                  <tr><td>{t("Medical status")}</td><td><span className="pill pill-gold">{h.medical_status ? t(h.medical_status) : t("N/A")}</span></td></tr>
                 </tbody>
               </table>
             </div>
             <div className="panel">
-              <h4 className="text-sm font-semibold mb-3">Recent form</h4>
+              <h4 className="text-sm font-semibold mb-3">{t("Recent form")}</h4>
               {form.length === 0 ? (
-                <p className="text-sm opacity-60">No results recorded for this horse yet.</p>
+                <p className="text-sm opacity-60">{t("No results recorded for this horse yet.")}</p>
               ) : (
                 <div className="flex gap-2">
                   {form.map((f, i) => (
@@ -81,13 +81,13 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             </div>
           </div>
 
-          <h2 className="font-display text-xl mb-4">Race history</h2>
+          <h2 className="font-display text-xl mb-4">{t("Race history")}</h2>
           {formHistory.length === 0 ? (
-            <p className="text-sm opacity-60">No races recorded for this horse yet.</p>
+            <p className="text-sm opacity-60">{t("No races recorded for this horse yet.")}</p>
           ) : (
             <div className="panel !p-0 overflow-hidden">
               <table>
-                <thead><tr><th>Pos</th><th>Race</th><th>Date</th></tr></thead>
+                <thead><tr><th>{t("Pos")}</th><th>{t("Race")}</th><th>{t("Date")}</th></tr></thead>
                 <tbody>
                   {formHistory.map((f, i) => (
                     <tr key={i}>

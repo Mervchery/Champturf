@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import {
   LayoutDashboard, Flag, Users, GraduationCap, Target, Building2, Newspaper,
-  Image as ImageIcon, Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus, CalendarDays, Megaphone,
+  Radio, BarChart3, ShieldCheck, LogOut, ArrowLeft, Plus, CalendarDays, Megaphone,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { HorseIcon } from "@/components/RacingIcons";
@@ -34,7 +34,6 @@ const SECTIONS = [
   ["stables", "Stables", Building2],
   ["owners", "Owners", Users],
   ["news", "News", Newspaper],
-  ["media", "Media library", ImageIcon],
   ["stream", "Live streams", Radio],
   ["ticker", "Ticker", Megaphone],
   ["stats", "Statistics", BarChart3],
@@ -179,12 +178,12 @@ export default function AdminDashboard({
               { key: "trainer_id", label: "Trainer", type: "select", options: trainers.map((t) => ({ value: t.id, label: t.name })) },
               { key: "stable_id", label: "Stable", type: "select", options: stables.map((s) => ({ value: s.id, label: s.name })) },
               { key: "medical_status", label: "Medical status" },
-              { key: "silk_image_url", label: "Silk image URL (optional manual override)", placeholder: "https://... — normally filled in automatically by the scraper" },
+              { key: "silk_image_url", label: "Silk image URL (optional override)", placeholder: "https://…" },
             ]}
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer are picked from existing records, not typed — renaming one updates every horse that references it. Stable is normally derived automatically from the horse's trainer (see the Stables tab) — only set it by hand for a horse whose trainer isn't linked to a stable yet. Silk image is normally set by the scraper the first time this horse runs; only fill it in by hand if a horse has never been scraped yet (e.g. a new arrival) or the scraped one needs correcting."}
+          {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer are picked from existing records, not typed — renaming one updates every horse that references it. Stable is derived from the horse's trainer — only set it by hand if the trainer isn't linked to a stable yet. Silk image is filled in automatically; only set it by hand for a new arrival or to correct one."}
         </p>
 
         {section === "jockeys" && (
@@ -284,7 +283,7 @@ export default function AdminDashboard({
           />
         )}
         <p className="text-xs opacity-50 mt-3">
-          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here immediately pulls in every horse that trainer has, and any horse assigned to that trainer afterwards (here or via the scraper) follows automatically — you shouldn't need to set a horse's stable by hand anymore. Silk image isn't scraped for stables (only per-horse) — set it by hand."}
+          {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here pulls in every horse that trainer has, and horses assigned to that trainer later follow automatically. Stable silks aren't imported — set them by hand."}
         </p>
 
         {section === "owners" && (
@@ -326,19 +325,6 @@ export default function AdminDashboard({
           />
         )}
 
-        {section === "media" && (
-          <div>
-            <div className="flex justify-between items-center mb-5">
-              <h2 className="font-display text-2xl">Media library</h2>
-              <button className="btn btn-dark" onClick={() => notify("Media storage isn't wired up yet — see README")}><Plus size={15} /> Upload files</button>
-            </div>
-            <p className="text-sm opacity-60">
-              Not connected yet. The natural next step is Supabase Storage — create a bucket, then swap this
-              placeholder for real uploads. Everything else in this dashboard is already real.
-            </p>
-          </div>
-        )}
-
         {section === "stream" && (
           <EntityAdminPanel
             table="streams" title="Live streams" addLabel="New stream" notify={notify}
@@ -360,7 +346,7 @@ export default function AdminDashboard({
                   { value: "rtmp", label: "Custom RTMP/HLS" },
                 ],
               },
-              { key: "embed_url", label: "Embed URL", placeholder: "See supabase/streams_schema.sql for the required format per source" },
+              { key: "embed_url", label: "Embed URL", placeholder: "Embeddable stream URL for the chosen source" },
               {
                 key: "race_id", label: "Race (optional)", type: "select",
                 options: races.map((r) => ({ value: r.id, label: r.name })),

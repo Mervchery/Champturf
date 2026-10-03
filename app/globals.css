@@ -250,9 +250,8 @@ tr:hover td {
 
 .runner-row {
   display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  padding: 14px 16px;
+  flex-direction: column;
+  padding: 14px 16px 16px;
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
@@ -268,18 +267,16 @@ tr:hover td {
 .runner-row:active {
   transform: scale(0.992);
 }
+.runner-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
 .runner-rail {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
-  width: 44px;
+  gap: 10px;
   flex-shrink: 0;
-  padding-top: 2px;
-}
-.runner-row.is-winner {
-  border-color: var(--gold-2);
-  box-shadow: 0 0 0 1.5px var(--gold-2), var(--shadow-sm);
 }
 .runner-number {
   display: flex;
@@ -595,4 +592,33 @@ tr:hover td {
     animation-duration: 0.001s !important;
     transition-duration: 0.001s !important;
   }
+}
+
+/* ---------- Language switch (footer) ---------- */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 4px 3px 9px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transition: opacity 0.2s var(--ease);
+}
+.lang-switch.is-pending { opacity: 0.6; }
+.lang-btn {
+  min-width: 34px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.65);
+  transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.15s var(--ease);
+}
+.lang-btn:hover { color: #fff; }
+.lang-btn:active { transform: scale(0.95); }
+.lang-btn.is-active {
+  background: var(--gold-2);
+  color: var(--ink);
 }

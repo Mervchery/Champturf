@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JockeyIcon } from "@/components/RacingIcons";
@@ -6,6 +7,7 @@ import { getJockeyById } from "@/lib/jockeys";
 export const revalidate = 0;
 
 export default async function JockeyDetailPage({ params }: { params: { id: string } }) {
+  const { t, lang } = getT();
   const j = await getJockeyById(params.id);
   if (!j) return notFound();
 
@@ -17,40 +19,40 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
             <JockeyIcon size={38} />
           </div>
           <div>
-            <span className="text-xs font-semibold text-gold2">{j.apprentice ? "APPRENTICE JOCKEY" : "JOCKEY PROFILE"}</span>
+            <span className="text-xs font-semibold text-gold2">{j.apprentice ? t("APPRENTICE JOCKEY") : t("JOCKEY PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{j.name}</h1>
-            <div className="text-white/70 text-sm mt-1.5">{j.nationality ?? "N/A"}</div>
+            <div className="text-white/70 text-sm mt-1.5">{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</div>
           </div>
         </div>
       </div>
       <section className="py-14">
         <div className="wrap">
-          <Link href="/jockeys" className="text-sm border-b border-ink pb-0.5">← Back to jockeys</Link>
+          <Link href="/jockeys" className="text-sm border-b border-ink pb-0.5">← {t("Back to jockeys")}</Link>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="panel"><div className="text-xs opacity-60">Wins</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
-            <div className="panel"><div className="text-xs opacity-60">Places</div><div className="font-mono font-semibold text-xl">{j.places}</div></div>
-            <div className="panel"><div className="text-xs opacity-60">Win %</div><div className="font-mono font-semibold text-xl">{j.win_pct}%</div></div>
-            <div className="panel"><div className="text-xs opacity-60">Suspensions</div><div className="font-mono font-semibold text-xl">{j.suspensions}</div></div>
+            <div className="panel"><div className="text-xs opacity-60">{t("Wins")}</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
+            <div className="panel"><div className="text-xs opacity-60">{t("Places")}</div><div className="font-mono font-semibold text-xl">{j.places}</div></div>
+            <div className="panel"><div className="text-xs opacity-60">{t("Win %")}</div><div className="font-mono font-semibold text-xl">{j.win_pct}%</div></div>
+            <div className="panel"><div className="text-xs opacity-60">{t("Suspensions")}</div><div className="font-mono font-semibold text-xl">{j.suspensions}</div></div>
           </div>
 
           {j.apprentice ? (
             <div className="panel mt-6">
-              <h4 className="text-sm font-semibold mb-3">Apprenticeship</h4>
+              <h4 className="text-sm font-semibold mb-3">{t("Apprenticeship")}</h4>
               <table>
                 <tbody>
-                  <tr><td>Mentor jockey</td><td>{j.mentor ? <Link href={`/jockeys/${j.mentor.id}`} className="font-semibold">{j.mentor.name}</Link> : "Unknown"}</td></tr>
-                  <tr><td>Apprentice allowance</td><td>{j.allowance ?? "N/A"}</td></tr>
-                  <tr><td>Progress report</td><td>{j.progress ?? "N/A"}</td></tr>
+                  <tr><td>{t("Mentor jockey")}</td><td>{j.mentor ? <Link href={`/jockeys/${j.mentor.id}`} className="font-semibold">{j.mentor.name}</Link> : t("Unknown")}</td></tr>
+                  <tr><td>{t("Apprentice allowance")}</td><td>{j.allowance ?? t("N/A")}</td></tr>
+                  <tr><td>{t("Progress report")}</td><td>{j.progress ?? t("N/A")}</td></tr>
                 </tbody>
               </table>
             </div>
           ) : (
             <div className="panel mt-6">
-              <h4 className="text-sm font-semibold mb-2">Biography</h4>
-              <p className="text-sm opacity-70">{j.bio ?? "N/A"}</p>
-              <h4 className="text-sm font-semibold mt-4 mb-1">Achievements</h4>
-              <p className="text-sm opacity-70">{j.achievements ?? "N/A"}</p>
+              <h4 className="text-sm font-semibold mb-2">{t("Biography")}</h4>
+              <p className="text-sm opacity-70">{j.bio ?? t("N/A")}</p>
+              <h4 className="text-sm font-semibold mt-4 mb-1">{t("Achievements")}</h4>
+              <p className="text-sm opacity-70">{j.achievements ?? t("N/A")}</p>
             </div>
           )}
         </div>

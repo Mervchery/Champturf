@@ -1,9 +1,11 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useEffect, useState } from "react";
 import { Sun, Moon } from "lucide-react";
 
 export default function ThemeToggle() {
+  const { t, lang } = useT();
   const [dark, setDark] = useState(false);
 
   useEffect(() => {
@@ -23,8 +25,8 @@ export default function ThemeToggle() {
   return (
     <button
       onClick={toggle}
-      aria-label="Toggle theme"
-      title="Toggle theme"
+      aria-label={t("Toggle theme")}
+      title={t("Toggle theme")}
       className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
     >
       {dark ? <Moon size={16} /> : <Sun size={16} />}

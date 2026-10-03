@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import { Diamond } from "lucide-react";
 import { getTickerItems } from "@/lib/ticker";
 
@@ -5,11 +6,11 @@ import { getTickerItems } from "@/lib/ticker";
 // components/AdminDashboard.tsx / lib/ticker.ts) rather than hardcoded
 // here — this component just renders whatever's currently in
 // ticker_items, in order.
-const FALLBACK = "Champ Turf — Mauritius horse racing";
 
 export default async function Ticker() {
+  const { t, lang } = getT();
   const items = await getTickerItems();
-  const texts = items.length > 0 ? items.map((i) => i.text) : [FALLBACK];
+  const texts = items.length > 0 ? items.map((i) => i.text) : [t("Champ Turf — Mauritius horse racing")];
   const doubled = [...texts, ...texts];
 
   return (

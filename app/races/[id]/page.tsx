@@ -1,14 +1,17 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Camera, Video, Search, Star, AlertTriangle, NotebookPen } from "lucide-react";
 import { getRaceById, getEntriesForRace, getResultsForRace } from "@/lib/races";
 import { getRecentForm } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
+import { fmtDateLong } from "@/lib/i18n";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
 
 export const revalidate = 0;
 
 export default async function RaceDetailPage({ params }: { params: { id: string } }) {
+  const { t, lang } = getT();
   const race = await getRaceById(params.id);
   if (!race) return notFound();
 
@@ -36,15 +39,15 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
 
   const tipsPanel = hasTips ? (
     <div className="panel fade-in mt-8">
-      <h3 className="font-display text-xl flex items-center gap-2"><NotebookPen size={18} /> Race tips &amp; racing notes</h3>
+      <h3 className="font-display text-xl flex items-center gap-2"><NotebookPen size={18} /> {t("Race tips & racing notes")}</h3>
       <div className="mt-3 space-y-3 text-sm">
         {tipped.length > 0 && (
           <div className="flex items-center gap-2 flex-wrap">
-            <span className="pill pill-gold inline-flex items-center gap-1"><Star size={11} fill="currentColor" /> Tip</span>
-            {tipped.map((t, i) => (
+            <span className="pill pill-gold inline-flex items-center gap-1"><Star size={11} fill="currentColor" /> {t("Tip")}</span>
+            {tipped.map((tp, i) => (
               <span key={i} className="font-semibold">
-                {t.no != null && <span className="opacity-50 font-normal">No. {t.no} · </span>}
-                {t.id ? <Link href={`/horses/${t.id}`} className="hover:underline">{t.name}</Link> : t.name}
+                {tp.no != null && <span className="opacity-50 font-normal">{t("No.")} {tp.no} · </span>}
+                {tp.id ? <Link href={`/horses/${tp.id}`} className="hover:underline">{tp.name}</Link> : tp.name}
               </span>
             ))}
           </div>
@@ -57,7 +60,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
         {race.danger_horse && (
           <div className="flex items-center gap-2">
             <AlertTriangle size={15} className="text-red-600 shrink-0" />
-            <span><span className="font-semibold">Danger:</span> {race.danger_horse}</span>
+            <span><span className="font-semibold">{t("Danger")}:</span> {race.danger_horse}</span>
           </div>
         )}
       </div>
@@ -68,10 +71,10 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
     <div>
       <div className="detail-hero">
         <div className="wrap">
-          <span className="text-xs font-semibold text-gold2">{race.status.toUpperCase()} · {race.course}</span>
+          <span className="text-xs font-semibold text-gold2">{(race.status === "upcoming" ? t("UPCOMING") : t("COMPLETED"))} · {race.course}</span>
           <h1 className="text-3xl font-display mt-1">{race.name}</h1>
           <div className="text-white/70 text-sm mt-2">
-            {race.race_date} · {race.race_time} · {race.distance} · {fmtMoney(race.prize)}
+            {fmtDateLong(lang, race.race_date)} · {race.race_time} · {race.distance} · {fmtMoney(race.prize, lang)}
             {race.conditions ? ` · ${race.conditions}` : ""}
           </div>
         </div>
@@ -79,8 +82,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
       <section className="py-14">
         <div className="wrap">
           <div className="flex flex-wrap gap-4 justify-between items-center">
-            <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">← All race days</Link>
-            <Link href={`/race-days/${race.race_date}`} className="text-sm border-b border-ink pb-0.5">View full race day →</Link>
+            <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">← {t("All race days")}</Link>
+            <Link href={`/race-days/${race.race_date}`} className="text-sm border-b border-ink pb-0.5">{t("View full race day")} →</Link>
           </div>
 
           {tipsPanel}
@@ -88,13 +91,13 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           {race.status === "completed" ? (
             <div className="mt-8">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-                <h3 className="font-display text-xl">Official result</h3>
+                <h3 className="font-display text-xl">{t("Official result")}</h3>
                 {results.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">Jockey · Trainer · No. · Weight · Win/Place</span>
+                  <span className="text-xs opacity-50 hidden sm:block">{t("Jockey · Trainer · No. · Weight · Win/Place")}</span>
                 )}
               </div>
               {results.length === 0 ? (
-                <p className="text-sm opacity-60">No result has been entered for this race yet.</p>
+                <p className="text-sm opacity-60">{t("No result has been entered for this race yet.")}</p>
               ) : (
                 <div className="space-y-3">
                   {results.map((row, i) => (
@@ -121,33 +124,33 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
               )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mt-8">
                 <div className="panel">
-                  <h4 className="text-sm font-semibold flex items-center gap-2"><Camera size={15} /> Photo finish gallery</h4>
+                  <h4 className="text-sm font-semibold flex items-center gap-2"><Camera size={15} /> {t("Photo finish gallery")}</h4>
                   <div className="h-[120px] mt-2.5 bg-gradient-to-br from-turf to-turf2 rounded-2xl flex items-center justify-center text-white/50">
-                    Image
+                    {t("Image")}
                   </div>
                 </div>
                 <div className="panel">
-                  <h4 className="text-sm font-semibold flex items-center gap-2"><Video size={15} /> Replay video</h4>
+                  <h4 className="text-sm font-semibold flex items-center gap-2"><Video size={15} /> {t("Replay video")}</h4>
                   {race.youtube_video_id ? (
                     <div className="mt-2.5 aspect-video rounded-2xl overflow-hidden">
                       <iframe
                         className="w-full h-full"
                         src={`https://www.youtube.com/embed/${race.youtube_video_id}`}
-                        title={`${race.name} replay`}
+                        title={`${race.name} — ${t("Replay video")}`}
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
                       />
                     </div>
                   ) : (
                     <div className="h-[120px] mt-2.5 bg-gradient-to-br from-turf to-turf2 rounded-2xl flex flex-col items-center justify-center text-white/60 text-center px-4 gap-2">
-                      <span className="text-xs">No replay linked yet</span>
+                      <span className="text-xs">{t("No replay linked yet")}</span>
                       <a
                         href={`https://www.youtube.com/results?search_query=${encodeURIComponent(`${race.name} ${race.race_date} Champ de Mars`)}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="pill pill-gold flex items-center gap-1.5"
                       >
-                        <Search size={11} /> Search YouTube
+                        <Search size={11} /> {t("Search YouTube")}
                       </a>
                     </div>
                   )}
@@ -157,13 +160,13 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           ) : (
             <div className="mt-8">
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
-                <h3 className="font-display text-xl">Entries</h3>
+                <h3 className="font-display text-xl">{t("Entries")}</h3>
                 {entries.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">No. · Horse · Trainer · Jockey · Gate · Weight · Gear</span>
+                  <span className="text-xs opacity-50 hidden sm:block">{t("No. · Horse · Trainer · Jockey · Gate · Weight · Gear")}</span>
                 )}
               </div>
               {entries.length === 0 ? (
-                <p className="text-sm opacity-60">Entries haven&apos;t been declared for this race yet.</p>
+                <p className="text-sm opacity-60">{t("Entries haven't been declared for this race yet.")}</p>
               ) : (
                 <div className="space-y-3">
                   {entries.map((e, i) => (

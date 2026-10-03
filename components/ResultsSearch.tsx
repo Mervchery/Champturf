@@ -1,22 +1,15 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useMemo, useState } from "react";
 import { Download } from "lucide-react";
+import { ordinal } from "@/lib/i18n";
 import type { Race, RaceResult } from "@/lib/races";
 
 type RaceWithResults = Race & { results: RaceResult[] };
 
-// "1st", "2nd", "3rd", "4th"… — handles the 11th/12th/13th exceptions.
-function ordinal(n: number): string {
-  const j = n % 10;
-  const k = n % 100;
-  if (j === 1 && k !== 11) return `${n}st`;
-  if (j === 2 && k !== 12) return `${n}nd`;
-  if (j === 3 && k !== 13) return `${n}rd`;
-  return `${n}th`;
-}
-
 export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
+  const { t, lang } = useT();
   const [q, setQ] = useState("");
 
   const filtered = useMemo(() => {
@@ -33,15 +26,15 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by horse, jockey, trainer, race…"
+          placeholder={t("Search by horse, jockey, trainer, race…")}
           className="px-3.5 py-2 border border-line rounded-full bg-surface text-sm flex-1"
         />
-        <button onClick={() => alert("Generating PDF report… (wire this up to a real export endpoint)")} className="btn btn-outline">
-          <Download size={15} /> Download PDF report
+        <button onClick={() => window.print()} className="btn btn-outline print:hidden">
+          <Download size={15} /> {t("Print / save as PDF")}
         </button>
       </div>
 
-      {filtered.length === 0 && <p className="text-sm opacity-60">No results match your search.</p>}
+      {filtered.length === 0 && <p className="text-sm opacity-60">{t("No results match your search.")}</p>}
 
       {filtered.map((r) => (
         <div key={r.id} className="panel mb-4">
@@ -50,15 +43,15 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
             <span className="text-sm opacity-60">{r.race_date} · {r.course} · {r.distance}</span>
           </div>
           {r.results.length === 0 ? (
-            <p className="text-sm opacity-60 mt-2">No result entered yet.</p>
+            <p className="text-sm opacity-60 mt-2">{t("No result entered yet.")}</p>
           ) : (
             <table className="mt-3">
-              <thead><tr><th>Pos</th><th>No.</th><th>Horse</th><th>Jockey</th><th>Time</th></tr></thead>
+              <thead><tr><th>{t("Pos")}</th><th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Jockey")}</th><th>{t("Time")}</th></tr></thead>
               <tbody>
                 {r.results.map((row) => (
                   <tr key={row.id}>
-                    <td>{ordinal(row.position)}</td>
-                    <td className="tabular-nums opacity-70">{row.runner_no ?? "N/A"}</td>
+                    <td>{ordinal(lang, row.position)}</td>
+                    <td className="tabular-nums opacity-70">{row.runner_no ?? t("N/A")}</td>
                     <td>{row.horses?.name ?? "—"}</td>
                     <td>{row.jockey}</td>
                     <td className="font-mono">{row.finish_time}</td>

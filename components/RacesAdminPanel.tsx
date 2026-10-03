@@ -316,7 +316,7 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
         <button className="btn btn-dark" onClick={saveManual}>Save</button>
       </div>
       <p className="text-xs opacity-50 mt-2.5">
-        Auto-find calls the YouTube Data API (needs YOUTUBE_API_KEY set — see README): it searches the query above, restricted to videos uploaded within 14 days of this race's date (for uniqueness across years), and saves the first result under 5 minutes so a full race-day broadcast doesn't get linked instead. Each click uses real API quota, so it's manual, not automatic.
+        Auto-find searches YouTube for the query above (videos uploaded within 14 days of the race date, under 5 minutes) and saves the first match. You can also paste a link directly.
       </p>
     </div>
   );
@@ -438,7 +438,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
           <button className="btn btn-outline" onClick={resetForm}>Cancel</button>
         )}
       </div>
-      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear and tips are pulled automatically by the scraper from Supertote — re-run it for a date to refresh them.</p>
+      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear and tips are imported automatically and shown read-only here.</p>
       {horses.length === 0 && (
         <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
       )}

@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
 ];
 
 export default function Header() {
+  const { t, lang } = useT();
   const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
@@ -42,7 +44,7 @@ export default function Header() {
       <div className="wrap flex items-center gap-5 py-3.5">
         <button
           className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 border border-white/15 shrink-0"
-          aria-label="Menu"
+          aria-label={t("Menu")}
           onClick={() => { setOpen((v) => !v); setSearchOpen(false); }}
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -60,7 +62,7 @@ export default function Header() {
               href={href}
               className="whitespace-nowrap text-sm px-3 py-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition"
             >
-              {label}
+              {t(label)}
             </Link>
           ))}
         </nav>
@@ -70,7 +72,7 @@ export default function Header() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search…"
+            placeholder={t("Search…")}
             className="bg-transparent outline-none text-sm text-white placeholder:text-white/50 w-full"
           />
         </form>
@@ -82,7 +84,7 @@ export default function Header() {
               search doesn't leave a menu covering the results. */}
           <button
             className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
-            aria-label="Search"
+            aria-label={t("Search")}
             onClick={() => { setSearchOpen((v) => !v); setOpen(false); }}
           >
             {searchOpen ? <X size={16} /> : <Search size={16} />}
@@ -91,8 +93,8 @@ export default function Header() {
           <Link
             href="/admin"
             className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
-            aria-label="Admin"
-            title="Admin"
+            aria-label={t("Staff")}
+            title={t("Staff")}
           >
             <Settings size={16} />
           </Link>
@@ -106,7 +108,7 @@ export default function Header() {
             autoFocus
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search…"
+            placeholder={t("Search…")}
             className="bg-transparent outline-none text-sm text-white placeholder:text-white/50 w-full"
           />
         </form>
@@ -121,7 +123,7 @@ export default function Header() {
               onClick={() => setOpen(false)}
               className="px-3 py-3 rounded-lg text-sm border-b border-white/5"
             >
-              {label}
+              {t(label)}
             </Link>
           ))}
         </nav>

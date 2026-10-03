@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Target, User } from "lucide-react";
@@ -9,6 +10,7 @@ import SilkImage from "@/components/SilkImage";
 export const revalidate = 0;
 
 export default async function TrainerDetailPage({ params }: { params: { id: string } }) {
+  const { t, lang } = getT();
   const trainer = await getTrainerById(params.id);
   if (!trainer) return notFound();
 
@@ -31,7 +33,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
             )}
           </div>
           <div className="min-w-0">
-            <span className="text-xs font-semibold text-gold2">TRAINER PROFILE</span>
+            <span className="text-xs font-semibold text-gold2">{t("TRAINER PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{trainer.name}</h1>
             <div className="text-white/70 text-sm mt-1.5 flex items-center gap-2 flex-wrap">
               {trainer.stable ? (
@@ -39,8 +41,8 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
                   <SilkImage url={trainer.stable.silk_image_url} size={22} title={trainer.stable.name} />
                   <Link href={`/stables/${trainer.stable.id}`} className="hover:underline">{trainer.stable.name}</Link>
                 </>
-              ) : "Unknown stable"}
-              {trainer.ranking && <span className="pill pill-gold ml-2">Ranked #{trainer.ranking}</span>}
+              ) : t("Unknown stable")}
+              {trainer.ranking && <span className="pill pill-gold ml-2">{t("Ranked")} #{trainer.ranking}</span>}
             </div>
           </div>
         </div>
@@ -48,23 +50,23 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
 
       <section className="py-14">
         <div className="wrap">
-          <Link href="/trainers" className="text-sm border-b border-ink pb-0.5">← Back to trainers</Link>
+          <Link href="/trainers" className="text-sm border-b border-ink pb-0.5">← {t("Back to trainers")}</Link>
 
-          <h2 className="font-display text-xl mt-7 mb-4">Career statistics</h2>
+          <h2 className="font-display text-xl mt-7 mb-4">{t("Career statistics")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div className="stat-tile"><div className="v">{trainer.wins}</div><div className="l">Total wins</div></div>
-            <div className="stat-tile"><div className="v">{stats.places}</div><div className="l">Total places</div></div>
-            <div className="stat-tile"><div className="v">{stats.winPct}%</div><div className="l">Win percentage</div></div>
-            <div className="stat-tile"><div className="v">{stats.placePct}%</div><div className="l">Place percentage</div></div>
-            <div className="stat-tile"><div className="v">{stats.starts}</div><div className="l">Total starts</div></div>
-            <div className="stat-tile"><div className="v">{stats.avgFinish ?? "N/A"}</div><div className="l">Avg. finishing position</div></div>
-            <div className="stat-tile"><div className="v">{trainer.horses}</div><div className="l">Horses in stable</div></div>
-            <div className="stat-tile"><div className="v">{trainer.ranking ? `#${trainer.ranking}` : "N/A"}</div><div className="l">Current ranking</div></div>
+            <div className="stat-tile"><div className="v">{trainer.wins}</div><div className="l">{t("Total wins")}</div></div>
+            <div className="stat-tile"><div className="v">{stats.places}</div><div className="l">{t("Total places")}</div></div>
+            <div className="stat-tile"><div className="v">{stats.winPct}%</div><div className="l">{t("Win percentage")}</div></div>
+            <div className="stat-tile"><div className="v">{stats.placePct}%</div><div className="l">{t("Place percentage")}</div></div>
+            <div className="stat-tile"><div className="v">{stats.starts}</div><div className="l">{t("Total starts")}</div></div>
+            <div className="stat-tile"><div className="v">{stats.avgFinish ?? t("N/A")}</div><div className="l">{t("Avg. finishing position")}</div></div>
+            <div className="stat-tile"><div className="v">{trainer.horses}</div><div className="l">{t("Horses in stable")}</div></div>
+            <div className="stat-tile"><div className="v">{trainer.ranking ? `#${trainer.ranking}` : t("N/A")}</div><div className="l">{t("Current ranking")}</div></div>
           </div>
 
           {stats.recentForm.length > 0 && (
             <div className="mb-10">
-              <h4 className="text-sm font-semibold mb-2">Recent form</h4>
+              <h4 className="text-sm font-semibold mb-2">{t("Recent form")}</h4>
               <div className="flex gap-2">
                 {stats.recentForm.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"}`}>{f}</span>)}
               </div>
@@ -73,9 +75,9 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="min-w-0">
-              <h2 className="font-display text-xl mb-4">Horses currently trained</h2>
+              <h2 className="font-display text-xl mb-4">{t("Horses currently trained")}</h2>
               {horses.length === 0 ? (
-                <p className="text-sm opacity-60">No horses currently assigned to this trainer.</p>
+                <p className="text-sm opacity-60">{t("No horses currently assigned to this trainer.")}</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {horses.map((h) => (
@@ -83,7 +85,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
                       <SilkImage fallback url={h.silk_image_url} size={26} title={h.name} />
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate">{h.name}</div>
-                        <div className="text-xs opacity-60">{h.wins}W · {h.starts} starts</div>
+                        <div className="text-xs opacity-60">{h.wins}{t("W")} · {h.starts} {t("starts")}</div>
                       </div>
                     </Link>
                   ))}
@@ -92,13 +94,13 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
             </div>
 
             <div className="min-w-0">
-              <h2 className="font-display text-xl mb-4">Recent results</h2>
+              <h2 className="font-display text-xl mb-4">{t("Recent results")}</h2>
               {stats.recentResults.length === 0 ? (
-                <p className="text-sm opacity-60">No results recorded yet.</p>
+                <p className="text-sm opacity-60">{t("No results recorded yet.")}</p>
               ) : (
                 <div className="panel !p-0 overflow-x-auto">
                   <table>
-                    <thead><tr><th>Pos</th><th>Horse</th><th>Race</th><th>Date</th></tr></thead>
+                    <thead><tr><th>{t("Pos")}</th><th>{t("Horse")}</th><th>{t("Race")}</th><th>{t("Date")}</th></tr></thead>
                     <tbody>
                       {stats.recentResults.map((r, i) => (
                         <tr key={i}>
@@ -117,7 +119,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
 
           {trainer.achievements && (
             <div className="panel mt-8">
-              <h4 className="text-sm font-semibold mb-2 flex items-center gap-2"><User size={15} /> Achievements</h4>
+              <h4 className="text-sm font-semibold mb-2 flex items-center gap-2"><User size={15} /> {t("Achievements")}</h4>
               <p className="text-sm opacity-70">{trainer.achievements}</p>
             </div>
           )}

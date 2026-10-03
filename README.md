@@ -510,3 +510,7 @@ has been removed. Run `supabase/scraped_odds_gear_tips_migration.sql` once, then
 - Runner cards use a fixed grid (jockey/trainer → gate/weight/rating/gear → win/place) so they align regardless of content.
 - Horses with no silk (or a silk that fails to load) fall back to Supertote's own default silk, then to a built-in SVG.
 - `app/loading.tsx` and `app/races/[id]/loading.tsx` give instant skeleton loading screens; `app/template.tsx` fades pages in; `components/NavProgress.tsx` is the top progress bar.
+
+## Languages (EN / FR)
+
+The footer has an EN | FR switch (choice stored in the `ct-lang` cookie). UI text lives in `lib/i18n/fr.ts` — English text is the key, so a missing entry simply shows English. Server components use `getT()` (`lib/i18n/server.ts`), client components use `useT()`. Horse, jockey, trainer, stable, owner and race names are never translated, and neither is free text entered by staff (news, notes, etc.).

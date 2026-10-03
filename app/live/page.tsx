@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { Play, Radio } from "lucide-react";
 import { getActiveStream } from "@/lib/streams";
@@ -9,6 +10,7 @@ import ViewerCount from "@/components/ViewerCount";
 export const revalidate = 0;
 
 export default async function LivePage() {
+  const { t, lang } = getT();
   const [stream, races] = await Promise.all([getActiveStream(), getRaces()]);
   const replays = races.filter((r) => r.status === "completed");
 
@@ -16,8 +18,8 @@ export default async function LivePage() {
     <div>
       <div className="detail-hero">
         <div className="wrap">
-          <span className="text-xs font-semibold text-gold2">BROADCAST</span>
-          <h1 className="text-3xl font-display mt-1">Live &amp; replays</h1>
+          <span className="text-xs font-semibold text-gold2">{t("BROADCAST")}</span>
+          <h1 className="text-3xl font-display mt-1">{t("Live & replays")}</h1>
         </div>
       </div>
       <section className="py-6 md:py-14">
@@ -34,7 +36,7 @@ export default async function LivePage() {
               {stream ? (
                 <>
                   <div className="absolute top-3.5 left-3.5 bg-coral text-white text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5 z-10">
-                    <Radio size={11} className="animate-pulse" /> LIVE
+                    <Radio size={11} className="animate-pulse" /> {t("LIVE")}
                   </div>
                   <StreamPlayer stream={stream} />
                 </>
@@ -42,7 +44,7 @@ export default async function LivePage() {
                 <div className="w-full h-full flex items-center justify-center text-white/50">
                   <div className="text-center px-4">
                     <Play size={28} className="mx-auto opacity-60" />
-                    <div className="text-sm mt-2">No live stream right now — check back during a race day.</div>
+                    <div className="text-sm mt-2">{t("No live stream right now — check back during a race day.")}</div>
                   </div>
                 </div>
               )}
@@ -52,9 +54,9 @@ export default async function LivePage() {
           {/* Replays */}
           <div className="order-3 md:order-none md:col-start-1 md:row-start-2">
             <div className="flex justify-between items-end mb-3">
-              <h2 className="text-xl font-display">Replay archive</h2>
+              <h2 className="text-xl font-display">{t("Replay archive")}</h2>
             </div>
-            {replays.length === 0 && <p className="text-sm opacity-60">No completed races yet.</p>}
+            {replays.length === 0 && <p className="text-sm opacity-60">{t("No completed races yet.")}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {replays.map((r) => (
                 <Link key={r.id} href={`/races/${r.id}`} className="card overflow-hidden">

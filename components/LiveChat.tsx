@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
 import { ArrowDown, Send } from "lucide-react";
@@ -40,6 +41,7 @@ const formatTime = (ts: number) =>
   new Date(ts).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 
 export default function LiveChat() {
+  const { t: tr, lang } = useT();
   const supabase = useMemo(() => createClient(), []);
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -175,19 +177,19 @@ export default function LiveChat() {
 
     // --- Anti-spam & abuse checks ---
     if (messageText.length > MAX_LENGTH) {
-      setErrorMessage(`Message is too long (max ${MAX_LENGTH} characters).`);
+      setErrorMessage(tr("Message is too long (max {n} characters).", { n: MAX_LENGTH }));
       return;
     }
 
     const now = Date.now();
     const wait = COOLDOWN_MS - (now - lastSentRef.current);
     if (wait > 0) {
-      setErrorMessage(`Slow down — you can send again in ${Math.ceil(wait / 1000)}s.`);
+      setErrorMessage(tr("Slow down — you can send again in {s}s.", { s: Math.ceil(wait / 1000) }));
       return;
     }
 
     if (containsProfanity(messageText)) {
-      setErrorMessage("Please keep the chat respectful.");
+      setErrorMessage(tr("Please keep the chat respectful."));
       return;
     }
 
@@ -215,7 +217,7 @@ export default function LiveChat() {
       setInput(messageText);
       lastSentRef.current = 0;
       setCooldownLeft(0);
-      setErrorMessage("Couldn't send — check your connection and try again.");
+      setErrorMessage(tr("Couldn't send — check your connection and try again."));
     }
   }
 
@@ -224,7 +226,7 @@ export default function LiveChat() {
 
   const statusDot =
     status === "live" ? "bg-emerald-500" : status === "connecting" ? "bg-amber-400 animate-pulse" : "bg-red-500";
-  const statusLabel = status === "live" ? "Live" : status === "connecting" ? "Connecting…" : "Offline";
+  const statusLabel = status === "live" ? tr("Live") : status === "connecting" ? tr("Connecting…") : tr("Offline");
 
   return (
     <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
@@ -232,12 +234,12 @@ export default function LiveChat() {
       <div className="px-3.5 py-3 border-b border-line flex justify-between items-center gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <span className={`inline-block w-2 h-2 rounded-full ${statusDot}`} aria-hidden />
-          <span>Live chat</span>
+          <span>{tr("Live chat")}</span>
           <span className="text-xs font-normal opacity-60">{statusLabel}</span>
         </div>
         <span className="text-xs opacity-75 truncate">
           {identity ? (
-            <>You: <b>{identity.username}</b></>
+            <>{tr("You")}: <b>{identity.username}</b></>
           ) : (
             "\u00A0"
           )}
@@ -251,14 +253,14 @@ export default function LiveChat() {
           onScroll={onScroll}
           role="log"
           aria-live="polite"
-          aria-label="Live chat messages"
+          aria-label={tr("Live chat messages")}
           className="h-full overflow-y-auto overscroll-contain p-3.5 text-sm space-y-2"
         >
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center text-center opacity-50 text-xs px-6">
               {status === "offline"
-                ? "Can't reach chat. Check your connection and the Supabase URL/key, then refresh."
-                : "No messages yet. Say something about the race."}
+                ? tr("Chat is unavailable right now. Please check your connection and refresh.")
+                : tr("No messages yet. Say something about the race.")}
             </div>
           ) : (
             messages.map((m) => {
@@ -269,7 +271,7 @@ export default function LiveChat() {
                   className={`rounded-lg px-2.5 py-1.5 break-words ${mine ? "bg-coral/10" : ""}`}
                 >
                   <div className="flex items-baseline gap-2">
-                    <b className="text-coral">{mine ? "You" : m.sender}</b>
+                    <b className="text-coral">{mine ? tr("You") : m.sender}</b>
                     <span className="text-[11px] opacity-40">{formatTime(m.sentAt)}</span>
                   </div>
                   <div>{m.message}</div>
@@ -285,7 +287,7 @@ export default function LiveChat() {
             onClick={jumpToLatest}
             className="absolute bottom-2 left-1/2 -translate-x-1/2 bg-coral text-white text-xs font-semibold px-3 py-1.5 rounded-full shadow-md flex items-center gap-1.5"
           >
-            <ArrowDown size={12} /> {unseen} new {unseen === 1 ? "message" : "messages"}
+            <ArrowDown size={12} /> {tr(unseen === 1 ? "{n} new message" : "{n} new messages", { n: unseen })}
           </button>
         )}
       </div>
@@ -303,12 +305,12 @@ export default function LiveChat() {
           <input
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={status === "live" ? "Say something…" : "Connecting…"}
+            placeholder={status === "live" ? tr("Say something…") : tr("Connecting…")}
             maxLength={MAX_LENGTH}
             disabled={status !== "live"}
             autoComplete="off"
             enterKeyHint="send"
-            aria-label="Chat message"
+            aria-label={tr("Chat message")}
             className="w-full border-none pl-3.5 pr-10 py-3 text-base sm:text-sm outline-none bg-transparent disabled:opacity-50"
           />
           {remaining <= 30 && (
@@ -325,10 +327,10 @@ export default function LiveChat() {
         <button
           type="submit"
           disabled={!canSend}
-          aria-label="Send message"
+          aria-label={tr("Send message")}
           className="px-4 py-3 text-coral font-semibold text-sm flex items-center gap-1.5 disabled:opacity-40 min-w-[64px] justify-center"
         >
-          {cooldownLeft > 0 ? `${cooldownLeft}s` : (<><Send size={14} /> Send</>)}
+          {cooldownLeft > 0 ? `${cooldownLeft}s` : (<><Send size={14} /> {tr("Send")}</>)}
         </button>
       </form>
     </div>

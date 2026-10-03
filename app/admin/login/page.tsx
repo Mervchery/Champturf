@@ -45,9 +45,9 @@ function AdminLoginForm() {
   return (
     <div className="min-h-[70vh] flex items-center justify-center px-5 py-10">
       <div className="w-full max-w-[380px] card p-8">
-        <span className="text-xs font-semibold text-coral">RESTRICTED ACCESS</span>
+        <span className="text-xs font-semibold text-coral">STAFF ACCESS</span>
         <h2 className="font-display text-2xl mt-1.5 flex items-center gap-2"><LockKeyhole size={20} /> Admin sign in</h2>
-        <p className="text-sm opacity-70 mt-1.5 mb-5">Sign in with your Supabase account. Your role determines what you can do here.</p>
+        <p className="text-sm opacity-70 mt-1.5 mb-5">Sign in with your staff account. Your role determines what you can do here.</p>
 
         {notAuthorized && (
           <div className="text-coral text-sm mb-4 bg-parchment2 p-3 rounded-md">
@@ -84,8 +84,7 @@ function AdminLoginForm() {
         </form>
 
         <div className="text-xs opacity-55 bg-parchment2 p-3 rounded-md mt-4 leading-relaxed">
-          No account yet? Create one in the Supabase dashboard (Authentication → Users), or enable sign-up
-          and add it here. New accounts have no admin role by default — see <code>supabase/schema.sql</code>.
+          Need access? Ask a Super Admin to create your account and assign a role.
         </div>
       </div>
     </div>

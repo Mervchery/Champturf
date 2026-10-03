@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { HorseIcon } from "@/components/RacingIcons";
@@ -7,6 +8,7 @@ import SilkImage from "@/components/SilkImage";
 import type { Horse } from "@/lib/horses";
 
 export default function HorsesGrid({ horses }: { horses: Horse[] }) {
+  const { t, lang } = useT();
   const [q, setQ] = useState("");
   const [sort, setSort] = useState<"wins" | "earnings" | "name">("wins");
 
@@ -22,16 +24,16 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
         <input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search by name, owner, stable…"
+          placeholder={t("Search by name, owner, stable…")}
           className="px-3.5 py-2 border border-line rounded-full bg-surface text-sm flex-1"
         />
         <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="px-3.5 py-2 border border-line rounded-full bg-surface text-sm">
-          <option value="wins">Sort: most wins</option>
-          <option value="earnings">Sort: earnings</option>
-          <option value="name">Sort: name A–Z</option>
+          <option value="wins">{t("Sort: most wins")}</option>
+          <option value="earnings">{t("Sort: earnings")}</option>
+          <option value="name">{t("Sort: name A–Z")}</option>
         </select>
       </div>
-      {list.length === 0 && <p className="text-sm opacity-60">No horses match your search.</p>}
+      {list.length === 0 && <p className="text-sm opacity-60">{t("No horses match your search.")}</p>}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {list.map((h) => (
           <Link key={h.id} href={`/horses/${h.id}`} className="card">
@@ -50,11 +52,11 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
             </div>
             <div className="p-4">
               <h4 className="font-semibold">{h.name}</h4>
-              <div className="text-xs opacity-60 mt-1">{h.age ? `${h.age}yo` : "N/A"} {h.sex ?? "N/A"} · {h.color ?? "N/A"}</div>
+              <div className="text-xs opacity-60 mt-1">{h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.color ? t(h.color) : t("N/A")}</div>
               <div className="flex gap-3.5 mt-3 text-xs">
-                <div><b className="block font-mono text-sm">{h.wins}</b>Wins</div>
-                <div><b className="block font-mono text-sm">{h.seconds + h.thirds}</b>Placed</div>
-                <div><b className="block font-mono text-sm">{h.starts}</b>Starts</div>
+                <div><b className="block font-mono text-sm">{h.wins}</b>{t("Wins")}</div>
+                <div><b className="block font-mono text-sm">{h.seconds + h.thirds}</b>{t("Placed")}</div>
+                <div><b className="block font-mono text-sm">{h.starts}</b>{t("Starts")}</div>
               </div>
             </div>
           </Link>

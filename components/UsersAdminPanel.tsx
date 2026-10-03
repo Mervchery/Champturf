@@ -22,8 +22,7 @@ export default function UsersAdminPanel({ profiles, notify }: { profiles: Profil
     <div>
       <h2 className="font-display text-2xl mb-5">Users &amp; roles</h2>
       <p className="text-sm opacity-60 mb-4">
-        Roles are Supabase accounts, not invites — someone needs an account already (Authentication → Users
-        in the Supabase dashboard) before they show up here to be granted a role.
+        People appear here once they have an account. Grant a role to give them access to the dashboard.
       </p>
       <div className="panel !p-0 overflow-hidden">
         <table>

@@ -12,9 +12,23 @@
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/css/601d4c42e3d2ab3a.css",
+      "static/css/18f47332590ebaf6.css",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/layout-97524cb552982508.js"
+      "static/chunks/app/layout-f662c06c6bbbf42d.js"
+    ],
+    "/template": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/app/template-06ea878893c33892.js"
+    ],
+    "/loading": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/app/loading-bb19269f59eece81.js"
     ],
     "/admin/login/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -22,22 +36,14 @@
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/408-1d3347176767e95b.js",
-      "static/chunks/app/admin/login/page-571848f7647e8e42.js"
+      "static/chunks/app/admin/login/page-ef9065fc68ce649b.js"
     ],
     "/races/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/app/races/page-fe8a27cba51c41e9.js"
-    ],
-    "/admin/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/408-1d3347176767e95b.js",
-      "static/chunks/app/admin/page-b83adb762851da80.js"
+      "static/chunks/app/races/page-5c9a6718eb8a7f13.js"
     ],
     "/horses/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -45,30 +51,7 @@
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/horses/page-e95eb79a54b1ac61.js"
-    ],
-    "/jockeys/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/jockeys/page-5d27916e7fa716a1.js"
-    ],
-    "/news/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/news/page-eaf2a04c8fd44cc0.js"
-    ],
-    "/owners/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/app/owners/page-451d6bbad58b5497.js"
+      "static/chunks/app/horses/page-41b560ac6e413c48.js"
     ],
     "/jockeys/[id]/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -76,38 +59,15 @@
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/jockeys/[id]/page-5d50096c11063070.js"
+      "static/chunks/app/jockeys/[id]/page-add0b4bd7cf95f13.js"
     ],
-    "/horses/[id]/page": [
+    "/jockeys/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/horses/[id]/page-bb24f8cb85ad9d43.js"
-    ],
-    "/race-days/[date]/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/race-days/[date]/page-562b1a0eaca770c7.js"
-    ],
-    "/race-days/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/race-days/page-876327e03d3cf7f4.js"
-    ],
-    "/results/page": [
-      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
-      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
-      "static/chunks/23-7fb7b6aad2aa5023.js",
-      "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/app/results/page-33923a70b7ff69c2.js"
+      "static/chunks/app/jockeys/page-202c0bf2c765e45c.js"
     ],
     "/live/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -118,21 +78,59 @@
       "static/chunks/408-1d3347176767e95b.js",
       "static/chunks/app/live/page-abc857f4f667ecc5.js"
     ],
-    "/races/[id]/page": [
+    "/horses/[id]/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/races/[id]/page-db265e07a685e60d.js"
+      "static/chunks/app/horses/[id]/page-ddd73a5fd42b31c6.js"
     ],
-    "/stables/page": [
+    "/owners/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/app/owners/page-cbfdcb24a50264d5.js"
+    ],
+    "/admin/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/408-1d3347176767e95b.js",
+      "static/chunks/app/admin/page-1aa39770e35b9eb0.js"
+    ],
+    "/race-days/[date]/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/stables/page-cd1bbeed8812e91d.js"
+      "static/chunks/app/race-days/[date]/page-688c456d66e66482.js"
+    ],
+    "/race-days/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/231-eb43e8c5053fa290.js",
+      "static/chunks/app/race-days/page-cb0e2184419c1834.js"
+    ],
+    "/results/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/app/results/page-33923a70b7ff69c2.js"
+    ],
+    "/search/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/231-eb43e8c5053fa290.js",
+      "static/chunks/app/search/page-46fb8247fe871743.js"
     ],
     "/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -142,13 +140,28 @@
       "static/chunks/231-eb43e8c5053fa290.js",
       "static/chunks/app/page-c6ddee4b82baf9b4.js"
     ],
-    "/search/page": [
+    "/stables/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/search/page-f145acb1a30d163e.js"
+      "static/chunks/app/stables/page-2fc49588ae59b1ab.js"
+    ],
+    "/races/[id]/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/231-eb43e8c5053fa290.js",
+      "static/chunks/app/races/[id]/page-bc67218a17a923dc.js"
+    ],
+    "/races/[id]/loading": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/app/races/[id]/loading-0a033a1d68d6bfe8.js"
     ],
     "/stables/[id]/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -156,22 +169,22 @@
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/stables/[id]/page-7fe63c02506139a4.js"
+      "static/chunks/app/stables/[id]/page-f46bd4a487fb0230.js"
     ],
     "/trainers/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
-      "static/chunks/app/trainers/page-e707f8d1dfa1653b.js"
+      "static/chunks/app/trainers/page-b1d7b8e8ad9018d6.js"
     ],
-    "/trainers/[id]/page": [
+    "/news/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
       "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/trainers/[id]/page-e3d9807c7e9b1ee5.js"
+      "static/chunks/app/news/page-53af5198455303cc.js"
     ],
     "/stats/page": [
       "static/chunks/webpack-8cc2d7fee83ad9cc.js",
@@ -179,7 +192,15 @@
       "static/chunks/23-7fb7b6aad2aa5023.js",
       "static/chunks/main-app-28678b772b2fcca9.js",
       "static/chunks/231-eb43e8c5053fa290.js",
-      "static/chunks/app/stats/page-12e0fcb3403cd94d.js"
+      "static/chunks/app/stats/page-8564fc7397bc63ef.js"
+    ],
+    "/trainers/[id]/page": [
+      "static/chunks/webpack-8cc2d7fee83ad9cc.js",
+      "static/chunks/fd9d1056-be7cd5492eb16bb5.js",
+      "static/chunks/23-7fb7b6aad2aa5023.js",
+      "static/chunks/main-app-28678b772b2fcca9.js",
+      "static/chunks/231-eb43e8c5053fa290.js",
+      "static/chunks/app/trainers/[id]/page-873d58b0c8414d5c.js"
     ]
   }
 }

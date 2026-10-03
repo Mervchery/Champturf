@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { Newspaper } from "lucide-react";
 import { getNews } from "@/lib/news";
@@ -5,6 +6,7 @@ import { getNews } from "@/lib/news";
 export const revalidate = 0;
 
 export default async function NewsPage({ searchParams }: { searchParams: { cat?: string } }) {
+  const { t, lang } = getT();
   const cat = searchParams.cat || "";
   const news = await getNews();
   const list = news.filter((n) => !cat || n.category === cat);
@@ -14,19 +16,19 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
     <div>
       <div className="detail-hero">
         <div className="wrap">
-          <span className="text-xs font-semibold text-gold2">EDITORIAL</span>
-          <h1 className="text-3xl font-display mt-1">News &amp; reports</h1>
+          <span className="text-xs font-semibold text-gold2">{t("EDITORIAL")}</span>
+          <h1 className="text-3xl font-display mt-1">{t("News & reports")}</h1>
         </div>
       </div>
       <section className="py-14">
         <div className="wrap">
           <div className="flex gap-2 flex-wrap mb-7">
-            <Link href="/news" className={`pill ${!cat ? "pill-gold" : "pill-outline"}`}>All</Link>
+            <Link href="/news" className={`pill ${!cat ? "pill-gold" : "pill-outline"}`}>{t("All")}</Link>
             {cats.map((c) => (
-              <Link key={c} href={`/news?cat=${encodeURIComponent(c)}`} className={`pill ${cat === c ? "pill-gold" : "pill-outline"}`}>{c}</Link>
+              <Link key={c} href={`/news?cat=${encodeURIComponent(c)}`} className={`pill ${cat === c ? "pill-gold" : "pill-outline"}`}>{t(c)}</Link>
             ))}
           </div>
-          {list.length === 0 && <p className="text-sm opacity-60">No articles yet.</p>}
+          {list.length === 0 && <p className="text-sm opacity-60">{t("No articles yet.")}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {list.map((n) => (
               <div key={n.id} className="card">
@@ -34,9 +36,9 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
                   <Newspaper size={28} />
                 </div>
                 <div className="p-4">
-                  <span className="pill">{n.category}</span>
+                  <span className="pill">{t(n.category)}</span>
                   <h4 className="mt-2 font-semibold">{n.title}</h4>
-                  <p className="text-sm opacity-60 mt-1.5">{n.excerpt ?? "N/A"}</p>
+                  <p className="text-sm opacity-60 mt-1.5">{n.excerpt ?? t("N/A")}</p>
                   <div className="text-xs opacity-55 mt-2.5">{n.article_date}</div>
                 </div>
               </div>

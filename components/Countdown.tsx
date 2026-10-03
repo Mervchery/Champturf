@@ -1,8 +1,10 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useEffect, useState } from "react";
 
 export default function Countdown({ target }: { target: string }) {
+  const { t, lang } = useT();
   const [parts, setParts] = useState({ d: 0, h: 0, m: 0, s: 0 });
 
   useEffect(() => {
@@ -27,7 +29,7 @@ export default function Countdown({ target }: { target: string }) {
       {items.map(([label, value]) => (
         <div key={label} className="text-center">
           <div className="font-mono text-2xl font-semibold text-gold2">{String(value).padStart(2, "0")}</div>
-          <div className="text-[0.65rem] text-white/60 mt-0.5">{label}</div>
+          <div className="text-[0.65rem] text-white/60 mt-0.5">{t(label)}</div>
         </div>
       ))}
     </div>

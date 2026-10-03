@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useEffect, useRef, useState } from "react";
 import type { Stream } from "@/lib/streams";
 
@@ -7,6 +8,7 @@ import type { Stream } from "@/lib/streams";
 // load hls.js on demand. It's dynamically imported so it only downloads for
 // viewers who actually need it.
 function HlsVideo({ src }: { src: string }) {
+  const { t, lang } = useT();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [error, setError] = useState("");
   const [attempt, setAttempt] = useState(0);
@@ -63,13 +65,13 @@ function HlsVideo({ src }: { src: string }) {
       <video ref={videoRef} className="w-full h-full" controls autoPlay muted playsInline />
       {error && (
         <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-black/80 text-white text-sm text-center px-6">
-          <span>{error}</span>
+          <span>{t(error)}</span>
           <button
             type="button"
             onClick={() => setAttempt((n) => n + 1)}
             className="bg-coral text-white text-xs font-semibold px-3 py-1.5 rounded-full"
           >
-            Try again
+            {t("Try again")}
           </button>
         </div>
       )}

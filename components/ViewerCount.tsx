@@ -1,5 +1,6 @@
 "use client";
 
+import { useT } from "@/components/LanguageProvider";
 import { useEffect, useMemo, useState } from "react";
 import { Eye } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -9,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 // Free-plan note: presence is limited to 20 messages/sec, so a huge burst
 // of people joining at once can briefly lag the number — it self-corrects.
 export default function ViewerCount() {
+  const { t, lang } = useT();
   const supabase = useMemo(() => createClient(), []);
   const [count, setCount] = useState<number | null>(null);
 
@@ -46,7 +48,7 @@ export default function ViewerCount() {
       aria-live="polite"
     >
       <Eye size={12} />
-      {count.toLocaleString()} watching
+      {t("{n} watching", { n: count.toLocaleString() })}
     </div>
   );
 }

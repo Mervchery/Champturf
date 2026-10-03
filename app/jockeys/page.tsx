@@ -1,3 +1,4 @@
+import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { JockeyIcon } from "@/components/RacingIcons";
 import { getJockeys } from "@/lib/jockeys";
@@ -5,6 +6,7 @@ import { getJockeys } from "@/lib/jockeys";
 export const revalidate = 0;
 
 export default async function JockeysPage({ searchParams }: { searchParams: { tab?: string } }) {
+  const { t, lang } = getT();
   const tab = searchParams.tab === "apprentice" ? "apprentice" : "pro";
   const jockeys = await getJockeys();
   const list = jockeys.filter((j) => (tab === "apprentice" ? j.apprentice : !j.apprentice));
@@ -13,21 +15,21 @@ export default async function JockeysPage({ searchParams }: { searchParams: { ta
     <div>
       <div className="detail-hero">
         <div className="wrap">
-          <span className="text-xs font-semibold text-gold2">DATABASE</span>
-          <h1 className="text-3xl font-display mt-1">Jockeys &amp; apprentices</h1>
+          <span className="text-xs font-semibold text-gold2">{t("DIRECTORY")}</span>
+          <h1 className="text-3xl font-display mt-1">{t("Jockeys & apprentices")}</h1>
         </div>
       </div>
       <section className="py-14">
         <div className="wrap">
           <div className="flex gap-1 border-b border-line mb-7">
             <Link href="/jockeys?tab=pro" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "pro" ? "border-coral font-semibold" : "border-transparent opacity-55"}`}>
-              Professional
+              {t("Professional")}
             </Link>
             <Link href="/jockeys?tab=apprentice" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "apprentice" ? "border-coral font-semibold" : "border-transparent opacity-55"}`}>
-              Apprentice / trainee
+              {t("Apprentice / trainee")}
             </Link>
           </div>
-          {list.length === 0 && <p className="text-sm opacity-60">None yet.</p>}
+          {list.length === 0 && <p className="text-sm opacity-60">{t("None yet.")}</p>}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {list.map((j) => (
               <Link key={j.id} href={`/jockeys/${j.id}`} className="card">
@@ -36,10 +38,10 @@ export default async function JockeysPage({ searchParams }: { searchParams: { ta
                 </div>
                 <div className="p-4">
                   <h4 className="font-semibold">{j.name}</h4>
-                  <div className="text-xs opacity-60 mt-1">{j.nationality}{j.apprentice ? ` · Apprentice (${j.allowance})` : ""}</div>
+                  <div className="text-xs opacity-60 mt-1">{j.nationality ? t("nat:" + j.nationality) : ""}{j.apprentice ? ` · ${t("Apprentice")} (${j.allowance})` : ""}</div>
                   <div className="flex gap-3.5 mt-3 text-xs">
-                    <div><b className="block font-mono text-sm">{j.wins}</b>Wins</div>
-                    <div><b className="block font-mono text-sm">{j.win_pct}%</b>Win rate</div>
+                    <div><b className="block font-mono text-sm">{j.wins}</b>{t("Wins")}</div>
+                    <div><b className="block font-mono text-sm">{j.win_pct}%</b>{t("Win rate")}</div>
                   </div>
                 </div>
               </Link>
