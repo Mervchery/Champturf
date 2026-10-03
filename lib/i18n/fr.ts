@@ -68,15 +68,15 @@ export const fr: Record<string, string> = {
   "Completed": "Terminée",
   "{n} race": "{n} course",
   "{n} races": "{n} courses",
-  "total purse": "dotation totale",
   "RACE DAY": "JOURNÉE DE COURSES",
   "All race days": "Toutes les journées de courses",
   "Races": "Courses",
-  "Total prize money": "Dotation totale",
   "Weather": "Météo",
   "Track condition": "État de la piste",
   "FEATURED RACE": "COURSE VEDETTE",
   "Races on this card": "Courses au programme",
+  "total purse": "dotation totale",
+  "Total prize money": "Dotation totale",
   "Result in": "Résultat disponible",
 
   // Race page
@@ -275,6 +275,18 @@ export const fr: Record<string, string> = {
   "Couldn't send — check your connection and try again.": "Envoi impossible — vérifiez votre connexion et réessayez.",
   "{n} new message": "{n} nouveau message",
   "{n} new messages": "{n} nouveaux messages",
+
+
+  // Jockey Club data
+  "HWT": "P. cheval",
+  "Gear changed": "Équipement modifié",
+  "Class": "Classe",
+  "Rails": "Lisses",
+  "Prize money": "Dotation",
+  "Time factors": "Facteurs de temps",
+  "Fastest time": "Meilleur temps",
+  "Days since": "Jours depuis",
+  "Best (last 3 starts)": "Meilleur (3 dernières courses)",
 
   // Loading / errors
   "Loading the field…": "Chargement du peloton…",

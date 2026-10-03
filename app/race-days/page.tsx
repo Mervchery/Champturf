@@ -1,8 +1,8 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { CalendarDays, Flag, CloudSun } from "lucide-react";
-import { getRaceDays } from "@/lib/meetings";
 import { fmtMoney } from "@/lib/format";
+import { getRaceDays } from "@/lib/meetings";
 import { fmtDateLong } from "@/lib/i18n";
 
 export const revalidate = 0;

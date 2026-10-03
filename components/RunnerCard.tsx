@@ -14,9 +14,12 @@ function podiumClass(position: number | null) {
   return "";
 }
 
-function PrizeWon({ position, racePrize }: { position: number; racePrize: number }) {
+function PrizeWon({ position, racePrize, prizeSplit }: { position: number; racePrize: number; prizeSplit?: number[] | null }) {
   const { lang } = getT();
-  // Same 60/20/10 split used for horse earnings — display only.
+  // The race's real purse split (from the Jockey Club card) when we have it…
+  const real = prizeSplit?.[position - 1];
+  if (real != null) return <>{fmtMoney(real, lang)}</>;
+  // …otherwise the 60/20/10 estimate used for horse earnings — display only.
   const pct = position === 1 ? 0.6 : position === 2 ? 0.2 : position === 3 ? 0.1 : 0;
   if (pct === 0) return <span className="opacity-50">—</span>;
   return <>{fmtMoney(Math.round(racePrize * pct), lang)}</>;
@@ -94,12 +97,41 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-function GearValue({ gear }: { gear: string | null | undefined }) {
+function GearValue({ gear, equip, changed, prev }: { gear: string | null | undefined; equip?: string | null; changed?: boolean; prev?: string | null }) {
+  const { t } = getT();
+  // The Jockey Club's official gear code wins when we have it; otherwise Supertote's letters.
+  if (equip && equip.toUpperCase() === "NA") return <span className="opacity-40">—</span>; // official: no gear
+  if (equip) {
+    return (
+      <span
+        className={`gear-chip ${changed ? "is-changed" : ""}`}
+        title={changed ? `${t("Gear changed")}: ${prev ?? "?"} → ${equip}` : undefined}
+      >
+        {equip}{changed ? "*" : ""}
+      </span>
+    );
+  }
   const items = (gear ?? "").split(",").map((g) => g.trim()).filter(Boolean);
   if (items.length === 0) return <span className="opacity-40">—</span>;
   return (
     <span className="inline-flex gap-1 flex-wrap justify-center">
       {items.map((g) => <span key={g} className="gear-chip">{g}</span>)}
+    </span>
+  );
+}
+
+/** Horse weight with its change since the last run, e.g. 507 (−1). */
+function HwtValue({ hwt, last }: { hwt: number | null; last: number | null }) {
+  if (hwt == null) return <span className="opacity-40">—</span>;
+  const diff = last != null ? hwt - last : null;
+  return (
+    <span className="inline-flex flex-col items-center leading-tight">
+      <span>{hwt}</span>
+      {diff != null && diff !== 0 && (
+        <span className={`text-[0.6rem] font-semibold ${diff > 0 ? "text-emerald-600" : "text-red-500"}`}>
+          {diff > 0 ? "+" : "−"}{Math.abs(diff)}
+        </span>
+      )}
     </span>
   );
 }
@@ -148,8 +180,12 @@ function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, st
 }
 
 export function EntryRow({
-  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, form, index,
-}: BaseProps & { gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean; form?: string[] }) {
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, form, index,
+}: BaseProps & {
+  gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
+  rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
+  form?: string[];
+}) {
   const { t, lang } = getT();
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
@@ -176,8 +212,9 @@ export function EntryRow({
       <div className="stats-grid">
         <Stat label="Gate">{gate ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
-        <Stat label="Rating">{horse?.rating ?? t("N/A")}</Stat>
-        <Stat label="Gear"><GearValue gear={gear} /></Stat>
+        <Stat label="Rating">{rating ?? horse?.rating ?? t("N/A")}</Stat>
+        {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
+        <Stat label="Gear"><GearValue gear={gear} equip={equip} changed={gearChanged} prev={gearPrev} /></Stat>
       </div>
 
       <OddsRow win={odds} place={placeOdds} />
@@ -207,11 +244,11 @@ export function EntryRow({
 }
 
 export function ResultRow({
-  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize, index,
+  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize, prizeSplit = null, index,
 }: BaseProps & {
   position: number; finishTime: string | null; margin: string | null;
   winOdds?: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
-  performanceRating: number | null; racePrize: number;
+  performanceRating: number | null; racePrize: number; prizeSplit?: number[] | null;
 }) {
   const { t, lang } = getT();
   return (
@@ -233,7 +270,7 @@ export function ResultRow({
         </div>
         <div className="text-right shrink-0">
           <div className="font-mono text-sm leading-tight">{finishTime ?? t("N/A")}</div>
-          <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} /></div>
+          <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} prizeSplit={prizeSplit} /></div>
         </div>
       </div>
 

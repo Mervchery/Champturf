@@ -18,6 +18,10 @@ export type Race = {
   racing_notes: string | null;
   // English translation of racing_notes (names untouched), filled in by the scraper.
   racing_notes_en: string | null;
+  // From the Jockey Club race card
+  race_class: string | null;
+  rails: string | null;
+  prize_split: number[] | null;
   danger_horse: string | null;
 };
 
@@ -62,6 +66,16 @@ export type RaceEntry = {
   // this runner as its favourite pick of the race.
   gear: string | null;
   is_tipped: boolean;
+  // From the Jockey Club race card (supabase/mtc_data_migration.sql)
+  rating: number | null;
+  hwt: number | null;
+  hwt_last: number | null;
+  equip: string | null;
+  gear_changed: boolean;
+  gear_prev: string | null;
+  tf_fastest: string | null;
+  tf_days_since: string | null;
+  tf_best3: string | null;
   horse_id: string;
   horses: HorseSummary | null; // joined
   jockey_id: string | null;

@@ -518,3 +518,13 @@ The footer has an EN | FR switch (choice stored in the `ct-lang` cookie). UI tex
 ## Racing-notes translation
 
 Supertote publishes the notes in French. The scraper stores the original in `races.racing_notes` and an English version in `races.racing_notes_en`, protecting every horse, jockey and trainer name so they are never translated. Run `supabase/racing_notes_en_migration.sql` once, then re-scrape — or `npm run translate-notes` to fill in races already imported. Add `ANTHROPIC_API_KEY` to `.env.local` for best quality (otherwise a free service is used). If a translation can't be produced safely, the original text is shown.
+
+## Jockey Club data (ratings, HWT, gear changes, class, prize split, time factors)
+
+`scraper/scrape-mtc.mjs` enriches races already imported from Supertote. Run `supabase/mtc_data_migration.sql` once, scrape the dates with Supertote first, then:
+
+    npm run scrape-mtc -- 04-oct-2026                  # one day
+    npm run scrape-mtc -- 01-oct-2026 31-oct-2026      # a date range
+    npm run scrape-mtc -- "<race-card link>"           # one meeting, by link
+
+Date modes walk the Jockey Club's monthly fixtures calendar (`/form-guide/fixture-calendar-partial`), pick out each meeting's race card (`/form-guide/fixtures/<meeting>/R1`) and follow its Race 2, 3… tabs. Meetings whose race card isn't published yet are reported as skipped. The season runs April–December. Link mode does the same for a link you give it (`--only` skips the tabs). `--max-pages=N` caps requests (default 150); requests are rate-limited like the Supertote scraper. If a page can't be read it is saved to `scraper/debug/`. Live odds on that site are ignored — Supertote's tote prices stay the source. The official gear code (with a changed-gear marker; "NA" = no gear) replaces Supertote's letters whenever it is available.

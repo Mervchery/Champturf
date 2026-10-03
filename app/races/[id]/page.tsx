@@ -5,7 +5,7 @@ import { Camera, Video, Search, Star, AlertTriangle, NotebookPen } from "lucide-
 import { getRaceById, getEntriesForRace, getResultsForRace } from "@/lib/races";
 import { getRecentForm } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
-import { fmtDateLong } from "@/lib/i18n";
+import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
 
 export const revalidate = 0;
@@ -40,6 +40,22 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
   // yet, the original is shown rather than nothing.
   const notesText = lang === "en" ? race.racing_notes_en || race.racing_notes : race.racing_notes;
   const hasTips = tipped.length > 0 || !!notesText || !!race.danger_horse;
+
+  const prizePanel = race.prize_split && race.prize_split.length > 0 ? (
+    <div className="panel mt-8">
+      <h3 className="font-display text-xl">{t("Prize money")}</h3>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
+        {race.prize_split.map((amount, i) => (
+          <div key={i} className="stat-cell !text-left border border-line rounded-xl">
+            <div className="stat-label !text-left">{ordinal(lang, i + 1)}</div>
+            <div className="font-semibold tabular-nums mt-0.5">{fmtMoney(amount, lang)}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  ) : null;
+
+  const timeFactors = entries.filter((e) => e.tf_fastest || e.tf_best3);
 
   const tipsPanel = hasTips ? (
     <div className="panel fade-in mt-8">
@@ -81,6 +97,12 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             {fmtDateLong(lang, race.race_date)} · {race.race_time} · {race.distance} · {fmtMoney(race.prize, lang)}
             {race.conditions ? ` · ${race.conditions}` : ""}
           </div>
+          {(race.race_class || race.rails) && (
+            <div className="flex flex-wrap gap-2 mt-3 text-xs">
+              {race.race_class && <span className="rounded-full bg-white/10 px-3 py-1">{t("Class")} {race.race_class}</span>}
+              {race.rails && <span className="rounded-full bg-white/10 px-3 py-1">{t("Rails")}: {race.rails}</span>}
+            </div>
+          )}
         </div>
       </div>
       <section className="py-14">
@@ -89,6 +111,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">← {t("All race days")}</Link>
             <Link href={`/race-days/${race.race_date}`} className="text-sm border-b border-ink pb-0.5">{t("View full race day")} →</Link>
           </div>
+
+          {prizePanel}
 
           {tipsPanel}
 
@@ -122,6 +146,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       isTipped={row.is_tipped}
                       performanceRating={row.performance_rating}
                       racePrize={race.prize}
+                      prizeSplit={race.prize_split}
                     />
                   ))}
                 </div>
@@ -187,9 +212,40 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       placeOdds={e.place_odds}
                       gear={e.gear}
                       isTipped={e.is_tipped}
+                      rating={e.rating}
+                      hwt={e.hwt}
+                      hwtLast={e.hwt_last}
+                      equip={e.equip}
+                      gearChanged={e.gear_changed}
+                      gearPrev={e.gear_prev}
                       form={e.horses ? formByHorse[e.horses.id] : undefined}
                     />
                   ))}
+                </div>
+              )}
+              {timeFactors.length > 0 && (
+                <div className="panel mt-8">
+                  <h3 className="font-display text-xl">{t("Time factors")}</h3>
+                  <div className="overflow-x-auto mt-3">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Fastest time")}</th><th>{t("Days since")}</th><th>{t("Best (last 3 starts)")}</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {timeFactors.map((e) => (
+                          <tr key={e.id}>
+                            <td>{e.runner_no ?? "—"}</td>
+                            <td>{e.horses?.name ?? t("Unknown")}</td>
+                            <td className="tabular-nums">{e.tf_fastest ?? "—"}</td>
+                            <td>{e.tf_days_since ?? "—"}</td>
+                            <td className="tabular-nums">{e.tf_best3 ?? "—"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

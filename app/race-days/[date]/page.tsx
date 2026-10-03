@@ -18,8 +18,8 @@ export default async function RaceDayPage({ params }: { params: { date: string }
 
   if (races.length === 0) return notFound();
 
-  const dateLabel = fmtDateLong(lang, params.date);
   const totalPrize = races.reduce((sum, r) => sum + (r.prize ?? 0), 0);
+  const dateLabel = fmtDateLong(lang, params.date);
   // races is already ordered by race_time (see getRacesForDate) — Race 6
   // of the day, by local convention, not the biggest purse.
   const featured = pickFeaturedRace(races);

@@ -631,3 +631,11 @@ tr:hover td {
   transition: transform 0.35s var(--ease);
 }
 a:hover > .brand-logo { transform: rotate(-6deg) scale(1.06); }
+
+/* Gear that changed since the last run: warm outline + asterisk. */
+.gear-chip.is-changed {
+  border-color: #d9822b;
+  background: rgba(217, 130, 43, 0.14);
+  color: #b3621a;
+}
+.dark .gear-chip.is-changed { color: #f2a65a; }
