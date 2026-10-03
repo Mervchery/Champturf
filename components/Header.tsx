@@ -93,8 +93,8 @@ export default function Header() {
           <Link
             href="/admin"
             className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
-            aria-label={t("Staff")}
-            title={t("Staff")}
+            aria-label={t("Staff area")}
+            title={t("Staff area")}
           >
             <Settings size={16} />
           </Link>
