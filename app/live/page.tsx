@@ -6,16 +6,6 @@ import LiveChat from "@/components/LiveChat";
 
 export const revalidate = 0;
 
-// Still a static placeholder — unrelated to the real stream wiring below.
-// A real version would come from race-day commentary, e.g. inserted rows
-// keyed to a race, polled or pushed via Supabase Realtime.
-const TICKER = [
-  "R4 — Off and running — Corsaire du Nord takes early lead",
-  "R4 — 600m: Belle Étoile moves up on the outside",
-  "R4 — 200m: Île Royale and Roi des Sables locked together",
-  "R4 — Photo finish called",
-];
-
 function renderEmbed(stream: Stream) {
   if (stream.source === "rtmp") {
     // Native <video> HLS playback works in Safari; other browsers need
@@ -47,9 +37,15 @@ export default async function LivePage() {
           <h1 className="text-3xl font-display mt-1">Live &amp; replays</h1>
         </div>
       </div>
-      <section className="py-14">
-        <div className="wrap grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-8 items-start">
-          <div>
+      <section className="py-6 md:py-14">
+        <div className="wrap grid grid-cols-1 md:grid-cols-[1.6fr_1fr] gap-6 md:gap-8 items-start">
+          {/* Chat: second on mobile (under the stream); right column (sticky) on desktop */}
+          <div className="order-2 md:order-none md:col-start-2 md:row-start-1 md:row-span-2 md:sticky md:top-24">
+            <LiveChat />
+          </div>
+
+          {/* Stream */}
+          <div className="order-1 md:order-none md:col-start-1 md:row-start-1">
             <div className="relative aspect-video bg-black rounded overflow-hidden">
               {stream ? (
                 <>
@@ -60,22 +56,18 @@ export default async function LivePage() {
                 </>
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-white/50">
-                  <div className="text-center">
+                  <div className="text-center px-4">
                     <Play size={28} className="mx-auto opacity-60" />
                     <div className="text-sm mt-2">No live stream right now — check back during a race day.</div>
                   </div>
                 </div>
               )}
             </div>
+          </div>
 
-            <div className="panel mt-5">
-              <h4 className="text-sm font-semibold mb-2.5">Live race ticker</h4>
-              <div className="font-mono text-sm leading-loose">
-                {TICKER.map((t, i) => <div key={i}>&#9656; {t}</div>)}
-              </div>
-            </div>
-
-            <div className="flex justify-between items-end mt-8 mb-3">
+          {/* Replays */}
+          <div className="order-3 md:order-none md:col-start-1 md:row-start-2">
+            <div className="flex justify-between items-end mb-3">
               <h2 className="text-xl font-display">Replay archive</h2>
             </div>
             {replays.length === 0 && <p className="text-sm opacity-60">No completed races yet.</p>}
@@ -93,8 +85,6 @@ export default async function LivePage() {
               ))}
             </div>
           </div>
-
-          <LiveChat />
         </div>
       </section>
     </div>
