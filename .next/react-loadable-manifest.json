@@ -1,4 +1,10 @@
 {
+  "components/StreamPlayer.tsx -> hls.js": {
+    "id": 3915,
+    "files": [
+      "static/chunks/a4634e51.d790ddc0fb28b2d4.js"
+    ]
+  },
   "node_modules/@supabase/auth-js/dist/module/lib/helpers.js -> @supabase/node-fetch": {
     "id": 4307,
     "files": []
