@@ -24,6 +24,13 @@ type ChatMessage = {
 
 type Status = "connecting" | "live" | "offline";
 
+// crypto.randomUUID() only exists in secure contexts (https or localhost).
+// Testing on a phone over http://192.168.x.x would crash without a fallback.
+const genId = () =>
+  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+
 const containsProfanity = (text: string) => {
   const lower = text.toLowerCase();
   return BANNED_WORDS.some((w) => lower.includes(w));
@@ -59,7 +66,7 @@ export default function LiveChat() {
       clientId = localStorage.getItem("chat_client_id") || "";
       username = localStorage.getItem("chat_username") || "";
     } catch {}
-    if (!clientId) clientId = crypto.randomUUID();
+    if (!clientId) clientId = genId();
     if (!username) username = `User_${Math.floor(Math.random() * 900) + 100}`;
     try {
       localStorage.setItem("chat_client_id", clientId);
@@ -71,7 +78,7 @@ export default function LiveChat() {
   // Realtime subscription
   useEffect(() => {
     const chatChannel = supabase.channel("live_chat_room", {
-      config: { broadcast: { self: true } },
+      config: { broadcast: { self: true, ack: true } },
     });
 
     chatChannel
@@ -89,7 +96,7 @@ export default function LiveChat() {
           return;
         }
         const incoming: ChatMessage = {
-          id: typeof payload.id === "string" ? payload.id : crypto.randomUUID(),
+          id: typeof payload.id === "string" ? payload.id : genId(),
           clientId: typeof payload.clientId === "string" ? payload.clientId : "",
           sender: payload.sender,
           message: payload.message,
@@ -99,7 +106,8 @@ export default function LiveChat() {
         setMessages((prev) => [...prev, incoming].slice(-MAX_MESSAGES));
         if (!stickToBottomRef.current) setUnseen((n) => n + 1);
       })
-      .subscribe((s) => {
+      .subscribe((s, err) => {
+        console.log("[LiveChat] channel status:", s, err ?? "");
         if (s === "SUBSCRIBED") {
           setChannel(chatChannel);
           setStatus("live");
@@ -108,7 +116,13 @@ export default function LiveChat() {
         }
       });
 
+    // If we never reach SUBSCRIBED, say so instead of spinning forever
+    const timeout = setTimeout(() => {
+      setStatus((cur) => (cur === "connecting" ? "offline" : cur));
+    }, 8000);
+
     return () => {
+      clearTimeout(timeout);
       supabase.removeChannel(chatChannel);
     };
   }, [supabase]);
@@ -187,7 +201,7 @@ export default function LiveChat() {
       type: "broadcast",
       event: "chat_message",
       payload: {
-        id: crypto.randomUUID(),
+        id: genId(),
         clientId: identity.clientId,
         sender: identity.username,
         message: messageText,
@@ -196,6 +210,7 @@ export default function LiveChat() {
     });
 
     if (res !== "ok") {
+      console.error("[LiveChat] send failed:", res);
       // Give the text back and let them retry right away
       setInput(messageText);
       lastSentRef.current = 0;
@@ -242,7 +257,7 @@ export default function LiveChat() {
           {messages.length === 0 ? (
             <div className="h-full flex items-center justify-center text-center opacity-50 text-xs px-6">
               {status === "offline"
-                ? "Chat is offline right now. Refresh to reconnect."
+                ? "Can't reach chat. Check your connection and the Supabase URL/key, then refresh."
                 : "No messages yet. Say something about the race."}
             </div>
           ) : (
