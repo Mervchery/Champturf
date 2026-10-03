@@ -17,7 +17,7 @@ export const fr: Record<string, string> = {
   "Menu": "Menu",
   "Search": "Rechercher",
   "Search…": "Rechercher…",
-  "Staff": "Équipe",
+  "Staff area": "Espace équipe",
   "Toggle theme": "Changer de thème",
   "Language": "Langue",
   "Explore": "Explorer",
