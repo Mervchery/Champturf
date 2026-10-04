@@ -639,3 +639,43 @@ a:hover > .brand-logo { transform: rotate(-6deg) scale(1.06); }
   color: #b3621a;
 }
 .dark .gear-chip.is-changed { color: #f2a65a; }
+
+/* ---------- Odds movement: ▲ drifting (red) / ▼ firming (green) ---------- */
+.odds-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.odds-move {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px 2px 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+.odds-move.is-up { color: #c0392b; }
+.odds-move.is-down { color: #1e8e5a; }
+/* A price that moved in the last 15 minutes pulses gently. */
+.odds-move.is-fresh { animation: movePulse 1.8s ease-in-out infinite; }
+@keyframes movePulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.55); transform: scale(1); }
+  50% { box-shadow: 0 0 0 5px rgba(255, 255, 255, 0); transform: scale(1.06); }
+}
+.odds-legend {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.7rem;
+  opacity: 0.75;
+}
+/* In the legend the chips sit on the page background, not on a coloured pill. */
+.odds-legend .odds-move {
+  padding: 2px 4px;
+  margin-right: 4px;
+  background: rgba(0, 0, 0, 0.06);
+}
+.dark .odds-legend .odds-move { background: rgba(255, 255, 255, 0.1); }

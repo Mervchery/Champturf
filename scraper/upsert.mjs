@@ -116,16 +116,44 @@ export async function setRaceStatus(raceId, status) {
 /** Race entries store horse_id/jockey_id/trainer_id — never names — as
  *  the actual relationship. jockeyName/trainerName here are just the
  *  scraped text used to resolve (or create) the linked row. */
+/** Compares the freshly scraped prices with what is stored, so the site can show
+ *  drift (price lengthening ▲) and firming (shortening ▼).
+ *    *_open — first price ever seen · *_prev — the price before the latest change
+ *    odds_changed_at — when the latest change was seen (only touched on a change) */
+function oddsMovement(existing, win, place) {
+  const out = {};
+  let changed = false;
+  const track = (current, key, prevKey, openKey) => {
+    const stored = existing?.[key] ?? null;
+    out[openKey] = existing?.[openKey] ?? stored ?? current ?? null;
+    out[prevKey] = existing?.[prevKey] ?? null;
+    if (current != null && stored != null && Number(current) !== Number(stored)) {
+      out[prevKey] = stored;
+      changed = true;
+    }
+  };
+  track(win, "odds", "odds_prev", "odds_open");
+  track(place, "place_odds", "place_odds_prev", "place_odds_open");
+  if (changed) out.odds_changed_at = new Date().toISOString();
+  return out;
+}
+
 export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo, winOdds, placeOdds, gear, isTipped }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
+
+  const { data: existing } = await supabaseAdmin
+    .from("race_entries")
+    .select("odds, place_odds, odds_open, place_odds_open, odds_prev, place_odds_prev")
+    .eq("race_id", raceId).eq("horse_id", horseId).maybeSingle();
 
   const { error } = await supabaseAdmin
     .from("race_entries")
     .upsert(
       { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg, runner_no: runnerNo ?? null,
         // Tote prices/gear/tip are re-written on every scrape so late price moves and gear changes are picked up.
-        odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped },
+        odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
+        ...oddsMovement(existing, winOdds, placeOdds) },
       { onConflict: "race_id,horse_id" }
     );
   if (error) throw new Error(`Failed to upsert entry: ${error.message}`);

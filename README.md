@@ -519,12 +519,10 @@ The footer has an EN | FR switch (choice stored in the `ct-lang` cookie). UI tex
 
 Supertote publishes the notes in French. The scraper stores the original in `races.racing_notes` and an English version in `races.racing_notes_en`, protecting every horse, jockey and trainer name so they are never translated. Run `supabase/racing_notes_en_migration.sql` once, then re-scrape — or `npm run translate-notes` to fill in races already imported. Add `ANTHROPIC_API_KEY` to `.env.local` for best quality (otherwise a free service is used). If a translation can't be produced safely, the original text is shown.
 
-## Jockey Club data (ratings, HWT, gear changes, class, prize split, time factors)
+## Club data fields (rating, HWT, gear, class, rails, prize split, time factors)
 
-`scraper/scrape-mtc.mjs` enriches races already imported from Supertote. Run `supabase/mtc_data_migration.sql` once, scrape the dates with Supertote first, then:
+These are edited by hand in **Admin → Races → Manage**: race-level fields (class, rails, prize split) in "Race details", runner-level fields in the entry form (upcoming) or result form (finished). Run `supabase/mtc_data_migration.sql` and `supabase/mtc_results_migration.sql` once to create the columns. The official gear code replaces Supertote's letters when set (`NA` = no gear); a changed gear shows an orange marker.
 
-    npm run scrape-mtc -- 04-oct-2026                  # one day
-    npm run scrape-mtc -- 01-oct-2026 31-oct-2026      # a date range
-    npm run scrape-mtc -- "<race-card link>"           # one meeting, by link
+## Odds movement (drift)
 
-Date modes walk the Jockey Club's monthly fixtures calendar (`/form-guide/fixture-calendar-partial`), pick out each meeting's race card (`/form-guide/fixtures/<meeting>/R1`) and follow its Race 2, 3… tabs. Meetings whose race card isn't published yet are reported as skipped. The season runs April–December. Link mode does the same for a link you give it (`--only` skips the tabs). `--max-pages=N` caps requests (default 150); requests are rate-limited like the Supertote scraper. If a page can't be read it is saved to `scraper/debug/`. Live odds on that site are ignored — Supertote's tote prices stay the source. The official gear code (with a changed-gear marker; "NA" = no gear) replaces Supertote's letters whenever it is available.
+Each scrape compares the new Win/Place tote prices with the stored ones. When a price changes, the old one is kept (`odds_prev`), the change time is recorded and the first price seen is kept as the opening price. Runner cards show ▲ (red, drifting — price lengthened) or ▼ (green, firming — price shortened) with the size of the move; hover/long-press for "was … · Opened …". A move seen in the last 15 minutes pulses. Run `supabase/odds_movement_migration.sql` once. Movement can only be seen as often as you scrape, so re-run `npm run scrape -- <date>` repeatedly on race day (a scheduled job works well).

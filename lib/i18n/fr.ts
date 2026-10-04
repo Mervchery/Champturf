@@ -95,7 +95,6 @@ export const fr: Record<string, string> = {
   "No replay linked yet": "Aucune rediffusion liée pour l'instant",
   "Search YouTube": "Chercher sur YouTube",
   "Entries": "Partants",
-  "No. · Horse · Trainer · Jockey · Gate · Weight · Gear": "N° · Cheval · Entraîneur · Jockey · Couloir · Poids · Équipement",
   "Entries haven't been declared for this race yet.": "Les partants de cette course n'ont pas encore été déclarés.",
 
   // Runner cards
@@ -287,6 +286,13 @@ export const fr: Record<string, string> = {
   "Fastest time": "Meilleur temps",
   "Days since": "Jours depuis",
   "Best (last 3 starts)": "Meilleur (3 dernières courses)",
+
+  // Odds movement
+  "Drifting": "En dérive",
+  "Firming": "En baisse",
+  "Odds movement": "Évolution des cotes",
+  "was {n}": "était {n}",
+  "Opened {n}": "Ouverture {n}",
 
   // Loading / errors
   "Loading the field…": "Chargement du peloton…",

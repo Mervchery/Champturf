@@ -16,6 +16,7 @@ import {
   setRaceVideo, findRaceVideoOnYoutube,
 } from "@/lib/actions/races";
 import { extractYoutubeId } from "@/lib/youtube";
+import type { EntryInput, ResultInput } from "@/lib/actions/races";
 
 const ENTRY_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name)`;
 const RESULT_SELECT = `*, ${HORSE_JOIN}, jockeys(id, name), trainers(id, name)`;
@@ -165,6 +166,132 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
   );
 }
 
+// ---------------------------------------------------------------------
+// Club data (rating, horse weight, gear, time factors) — entered by hand.
+// ---------------------------------------------------------------------
+type Club = {
+  rating: string; hwt: string; hwtLast: string; equip: string; gearChanged: boolean; gearPrev: string;
+  tfFastest: string; tfDays: string; tfBest3: string;
+};
+const emptyClub: Club = { rating: "", hwt: "", hwtLast: "", equip: "", gearChanged: false, gearPrev: "", tfFastest: "", tfDays: "", tfBest3: "" };
+const num = (v: string) => (v.trim() === "" ? null : Number(v));
+const txt = (v: string) => (v.trim() === "" ? null : v.trim());
+
+function clubFromRow(r: any): Club {
+  return {
+    rating: r.rating?.toString() ?? "", hwt: r.hwt?.toString() ?? "", hwtLast: r.hwt_last?.toString() ?? "",
+    equip: r.equip ?? "", gearChanged: !!r.gear_changed, gearPrev: r.gear_prev ?? "",
+    tfFastest: r.tf_fastest ?? "", tfDays: r.tf_days_since ?? "", tfBest3: r.tf_best3 ?? "",
+  };
+}
+
+function clubCommon(c: Club) {
+  return {
+    rating: num(c.rating), hwt: num(c.hwt), hwt_last: num(c.hwtLast),
+    equip: txt(c.equip), gear_changed: c.gearChanged, gear_prev: c.gearChanged ? txt(c.gearPrev) : null,
+  };
+}
+
+function ClubFields({ club, onChange, timeFactors }: { club: Club; onChange: (c: Club) => void; timeFactors: boolean }) {
+  const set = (patch: Partial<Club>) => onChange({ ...club, ...patch });
+  return (
+    <div className="mt-4 pt-3 border-t border-line">
+      <div className="text-xs font-semibold opacity-70 mb-2">Club data (optional)</div>
+      <div className="flex gap-2 flex-wrap items-end">
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Rating</label>
+          <input type="number" className="admin-input w-20" value={club.rating} onChange={(e) => set({ rating: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">HWT (kg)</label>
+          <input type="number" className="admin-input w-24" value={club.hwt} onChange={(e) => set({ hwt: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">HWT last run</label>
+          <input type="number" className="admin-input w-24" value={club.hwtLast} onChange={(e) => set({ hwtLast: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Equip (NA = none)</label>
+          <input className="admin-input w-28" placeholder="e.g. XA" value={club.equip} onChange={(e) => set({ equip: e.target.value.toUpperCase() })} />
+        </div>
+        <label className="text-xs flex items-center gap-1.5 pb-2.5">
+          <input type="checkbox" checked={club.gearChanged} onChange={(e) => set({ gearChanged: e.target.checked })} /> Gear changed
+        </label>
+        {club.gearChanged && (
+          <div>
+            <label className="text-xs opacity-65 block mb-1">Previous gear</label>
+            <input className="admin-input w-24" placeholder="e.g. N" value={club.gearPrev} onChange={(e) => set({ gearPrev: e.target.value.toUpperCase() })} />
+          </div>
+        )}
+        {timeFactors && (
+          <>
+            <div>
+              <label className="text-xs opacity-65 block mb-1">Fastest time</label>
+              <input className="admin-input w-28" placeholder="0:54.29" value={club.tfFastest} onChange={(e) => set({ tfFastest: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs opacity-65 block mb-1">Days since</label>
+              <input className="admin-input w-24" placeholder="28 d" value={club.tfDays} onChange={(e) => set({ tfDays: e.target.value })} />
+            </div>
+            <div>
+              <label className="text-xs opacity-65 block mb-1">Best (last 3)</label>
+              <input className="admin-input w-28" placeholder="0:54.29" value={club.tfBest3} onChange={(e) => set({ tfBest3: e.target.value })} />
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function RaceDetailsEditor({ race, onSave }: { race: Race; onSave: (input: { race_class: string | null; rails: string | null; prize_split: number[] | null }) => void }) {
+  const split = race.prize_split ?? [];
+  const [raceClass, setRaceClass] = useState(race.race_class ?? "");
+  const [rails, setRails] = useState(race.rails ?? "");
+  const [prizes, setPrizes] = useState<string[]>([0, 1, 2, 3].map((i) => split[i]?.toString() ?? ""));
+
+  useEffect(() => {
+    const sp = race.prize_split ?? [];
+    setRaceClass(race.race_class ?? "");
+    setRails(race.rails ?? "");
+    setPrizes([0, 1, 2, 3].map((i) => sp[i]?.toString() ?? ""));
+  }, [race.id, race.race_class, race.rails, race.prize_split]);
+
+  return (
+    <div className="mb-6 pb-5 border-b border-line">
+      <div className="text-xs font-semibold opacity-70 mb-2">Race details</div>
+      <div className="flex gap-2 flex-wrap items-end">
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Race class</label>
+          <input className="admin-input w-28" placeholder="e.g. BM36" value={raceClass} onChange={(e) => setRaceClass(e.target.value)} />
+        </div>
+        <div>
+          <label className="text-xs opacity-65 block mb-1">Rails</label>
+          <input className="admin-input w-56" placeholder="e.g. 2.25m" value={rails} onChange={(e) => setRails(e.target.value)} />
+        </div>
+        {["1st", "2nd", "3rd", "4th"].map((label, i) => (
+          <div key={label}>
+            <label className="text-xs opacity-65 block mb-1">Prize {label} (Rs)</label>
+            <input
+              type="number" className="admin-input w-28" value={prizes[i]}
+              onChange={(e) => setPrizes(prizes.map((p, j) => (j === i ? e.target.value : p)))}
+            />
+          </div>
+        ))}
+        <button
+          className="btn btn-dark"
+          onClick={() => {
+            const amounts = prizes.filter((p) => p.trim() !== "").map(Number);
+            onSave({ race_class: txt(raceClass), rails: txt(rails), prize_split: amounts.length ? amounts : null });
+          }}
+        >
+          Save details
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
   race: Race; horses: Horse[]; jockeys: Jockey[]; notify: (m: string) => void; onChanged: () => void;
 }) {
@@ -215,6 +342,11 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
       <h4 className="text-sm font-semibold mb-3">
         {race.status === "upcoming" ? "Entries" : "Results"} — {race.name}
       </h4>
+
+      <RaceDetailsEditor
+        race={race}
+        onSave={(input) => handle(() => updateRace(race.id, input), "Race details saved")}
+      />
 
       {loading ? (
         <p className="text-sm opacity-60">Loading…</p>
@@ -324,8 +456,8 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
 
 function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDelete }: {
   raceId: string; entries: RaceEntry[]; horses: Horse[]; jockeys: Jockey[];
-  onAdd: (input: { race_id: string; runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
-  onUpdate: (id: string, input: { runner_no: number | null; gate: number | null; horse_id: string; jockey_id: string | null; weight_kg: number | null }) => void;
+  onAdd: (input: EntryInput) => void;
+  onUpdate: (id: string, input: Partial<EntryInput>) => void;
   onDelete: (id: string) => void;
 }) {
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -334,10 +466,11 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
   const [horseId, setHorseId] = useState("");
   const [jockeyId, setJockeyId] = useState("");
   const [weight, setWeight] = useState("");
+  const [club, setClub] = useState<Club>(emptyClub);
 
   function resetForm() {
     setEditingId(null);
-    setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight("");
+    setRunnerNo(""); setGate(""); setHorseId(""); setJockeyId(""); setWeight(""); setClub(emptyClub);
   }
 
   function startEdit(e: RaceEntry) {
@@ -347,6 +480,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
     setHorseId(e.horse_id);
     setJockeyId(e.jockey_id ?? "");
     setWeight(e.weight_kg?.toString() ?? "");
+    setClub(clubFromRow(e));
   }
 
   // A horse already entered in this race can't be entered again — except
@@ -358,7 +492,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>Gear</th><th>Win</th><th>Place</th><th>Tip</th><th /></tr></thead>
+        <thead><tr><th>No.</th><th>Gate</th><th>Horse</th><th>Trainer</th><th>Jockey</th><th>Weight</th><th>Gear</th><th>Club data</th><th>Win</th><th>Place</th><th>Tip</th><th /></tr></thead>
         <tbody>
           {entries.map((e) => (
             <tr key={e.id} className={e.id === editingId ? "bg-black/[0.03]" : undefined}>
@@ -369,6 +503,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
               <td>{e.gear ?? "—"}</td>
+              <td className="whitespace-nowrap text-xs opacity-80">{e.rating ?? "–"} · {e.hwt ?? "–"} · {e.equip ?? "–"}{e.gear_changed ? "*" : ""}</td>
               <td>{e.odds ?? "N/A"}</td>
               <td>{e.place_odds ?? "N/A"}</td>
               <td>{e.is_tipped ? "★" : ""}</td>
@@ -378,7 +513,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               </td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={10} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={11} className="opacity-60 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       {editingId && (
@@ -423,6 +558,10 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               horse_id: horseId,
               jockey_id: jockeyId || null,
               weight_kg: weight ? Number(weight) : null,
+              ...clubCommon(club),
+              tf_fastest: txt(club.tfFastest),
+              tf_days_since: txt(club.tfDays),
+              tf_best3: txt(club.tfBest3),
             };
             if (editingId) {
               onUpdate(editingId, shared);
@@ -438,7 +577,8 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
           <button className="btn btn-outline" onClick={resetForm}>Cancel</button>
         )}
       </div>
-      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear and tips are imported automatically and shown read-only here.</p>
+      <ClubFields club={club} onChange={setClub} timeFactors />
+      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear letters and tips are imported automatically and shown read-only. Club data above is yours to edit.</p>
       {horses.length === 0 && (
         <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
       )}
@@ -449,7 +589,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
 
 function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
   raceId: string; results: RaceResult[]; horseOptions: { id: string; name: string }[];
-  onSave: (input: { race_id: string; position: number; horse_id: string; jockey: string; finish_time: string; margin: string | null; starting_price: string | null; performance_rating: number | null; gate: number | null; runner_no: number | null }) => void;
+  onSave: (input: ResultInput) => void;
   onDelete: (id: string) => void;
 }) {
   const [position, setPosition] = useState("");
@@ -461,11 +601,26 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
   const [margin, setMargin] = useState("");
   const [startingPrice, setStartingPrice] = useState("");
   const [performanceRating, setPerformanceRating] = useState("");
+  const [club, setClub] = useState<Club>(emptyClub);
+
+  // Loads an existing result into the form; saving it overwrites that position.
+  function startEdit(r: RaceResult) {
+    setPosition(r.position.toString());
+    setRunnerNo(r.runner_no?.toString() ?? "");
+    setGate(r.gate?.toString() ?? "");
+    setHorseId(r.horse_id);
+    setJockey(r.jockey ?? "");
+    setFinishTime(r.finish_time ?? "");
+    setMargin(r.margin ?? "");
+    setStartingPrice(r.starting_price ?? "");
+    setPerformanceRating(r.performance_rating?.toString() ?? "");
+    setClub(clubFromRow(r));
+  }
 
   return (
     <div>
       <table className="mb-4">
-        <thead><tr><th>Pos</th><th>No.</th><th>Gate</th><th>Horse</th><th>Jockey</th><th>Time</th><th>Margin</th><th>SP</th><th>Perf.</th><th /></tr></thead>
+        <thead><tr><th>Pos</th><th>No.</th><th>Gate</th><th>Horse</th><th>Jockey</th><th>Time</th><th>Margin</th><th>SP</th><th>Perf.</th><th>Club data</th><th /></tr></thead>
         <tbody>
           {results.map((r) => (
             <tr key={r.id}>
@@ -477,10 +632,14 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
               <td>{r.margin ?? "N/A"}</td>
               <td>{r.starting_price ?? "N/A"}</td>
               <td>{r.performance_rating ?? "N/A"}</td>
-              <td><button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button></td>
+              <td className="whitespace-nowrap text-xs opacity-80">{r.rating ?? "–"} · {r.hwt ?? "–"} · {r.equip ?? "–"}{r.gear_changed ? "*" : ""}</td>
+              <td className="whitespace-nowrap">
+                <button className="text-xs px-2 py-1 rounded border border-line mr-1.5" onClick={() => startEdit(r)}><Pencil size={12} /></button>
+                <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(r.id)}><Trash2 size={12} /></button>
+              </td>
             </tr>
           ))}
-          {results.length === 0 && <tr><td colSpan={10} className="opacity-60 text-sm">No result entered yet.</td></tr>}
+          {results.length === 0 && <tr><td colSpan={11} className="opacity-60 text-sm">No result entered yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
@@ -533,14 +692,16 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
               performance_rating: performanceRating ? Number(performanceRating) : null,
               gate: gate ? Number(gate) : null,
               runner_no: runnerNo ? Number(runnerNo) : null,
+              ...clubCommon(club),
             });
             setPosition(""); setRunnerNo(""); setGate(""); setHorseId(""); setJockey(""); setFinishTime("");
-            setMargin(""); setStartingPrice(""); setPerformanceRating("");
+            setMargin(""); setStartingPrice(""); setPerformanceRating(""); setClub(emptyClub);
           }}
         >
           Save result
         </button>
       </div>
+      <ClubFields club={club} onChange={setClub} timeFactors={false} />
       <p className="text-xs opacity-60 mt-2.5">
         Enter every finisher, not just the podium — a horse's starts/unplaced count depends on a result row existing for it.
       </p>

@@ -62,6 +62,12 @@ export type RaceEntry = {
   // supabase/scraped_odds_gear_tips_migration.sql). `odds` is the WIN price.
   odds: string | null;
   place_odds: string | null;
+  // Price movement, tracked by the scraper (supabase/odds_movement_migration.sql)
+  odds_prev: string | null;
+  place_odds_prev: string | null;
+  odds_open: string | null;
+  place_odds_open: string | null;
+  odds_changed_at: string | null;
   // Gear letters, comma-separated (e.g. "B,T"), and whether Supertote tips
   // this runner as its favourite pick of the race.
   gear: string | null;
@@ -95,6 +101,13 @@ export type RaceResult = {
   place_odds: string | null;
   gear: string | null;
   is_tipped: boolean;
+  // From the Jockey Club race card (supabase/mtc_results_migration.sql)
+  rating: number | null;
+  hwt: number | null;
+  hwt_last: number | null;
+  equip: string | null;
+  gear_changed: boolean;
+  gear_prev: string | null;
   performance_rating: number | null;
   horse_id: string;
   horses: HorseSummary | null; // joined

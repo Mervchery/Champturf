@@ -9,8 +9,7 @@
     "start": "next start",
     "lint": "next lint",
     "scrape": "node scraper/scrape.mjs",
-    "translate-notes": "node scraper/translate-notes.mjs",
-    "scrape-mtc": "node scraper/scrape-mtc.mjs"
+    "translate-notes": "node scraper/translate-notes.mjs"
   },
   "dependencies": {
     "next": "14.2.5",

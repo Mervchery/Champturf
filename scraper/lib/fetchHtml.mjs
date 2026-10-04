@@ -15,15 +15,22 @@ export async function fetchHtml(url) {
   if (wait > 0) await sleep(wait);
   lastFetchAt = Date.now();
 
+  // An honest identity. Set SCRAPER_CONTACT in .env.local to a real email
+  // (placeholder addresses are a common reason servers refuse a client).
+  const contact = process.env.SCRAPER_CONTACT || "set SCRAPER_CONTACT in .env.local";
   const res = await fetch(url, {
     headers: {
-      // Identifies this as a scraper, not a regular browser — replace the
-      // contact info with your own before running this against someone
-      // else's server.
-      "User-Agent": "ChampTurfDataImport/1.0 (personal fan project; contact: you@example.com)",
+      "User-Agent": `ChampTurfDataImport/1.0 (personal fan project; contact: ${contact})`,
+      "Accept": "text/html,application/xhtml+xml",
     },
   });
 
+  if (res.status === 403 || res.status === 429) {
+    throw new Error(
+      `The server refused the request (${res.status}) for ${url}. ` +
+      "That site doesn't allow automated access from here. Don't retry in a loop — ask the site owner to allow it."
+    );
+  }
   if (!res.ok) {
     throw new Error(`Fetch failed (${res.status}) for ${url}`);
   }

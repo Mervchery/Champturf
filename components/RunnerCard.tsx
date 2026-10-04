@@ -4,7 +4,7 @@ import { fmtMoney } from "@/lib/format";
 import { ordinal } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
 import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
-import { Star } from "lucide-react";
+import { ArrowDown, ArrowUp, Star } from "lucide-react";
 import type { HorseSummary } from "@/lib/races";
 
 function podiumClass(position: number | null) {
@@ -136,22 +136,46 @@ function HwtValue({ hwt, last }: { hwt: number | null; last: number | null }) {
   );
 }
 
-function OddsPill({ kind, value }: { kind: "win" | "place"; value: string | null }) {
+type Movement = { prev?: string | null; open?: string | null; changedAt?: string | null };
+
+/** ▲ drifting (price lengthened) / ▼ firming (price shortened), vs the previous price. */
+function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & Movement) {
+  const { t } = getT();
+  if (!value || !prev) return null;
+  const now = Number(value), before = Number(prev);
+  if (!Number.isFinite(now) || !Number.isFinite(before) || now === before) return null;
+  const up = now > before; // bigger number = longer price = drifting
+  const diff = Math.abs(now - before);
+  const fresh = !!changedAt && Date.now() - new Date(changedAt).getTime() < 15 * 60 * 1000;
+  const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: open })}` : ""}`;
+  const Icon = up ? ArrowUp : ArrowDown;
+  return (
+    <span className={`odds-move ${up ? "is-up" : "is-down"} ${fresh ? "is-fresh" : ""}`} title={label} aria-label={label}>
+      <Icon size={11} strokeWidth={3} />
+      {Number.isInteger(diff) ? diff : diff.toFixed(1)}
+    </span>
+  );
+}
+
+function OddsPill({ kind, value, prev, open, changedAt }: { kind: "win" | "place"; value: string | null } & Movement) {
   const { t } = getT();
   return (
     <div className={`odds-pill odds-${kind} ${value ? "" : "is-empty"}`}>
       <span className="odds-label">{kind === "win" ? t("Win") : t("Place")}</span>
-      <span className="odds-value">{value ?? "—"}</span>
+      <span className="odds-right">
+        <MoveBadge value={value} prev={prev} open={open} changedAt={changedAt} />
+        <span className="odds-value">{value ?? "—"}</span>
+      </span>
     </div>
   );
 }
 
-function OddsRow({ win, place }: { win: string | null; place: string | null }) {
+function OddsRow({ win, place, winMove, placeMove }: { win: string | null; place: string | null; winMove?: Movement; placeMove?: Movement }) {
   if (!win && !place) return null;
   return (
     <div className="odds-row">
-      <OddsPill kind="win" value={win} />
-      <OddsPill kind="place" value={place} />
+      <OddsPill kind="win" value={win} {...winMove} />
+      <OddsPill kind="place" value={place} {...placeMove} />
     </div>
   );
 }
@@ -180,10 +204,11 @@ function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, st
 }
 
 export function EntryRow({
-  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, form, index,
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, index,
 }: BaseProps & {
   gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
+  oddsPrev?: string | null; placeOddsPrev?: string | null; oddsOpen?: string | null; placeOddsOpen?: string | null; oddsChangedAt?: string | null;
   form?: string[];
 }) {
   const { t, lang } = getT();
@@ -217,7 +242,11 @@ export function EntryRow({
         <Stat label="Gear"><GearValue gear={gear} equip={equip} changed={gearChanged} prev={gearPrev} /></Stat>
       </div>
 
-      <OddsRow win={odds} place={placeOdds} />
+      <OddsRow
+        win={odds} place={placeOdds}
+        winMove={{ prev: oddsPrev, open: oddsOpen, changedAt: oddsChangedAt }}
+        placeMove={{ prev: placeOddsPrev, open: placeOddsOpen, changedAt: oddsChangedAt }}
+      />
 
       {horse && horse.starts > 0 && (
         <div className="form-panel flex items-center gap-2.5 mt-3">
@@ -244,10 +273,11 @@ export function EntryRow({
 }
 
 export function ResultRow({
-  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, performanceRating, racePrize, prizeSplit = null, index,
+  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, performanceRating, racePrize, prizeSplit = null, index,
 }: BaseProps & {
   position: number; finishTime: string | null; margin: string | null;
   winOdds?: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
+  rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
   performanceRating: number | null; racePrize: number; prizeSplit?: number[] | null;
 }) {
   const { t, lang } = getT();
@@ -282,8 +312,10 @@ export function ResultRow({
       <div className="stats-grid">
         <Stat label="No.">{number ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
-        <Stat label="Gear"><GearValue gear={gear} /></Stat>
-        {performanceRating != null && <Stat label="Perf">{performanceRating}</Stat>}
+        {rating != null && <Stat label="Rating">{rating}</Stat>}
+        {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
+        <Stat label="Gear"><GearValue gear={gear} equip={equip} changed={gearChanged} prev={gearPrev} /></Stat>
+        {performanceRating != null && rating == null && <Stat label="Perf">{performanceRating}</Stat>}
       </div>
 
       <OddsRow win={winOdds} place={placeOdds} />

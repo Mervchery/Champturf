@@ -1,7 +1,7 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Camera, Video, Search, Star, AlertTriangle, NotebookPen } from "lucide-react";
+import { Camera, Video, Search, Star, AlertTriangle, NotebookPen, ArrowUp, ArrowDown } from "lucide-react";
 import { getRaceById, getEntriesForRace, getResultsForRace } from "@/lib/races";
 import { getRecentForm } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
@@ -144,6 +144,12 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       placeOdds={row.place_odds}
                       gear={row.gear}
                       isTipped={row.is_tipped}
+                      rating={row.rating}
+                      hwt={row.hwt}
+                      hwtLast={row.hwt_last}
+                      equip={row.equip}
+                      gearChanged={row.gear_changed}
+                      gearPrev={row.gear_prev}
                       performanceRating={row.performance_rating}
                       racePrize={race.prize}
                       prizeSplit={race.prize_split}
@@ -191,7 +197,10 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
               <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                 <h3 className="font-display text-xl">{t("Entries")}</h3>
                 {entries.length > 0 && (
-                  <span className="text-xs opacity-50 hidden sm:block">{t("No. · Horse · Trainer · Jockey · Gate · Weight · Gear")}</span>
+                  <span className="odds-legend" aria-label={t("Odds movement")}>
+                    <span className="odds-move is-up"><ArrowUp size={10} strokeWidth={3} /></span> {t("Drifting")}
+                    <span className="odds-move is-down ml-2"><ArrowDown size={10} strokeWidth={3} /></span> {t("Firming")}
+                  </span>
                 )}
               </div>
               {entries.length === 0 ? (
@@ -212,6 +221,11 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       placeOdds={e.place_odds}
                       gear={e.gear}
                       isTipped={e.is_tipped}
+                      oddsPrev={e.odds_prev}
+                      placeOddsPrev={e.place_odds_prev}
+                      oddsOpen={e.odds_open}
+                      placeOddsOpen={e.place_odds_open}
+                      oddsChangedAt={e.odds_changed_at}
                       rating={e.rating}
                       hwt={e.hwt}
                       hwtLast={e.hwt_last}

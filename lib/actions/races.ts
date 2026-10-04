@@ -26,6 +26,10 @@ export type RaceInput = {
   prize: number;
   status: "upcoming" | "completed";
   conditions: string;
+  // Club data (supabase/mtc_data_migration.sql)
+  race_class?: string | null;
+  rails?: string | null;
+  prize_split?: number[] | null;
 };
 
 export async function createRace(input: RaceInput) {
@@ -68,6 +72,13 @@ export type ResultInput = {
   weight_kg?: number | null;
   gate?: number | null;
   runner_no?: number | null;
+  // Club data (supabase/mtc_results_migration.sql)
+  rating?: number | null;
+  hwt?: number | null;
+  hwt_last?: number | null;
+  equip?: string | null;
+  gear_changed?: boolean;
+  gear_prev?: string | null;
 };
 
 /** Creates or overwrites the result row for a given race+position
@@ -105,7 +116,16 @@ export type EntryInput = {
   horse_id: string;
   jockey_id: string | null;
   weight_kg: number | null;
-  // Odds, gear and tips are scraper-owned (see scraper/) — not editable here.
+  // Odds, gear letters and tips come from the scraper. The club data below is edited by hand.
+  rating?: number | null;
+  hwt?: number | null;
+  hwt_last?: number | null;
+  equip?: string | null;
+  gear_changed?: boolean;
+  gear_prev?: string | null;
+  tf_fastest?: string | null;
+  tf_days_since?: string | null;
+  tf_best3?: string | null;
 };
 
 export async function createEntry(input: EntryInput) {
