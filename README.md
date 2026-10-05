@@ -526,3 +526,9 @@ These are edited by hand in **Admin → Races → Manage**: race-level fields (c
 ## Odds movement (drift)
 
 Each scrape compares the new Win/Place tote prices with the stored ones. When a price changes, the old one is kept (`odds_prev`), the change time is recorded and the first price seen is kept as the opening price. Runner cards show ▲ (red, drifting — price lengthened) or ▼ (green, firming — price shortened) with the size of the move; hover/long-press for "was … · Opened …". A move seen in the last 15 minutes pulses. Run `supabase/odds_movement_migration.sql` once. Movement can only be seen as often as you scrape, so re-run `npm run scrape -- <date>` repeatedly on race day (a scheduled job works well).
+
+## User accounts (sign up / sign in)
+
+Everyone signs in on `/login` (`/admin/login` just redirects there): email + password, "Continue with Google" (more providers via `NEXT_PUBLIC_AUTH_PROVIDERS`), password reset by email. New accounts are **Members**: `profiles.role` stays empty, so they can use `/account` but are turned away from `/admin` (middleware + a re-check inside every server action; only admins can change roles, and there is no policy letting anyone edit their own profile). Staff keep signing in the same way — an admin role granted under Admin → Users & roles unlocks the dashboard and shows an "Admin dashboard" link in the account menu.
+
+Setup in Supabase: run `supabase/user_accounts_migration.sql`; **Authentication → Providers → Google** (paste the Client ID/secret from Google Cloud Console → APIs & Services → Credentials → OAuth client, type Web; add `https://<project-ref>.supabase.co/auth/v1/callback` as an authorised redirect URI); **Authentication → URL Configuration** → set Site URL to your domain and add `https://<your-domain>/auth/callback` (plus `http://localhost:3000/auth/callback` for development) to Redirect URLs. Supabase's built-in email sender is heavily rate-limited — configure custom SMTP before launch.

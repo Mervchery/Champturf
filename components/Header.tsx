@@ -4,8 +4,9 @@ import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, Search, Settings } from "lucide-react";
+import { Menu, X, Search } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import UserMenu from "./UserMenu";
 
 const NAV_ITEMS = [
   ["/", "Home"],
@@ -91,14 +92,7 @@ export default function Header() {
             {searchOpen ? <X size={16} /> : <Search size={16} />}
           </button>
           <ThemeToggle />
-          <Link
-            href="/admin"
-            className="flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
-            aria-label={t("Staff area")}
-            title={t("Staff area")}
-          >
-            <Settings size={16} />
-          </Link>
+          <UserMenu />
         </div>
       </div>
 

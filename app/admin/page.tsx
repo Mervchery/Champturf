@@ -23,7 +23,7 @@ export default async function AdminPage() {
   // if something were ever misconfigured in middleware.
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user) redirect("/admin/login?next=/admin");
+  if (!user) redirect("/login?next=/admin");
 
   const { data: profile } = await supabase
     .from("profiles")
@@ -32,7 +32,7 @@ export default async function AdminPage() {
     .single();
 
   if (!isAdminRole(profile?.role)) {
-    redirect("/admin/login?error=not_authorized");
+    redirect("/login?error=not_authorized");
   }
 
   const [races, horses, jockeys, trainers, stables, owners, news, streams, meetings, profiles, tickerItems] = await Promise.all([

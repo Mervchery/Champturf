@@ -36,10 +36,20 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   const { pathname } = request.nextUrl;
+  // Members-only pages: any signed-in account will do.
+  if (pathname.startsWith("/account") && !user) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/login";
+    url.search = "";
+    url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
   if (pathname.startsWith("/admin") && pathname !== "/admin/login") {
     if (!user) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
+      url.pathname = "/login";
+      url.search = "";
       url.searchParams.set("next", pathname);
       return NextResponse.redirect(url);
     }
@@ -52,7 +62,8 @@ export async function middleware(request: NextRequest) {
 
     if (!isAdminRole(profile?.role)) {
       const url = request.nextUrl.clone();
-      url.pathname = "/admin/login";
+      url.pathname = "/login";
+      url.search = "";
       url.searchParams.set("error", "not_authorized");
       return NextResponse.redirect(url);
     }
@@ -62,5 +73,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/account"],
 };

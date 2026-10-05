@@ -22,7 +22,7 @@ export default function UsersAdminPanel({ profiles, notify }: { profiles: Profil
     <div>
       <h2 className="font-display text-2xl mb-5">Users &amp; roles</h2>
       <p className="text-sm opacity-60 mb-4">
-        People appear here once they have an account. Grant a role to give them access to the dashboard.
+        Everyone who signs up appears here as a Member. Grant a role to give someone access to the dashboard.
       </p>
       <div className="panel !p-0 overflow-hidden">
         <table>
@@ -37,7 +37,7 @@ export default function UsersAdminPanel({ profiles, notify }: { profiles: Profil
                     value={p.role ?? ""}
                     onChange={(e) => handleChange(p.id, e.target.value)}
                   >
-                    <option value="">No admin access</option>
+                    <option value="">Member (no dashboard access)</option>
                     {ADMIN_ROLES.map((r) => <option key={r} value={r}>{r}</option>)}
                   </select>
                 </td>
