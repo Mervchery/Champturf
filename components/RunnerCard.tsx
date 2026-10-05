@@ -1,5 +1,6 @@
 import Link from "next/link";
 import SilkImage from "@/components/SilkImage";
+import FollowButton from "@/components/FollowButton";
 import { fmtMoney } from "@/lib/format";
 import { ordinal } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
@@ -204,12 +205,14 @@ function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, st
 }
 
 export function EntryRow({
-  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, index,
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, index, follow,
 }: BaseProps & {
   gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
   oddsPrev?: string | null; placeOddsPrev?: string | null; oddsOpen?: string | null; placeOddsOpen?: string | null; oddsChangedAt?: string | null;
   form?: string[];
+  // When set, a small "follow for alerts" bell is shown next to the horse's name.
+  follow?: { signedIn: boolean; following: boolean };
 }) {
   const { t, lang } = getT();
   const places = horse ? horse.seconds + horse.thirds : 0;
@@ -227,6 +230,11 @@ export function EntryRow({
           </div>
           <div className="text-xs opacity-60 mt-0.5">{ageSex(horse, t)}</div>
         </div>
+        {follow && horse && (
+          <div className="shrink-0 self-start">
+            <FollowButton variant="icon" horseId={horse.id} horseName={horse.name} initialFollowing={follow.following} signedIn={follow.signedIn} />
+          </div>
+        )}
       </div>
 
       <div className="people-grid">

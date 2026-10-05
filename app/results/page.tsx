@@ -1,8 +1,14 @@
 import { getT } from "@/lib/i18n/server";
 import { getCompletedRacesWithResults } from "@/lib/races";
 import ResultsSearch from "@/components/ResultsSearch";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Results"), description: t("Race results from Champ de Mars — finishing order, times and dividends."), path: "/results" });
+}
 
 export default async function ResultsPage() {
   const { t, lang } = getT();

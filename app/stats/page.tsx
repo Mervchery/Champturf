@@ -5,8 +5,9 @@ import { getJockeys } from "@/lib/jockeys";
 import { getTrainers } from "@/lib/trainers";
 import { getStables } from "@/lib/stables";
 import { fmtMoney } from "@/lib/format";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
 
 const TABS = [
   ["horses", "Leading horses"],
@@ -14,6 +15,11 @@ const TABS = [
   ["trainers", "Leading trainers"],
   ["stables", "Leading stables"],
 ] as const;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Statistics"), description: t("Leading horses, jockeys, trainers and stables in Mauritius racing."), path: "/stats" });
+}
 
 export default async function StatsPage({ searchParams }: { searchParams: { tab?: string } }) {
   const { t, lang } = getT();

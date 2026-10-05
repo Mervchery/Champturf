@@ -3,8 +3,14 @@ import Link from "next/link";
 import { Shirt } from "lucide-react";
 import { getStables } from "@/lib/stables";
 import SilkImage from "@/components/SilkImage";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Stables"), description: t("Racing stables of Mauritius — horses, trainers and results."), path: "/stables" });
+}
 
 export default async function StablesPage() {
   const { t, lang } = getT();

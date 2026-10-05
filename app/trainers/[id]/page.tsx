@@ -6,8 +6,20 @@ import { getTrainerById } from "@/lib/trainers";
 import { getHorses } from "@/lib/horses";
 import { getCareerStatsForTrainer } from "@/lib/careerStats";
 import SilkImage from "@/components/SilkImage";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { t } = getT();
+  const tr = await getTrainerById(params.id);
+  if (!tr) return { title: t("Trainer not found"), robots: { index: false } };
+  return pageMeta({
+    title: `${tr.name} — ${t("Trainer profile")}`,
+    description: `${tr.name}: ${t("career record, runners and results at Champ de Mars, Mauritius.")}`,
+    path: `/trainers/${tr.id}`,
+  });
+}
 
 export default async function TrainerDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();

@@ -1,0 +1,76 @@
+name: Refresh odds & races
+
+# All times below are UTC. Mauritius is UTC+4 (no daylight saving).
+on:
+  schedule:
+    # 06:00 and 18:00 Mauritius, every day. scraper/gate.mjs only lets it run Thu–Sun
+    # (or when a meeting is ≤2 days away): full scrape of today..+4 days.
+    - cron: "0 2,14 * * *"
+    # Every 5 minutes, 06:00–19:59 Mauritius, Thu–Sun. It is only a heartbeat: scraper/gate.mjs
+    # starts a scrape only when a race-day checkpoint is due (6 h before Race 1 = one full scrape;
+    # 2 h / 30 min / 10 min / 2 min before each race = that race only).
+    - cron: "*/5 2-15 * * 4,5,6,0"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "auto = decide like the schedule would · raceday = fast odds refresh of today · prerace = full scrape of the coming days"
+        type: choice
+        default: auto
+        options: [auto, raceday, prerace]
+      date:
+        description: "Optional: scrape one specific date, e.g. 2026-10-10 (overrides mode)"
+        required: false
+
+# Never two scrapes at once (they would fight over the same rows and double the load on the source site).
+concurrency:
+  group: scrape
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      SCRAPER_CONTACT: ${{ secrets.SCRAPER_CONTACT }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      NEXT_PUBLIC_SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+      NEXT_PUBLIC_VAPID_PUBLIC_KEY: ${{ secrets.NEXT_PUBLIC_VAPID_PUBLIC_KEY }}
+      VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
+      VAPID_SUBJECT: ${{ secrets.VAPID_SUBJECT }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Decide whether to scrape now
+        id: gate
+        run: node scraper/gate.mjs
+        env:
+          SCHEDULE: ${{ github.event.schedule }}
+          MODE_INPUT: ${{ github.event.inputs.mode }}
+          DATE_INPUT: ${{ github.event.inputs.date }}
+
+      - name: Install dependencies
+        if: steps.gate.outputs.run == 'true'
+        run: npm install --no-audit --no-fund --no-package-lock
+
+      - name: Scrape (${{ steps.gate.outputs.mode }})
+        if: steps.gate.outputs.run == 'true'
+        run: node scraper/scrape.mjs ${{ steps.gate.outputs.args }}
+
+      - name: Record finished checkpoints
+        if: steps.gate.outputs.run == 'true' && steps.gate.outputs.marks != ''
+        run: node scraper/mark-done.mjs
+        env:
+          MARKS: ${{ steps.gate.outputs.marks }}
+
+      - name: Send follower alerts
+        if: steps.gate.outputs.run == 'true' && !cancelled()
+        run: node scraper/alerts.mjs

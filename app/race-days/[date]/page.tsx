@@ -6,8 +6,22 @@ import { getMeetingInfo } from "@/lib/meetings";
 import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { date: string } }): Promise<Metadata> {
+  const { t, lang } = getT();
+  const races = await getRacesForDate(params.date);
+  if (races.length === 0) return { title: t("Race day not found"), robots: { index: false } };
+  const label = fmtDateLong(lang, params.date);
+  const done = races.every((r) => r.status === "completed");
+  return pageMeta({
+    title: `${t("Race day")} ${label} — Champ de Mars`,
+    description: `${races.length} ${t("races")} · ${label}. ${done ? t("Full results and dividends.") : t("Race cards, runners and live odds movement.")}`,
+    path: `/race-days/${params.date}`,
+  });
+}
 
 export default async function RaceDayPage({ params }: { params: { date: string } }) {
   const { t, lang } = getT();

@@ -14,7 +14,6 @@ import { getProfiles } from "@/lib/users";
 import { getTickerItems } from "@/lib/ticker";
 import AdminDashboard from "@/components/AdminDashboard";
 
-export const revalidate = 0;
 
 export default async function AdminPage() {
   // Real authorization check, independent of middleware: getUser() verifies

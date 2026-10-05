@@ -2,8 +2,14 @@ import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { JockeyIcon } from "@/components/RacingIcons";
 import { getJockeys } from "@/lib/jockeys";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Jockeys"), description: t("Jockeys and apprentices riding in Mauritius — wins, rides and results."), path: "/jockeys" });
+}
 
 export default async function JockeysPage({ searchParams }: { searchParams: { tab?: string } }) {
   const { t, lang } = getT();

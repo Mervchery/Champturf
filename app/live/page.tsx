@@ -6,8 +6,14 @@ import { getRaces } from "@/lib/races";
 import LiveChat from "@/components/LiveChat";
 import StreamPlayer from "@/components/StreamPlayer";
 import ViewerCount from "@/components/ViewerCount";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Live racing"), description: t("Watch Champ de Mars racing live and replay past races."), path: "/live" });
+}
 
 export default async function LivePage() {
   const { t, lang } = getT();

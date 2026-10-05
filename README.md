@@ -532,3 +532,42 @@ Each scrape compares the new Win/Place tote prices with the stored ones. When a 
 Everyone signs in on `/login` (`/admin/login` just redirects there): email + password, "Continue with Google" (more providers via `NEXT_PUBLIC_AUTH_PROVIDERS`), password reset by email. New accounts are **Members**: `profiles.role` stays empty, so they can use `/account` but are turned away from `/admin` (middleware + a re-check inside every server action; only admins can change roles, and there is no policy letting anyone edit their own profile). Staff keep signing in the same way — an admin role granted under Admin → Users & roles unlocks the dashboard and shows an "Admin dashboard" link in the account menu.
 
 Setup in Supabase: run `supabase/user_accounts_migration.sql`; **Authentication → Providers → Google** (paste the Client ID/secret from Google Cloud Console → APIs & Services → Credentials → OAuth client, type Web; add `https://<project-ref>.supabase.co/auth/v1/callback` as an authorised redirect URI); **Authentication → URL Configuration** → set Site URL to your domain and add `https://<your-domain>/auth/callback` (plus `http://localhost:3000/auth/callback` for development) to Redirect URLs. Supabase's built-in email sender is heavily rate-limited — configure custom SMTP before launch.
+
+## Scheduled odds refresh (GitHub Actions)
+
+`.github/workflows/scrape.yml` keeps odds, drift arrows, declared runners and results fresh without anyone running the scraper by hand.
+
+| When (Mauritius time) | What runs |
+|---|---|
+| **06:00 and 18:00, Thursday → Sunday** (and any day a meeting is ≤ 2 days away) | Full scrape of the coming days (a race day already in the database is left to the checkpoints below) — finds meetings, declared runners, new horses |
+| **6 hours before Race 1** | **One** full scrape of the whole race day (all races, horse profiles included) |
+| **2 hours, 30 minutes, 10 minutes and 2 minutes before each race** | Refresh **only that race** (`--url=<its Supertote page>`) |
+| **15 min after each race, until it is "completed"** | Fetch **only that race's** result (so results and "finished" alerts appear) — an addition to your list, otherwise races would never flip to completed |
+| Any other 5-minute tick | `scraper/gate.mjs` finds nothing due and stops in ~1 second |
+
+The 5-minute GitHub cron is only a heartbeat. `scraper/gate.mjs` reads each race's start time from the `races` table and starts a scrape only when a checkpoint is due. Each checkpoint runs once: finished ones are recorded in `scrape_checkpoints` (after a *successful* scrape, so a failed one is retried on the next tick). A checkpoint fires on the first tick within 4 minutes of its target and never after the race has started, so it lands at its target time or up to ~5 minutes earlier (GitHub cannot tick faster). If a tick is missed, the missed checkpoints for that race are folded into one refresh. There are no separate 6-hour scrapes per race.
+
+**Run `supabase/scrape_schedule_migration.sql` first** — it adds `races.source_url` (the scraper now saves each race's page URL, which is how a single race is refreshed) and the `scrape_checkpoints` table. A race that has no stored URL yet is covered by a fast refresh of the whole day until the 6-hour full scrape has filled it in.
+
+Things to know: GitHub's cron is best-effort (a "5-minute" run can start a few minutes late), scheduled workflows are paused if a repo has no activity for 60 days, and on a private repo each run bills at least a minute (public repos are free). Midweek meetings only get the race-day checkpoints if you add that weekday to the `*/5` cron's day list. Test a scenario locally with `GATE_NOW=2026-10-10T08:00:00Z SCHEDULE="*/5 2-15 * * 4,5,6,0" node scraper/gate.mjs` (needs the two Supabase env vars).
+
+## Page caching
+
+Public reads (`lib/supabase/public.ts`) go through Next's data cache for 30 seconds (`PUBLIC_REVALIDATE_SECONDS`), so any number of visitors in that window share one database query. Staff edits in `/admin` clear it immediately (`revalidateTag("public-data")`). The pages themselves are still rendered per request because the EN/FR language cookie is read in the layout — the cache is on the data, not the HTML. Do **not** put `export const revalidate = 0` or `dynamic = "force-dynamic"` on a public page: either switches the data cache back off. Responses over 2 MB (a very large horses table) are not cached by Next and simply hit the database as before.
+
+## Search engines, share cards & install
+
+- `app/sitemap.ts` → `/sitemap.xml` (every race, race day, horse, jockey, trainer, stable; rebuilt hourly) · `app/robots.ts` → `/robots.txt` (keeps `/admin`, `/account`, `/login`, `/api`, `/search` out of Google).
+- Every public page has its own title, description, canonical URL and Open Graph/Twitter tags (`lib/seo.ts`); the default share image is generated in `app/opengraph-image.tsx`.
+- **Set `NEXT_PUBLIC_SITE_URL`** to your real domain — canonical links, the sitemap and share cards all depend on it. Then submit `/sitemap.xml` in Google Search Console.
+- `app/manifest.ts` + `public/icons/*` make the site installable (Add to Home Screen) with the Champ Turf icon. The icons are scaled up from the 219 px `logo.png`; drop a 512 px+ logo in and re-run the icon step for crisper results.
+
+## Race-day alerts (follow a horse)
+
+Members tap the bell on a horse profile or a race-card row, then choose per horse: *Runs & results* and/or *Odds moves*. Turn on device notifications under **My account → Race-day alerts**. Run `supabase/follows_alerts_migration.sql` once.
+
+`scraper/alerts.mjs` runs after every scheduled scrape and creates alerts for: a followed horse **declared** on a race card, its win price **moving ≥ 15%** within the last hour (max one per runner per 15 min), and its **result**. Each alert is stored in the member's in-app feed and pushed via Web Push. Every alert has a dedupe key, so nobody gets the same one twice. Tune with `ALERT_ODDS_MIN_PCT`, `ALERT_ODDS_WINDOW_MIN`, `ALERT_ODDS_COOLDOWN_MIN`.
+
+**Setup:** `npm install`, run `npm run gen:vapid` once, put the keys in `.env.local`, Vercel and GitHub secrets (see `.env.example`). Preview without sending anything: `node scraper/alerts.mjs --dry`.
+
+iPhone/iPad only allows web push for sites **added to the Home Screen** (iOS 16.4+) — the account page tells people this. Alerts only fire as often as the scraper runs.

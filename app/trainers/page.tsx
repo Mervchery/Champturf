@@ -2,8 +2,14 @@ import { getT } from "@/lib/i18n/server";
 import { Target } from "lucide-react";
 import { getTrainers } from "@/lib/trainers";
 import SilkImage from "@/components/SilkImage";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Trainers"), description: t("Mauritian racehorse trainers — runners, wins and strike rates."), path: "/trainers" });
+}
 
 export default async function TrainersPage() {
   const { t, lang } = getT();

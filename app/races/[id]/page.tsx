@@ -7,14 +7,30 @@ import { getRecentForm } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
+import { getFollowState } from "@/lib/follows";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { t, lang } = getT();
+  const race = await getRaceById(params.id);
+  if (!race) return { title: t("Race not found"), robots: { index: false } };
+  const label = fmtDateLong(lang, race.race_date);
+  const time = race.race_time ? race.race_time.slice(0, 5) : "";
+  return pageMeta({
+    title: `${race.name} — ${label}`,
+    description: `${race.name}, ${label}${time ? ` ${time}` : ""}${race.distance ? ` · ${race.distance}` : ""} · Champ de Mars. ${race.status === "completed" ? t("Result, finishing order and dividends.") : t("Runners, jockeys, tote odds and odds movement.")}`,
+    path: `/races/${race.id}`,
+  });
+}
 
 export default async function RaceDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const race = await getRaceById(params.id);
   if (!race) return notFound();
 
+  const follow = await getFollowState();
   const [entries, results] = await Promise.all([
     race.status === "upcoming" ? getEntriesForRace(race.id) : Promise.resolve([]),
     race.status === "completed" ? getResultsForRace(race.id) : Promise.resolve([]),
@@ -233,6 +249,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       gearChanged={e.gear_changed}
                       gearPrev={e.gear_prev}
                       form={e.horses ? formByHorse[e.horses.id] : undefined}
+                      follow={e.horses ? { signedIn: follow.signedIn, following: follow.ids.has(e.horses.id) } : undefined}
                     />
                   ))}
                 </div>

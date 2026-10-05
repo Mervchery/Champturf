@@ -5,14 +5,21 @@ import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
 import { resolveTrainerName } from "./lib/trainerOverrides.mjs";
-import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes } from "./upsert.mjs";
+import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes, horseHasProfile, isRaceCompleteInDb } from "./upsert.mjs";
 import { translateNotes } from "./lib/translateNotes.mjs";
 
-const args = process.argv.slice(2);
-if (args.length === 0 || args.length > 2) {
+const rawArgs = process.argv.slice(2);
+// --fast = odds refresh mode, used by the 5-minute race-day job: skips horse-profile
+// pages for horses we already know, and skips races already finished in the database.
+const FAST = rawArgs.includes("--fast");
+// --url=<race page> (repeatable) refreshes just those races — used by the per-race checkpoints.
+const URLS = rawArgs.filter((a) => a.startsWith("--url=")).map((a) => a.slice(6));
+const args = rawArgs.filter((a) => !a.startsWith("--"));
+if (URLS.length === 0 && (args.length === 0 || args.length > 2)) {
   console.error("Usage:");
   console.error("  node scraper/scrape.mjs <date>              e.g. node scraper/scrape.mjs 06-sep-2026");
   console.error("  node scraper/scrape.mjs <start> <end>       e.g. node scraper/scrape.mjs 01-jan-2020 06-sep-2026");
+  console.error("  add --fast for a quick odds-only refresh   e.g. node scraper/scrape.mjs --fast 06-sep-2026");
   console.error("Date format must match the site's own URLs (DD-mon-YYYY).");
   process.exit(1);
 }
@@ -120,6 +127,13 @@ async function scrapeRace(raceUrl) {
   const raceDate = toIsoDate(urlDate);
   const raceTime = to24Hour(parsed.timeOfDay);
 
+  // Fast mode: a race that is already completed WITH results in the database has nothing
+  // new to give — skip it (avoids re-writing every result and re-running the stats trigger).
+  if (FAST && parsed.isResult && (await isRaceCompleteInDb(parsed.name, raceDate))) {
+    console.log(`  Skipping ${parsed.name} — already completed in the database (fast mode).`);
+    return;
+  }
+
   // English version of the (French) racing notes. Horse/jockey/trainer names
   // are protected so they never get translated. Skipped when the notes are
   // unchanged since the last scrape; "" means "tried and failed" — the site
@@ -133,7 +147,7 @@ async function scrapeRace(raceUrl) {
     }
   }
 
-  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse });
+  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse, sourceUrl: raceUrl });
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 
@@ -151,7 +165,10 @@ async function scrapeRace(raceUrl) {
       // some real trainers are displayed identically on the source site
       // with no distinguishing detail at all (see trainerOverrides.mjs).
       const resolvedTrainerName = resolveTrainerName(entry.horseSlug, entry.trainer);
-      const profile = await getHorseProfile(entry.horseSlug);
+      // Fast mode: horses we already hold with owner + origin don't need their profile page again.
+      const profile = FAST && entry.horseName && (await horseHasProfile(entry.horseName))
+        ? { name: entry.horseName, age: null, origin: undefined, trainerName: null, ownerName: null }
+        : await getHorseProfile(entry.horseSlug);
       const horse = await upsertHorse({
         name: entry.horseName ?? profile.name,
         age: entry.age ?? profile.age,
@@ -236,6 +253,16 @@ async function scrapeDay(date) {
 }
 
 async function main() {
+  if (URLS.length > 0) {
+    // Targeted mode: only the listed race pages, nothing else.
+    for (const raceUrl of URLS) {
+      try { await scrapeRace(raceUrl); }
+      catch (e) { stats.errors.push({ context: raceUrl, message: e.message }); console.error(`  Error scraping ${raceUrl}: ${e.message}`); }
+    }
+    printStats();
+    if (stats.racesProcessed === 0 && stats.errors.length > 0) process.exitCode = 1; // checkpoint not marked done → retried next tick
+    return;
+  }
   const dates = args.length === 1 ? [args[0]] : dateRange(args[0], args[1]);
 
   if (dates.length > 1) {
@@ -256,6 +283,7 @@ async function main() {
   }
 
   printStats();
+  if (stats.racesProcessed === 0 && stats.errors.length > 0) process.exitCode = 1;
 }
 
 main();

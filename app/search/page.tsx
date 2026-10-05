@@ -1,8 +1,11 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import type { Metadata } from "next";
 
-export const revalidate = 0;
+// Search result pages are endless combinations of queries — keep them out of Google.
+export const metadata: Metadata = { title: "Search", robots: { index: false, follow: true } };
+
 
 type Result = { type: string; label: string; href: string };
 

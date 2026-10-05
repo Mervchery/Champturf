@@ -73,5 +73,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account"],
+  // /races and /horses are included only so the member session is refreshed there (the
+  // follow bells need it); the redirect rules above still apply to /admin and /account only.
+  matcher: ["/admin/:path*", "/account", "/races/:path*", "/horses/:path*"],
 };

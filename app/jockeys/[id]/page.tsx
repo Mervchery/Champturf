@@ -3,8 +3,20 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JockeyIcon } from "@/components/RacingIcons";
 import { getJockeyById } from "@/lib/jockeys";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { t } = getT();
+  const j = await getJockeyById(params.id);
+  if (!j) return { title: t("Jockey not found"), robots: { index: false } };
+  return pageMeta({
+    title: `${j.name} — ${j.apprentice ? t("Apprentice jockey") : t("Jockey profile")}`,
+    description: `${j.name}: ${t("career record, rides and results at Champ de Mars, Mauritius.")}`,
+    path: `/jockeys/${j.id}`,
+  });
+}
 
 export default async function JockeyDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();

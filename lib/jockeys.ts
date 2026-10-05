@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient as createClient } from "@/lib/supabase/public";
 import type { RefSummary } from "@/lib/horses";
 
 export type Jockey = {

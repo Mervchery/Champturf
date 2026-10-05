@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { LanguageProvider } from "@/components/LanguageProvider";
 import { getLang } from "@/lib/i18n/server";
 import { translate } from "@/lib/i18n";
@@ -7,20 +7,44 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Ticker from "@/components/Ticker";
 import NavProgress from "@/components/NavProgress";
+import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
+import { siteUrl } from "@/lib/site";
 
 export function generateMetadata(): Metadata {
   const lang = getLang();
+  const title = translate(lang, "Champ Turf — Mauritius Horse Racing");
+  const description = translate(lang, "Live results, pedigree records, and race-day coverage for every meeting at Champ de Mars.");
   return {
-    title: translate(lang, "Champ Turf — Mauritius Horse Racing"),
-    description: translate(lang, "Live results, pedigree records, and race-day coverage for every meeting at Champ de Mars."),
+    metadataBase: new URL(siteUrl()),
+    title: { default: title, template: "%s · Champ Turf" },
+    description,
+    applicationName: "Champ Turf",
+    alternates: { canonical: "/" },
+    openGraph: {
+      type: "website",
+      siteName: "Champ Turf",
+      title,
+      description,
+      locale: lang === "fr" ? "fr_MU" : "en_MU",
+      // The share image itself comes from app/opengraph-image.tsx
+    },
+    twitter: { card: "summary_large_image", title, description },
+    appleWebApp: { capable: true, title: "Champ Turf", statusBarStyle: "black-translucent" },
+    formatDetection: { telephone: false },
   };
 }
 
-// Without this, the root layout (and the Ticker it renders) could be
-// cached at build time and not pick up admin edits to ticker_items —
-// every other data-driven page in this app already sets revalidate = 0
-// for the same reason.
-export const revalidate = 0;
+export const viewport: Viewport = {
+  themeColor: "#123c2e",
+  width: "device-width",
+  initialScale: 1,
+};
+
+// Caching note: this layout reads the language cookie, so pages are rendered per
+// request. What is cached (30s, shared between all visitors) is the DATA — every
+// public read goes through lib/supabase/public.ts. Do not add
+// `export const revalidate = 0` or `dynamic = "force-dynamic"` to a page: either
+// one switches that data cache off again.
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getLang();
@@ -29,6 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="font-sans">
         <LanguageProvider lang={lang}>
           <NavProgress />
+          <ServiceWorkerRegister />
           <Header />
           <Ticker />
           <main>{children}</main>

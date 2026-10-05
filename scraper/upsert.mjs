@@ -80,7 +80,7 @@ export async function getRaceNotes(name, raceDate) {
   return data ?? null;
 }
 
-export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse }) {
+export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse, sourceUrl }) {
   const { data: existing, error: selectError } = await supabaseAdmin
     .from("races").select("*").eq("name", name).eq("race_date", raceDate).maybeSingle();
   if (selectError) throw new Error(`Failed to look up race "${name}": ${selectError.message}`);
@@ -88,6 +88,7 @@ export async function upsertRace({ name, raceDate, raceTime, distance, racingNot
   const fields = {
     name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars",
     racing_notes: racingNotes, racing_notes_en: racingNotesEn, danger_horse: dangerHorse,
+    source_url: sourceUrl, // lets the scheduler refresh just this race later
   };
 
   if (existing) {
@@ -187,4 +188,21 @@ export async function upsertResult({ raceId, horseId, position, jockeyName, trai
     );
   if (error) throw new Error(`Failed to upsert result: ${error.message}`);
   return { jockey, trainer };
+}
+
+/** True when the horse is already stored with its owner and country of origin — i.e. its
+ *  profile page has been scraped before and doesn't need fetching again (used by --fast). */
+export async function horseHasProfile(name) {
+  const { data } = await supabaseAdmin.from("horses").select("owner_id, origin").eq("name", name).maybeSingle();
+  return !!(data && data.owner_id && data.origin);
+}
+
+/** True when the race is stored as completed and already has at least one result row. */
+export async function isRaceCompleteInDb(name, raceDate) {
+  const { data: race } = await supabaseAdmin
+    .from("races").select("id, status").eq("name", name).eq("race_date", raceDate).maybeSingle();
+  if (!race || race.status !== "completed") return false;
+  const { count } = await supabaseAdmin
+    .from("race_results").select("id", { count: "exact", head: true }).eq("race_id", race.id);
+  return (count ?? 0) > 0;
 }

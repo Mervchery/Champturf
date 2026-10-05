@@ -2,8 +2,14 @@ import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { Newspaper } from "lucide-react";
 import { getNews } from "@/lib/news";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Racing news"), description: t("Latest news and reports from Mauritian horse racing."), path: "/news" });
+}
 
 export default async function NewsPage({ searchParams }: { searchParams: { cat?: string } }) {
   const { t, lang } = getT();

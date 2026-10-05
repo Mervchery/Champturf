@@ -6,8 +6,20 @@ import { getHorses } from "@/lib/horses";
 import { getTrainers } from "@/lib/trainers";
 import { getCareerStatsForStable } from "@/lib/careerStats";
 import SilkImage from "@/components/SilkImage";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { t } = getT();
+  const st = await getStableById(params.id);
+  if (!st) return { title: t("Stable not found"), robots: { index: false } };
+  return pageMeta({
+    title: `${st.name} — ${t("Stable profile")}`,
+    description: `${st.name}: ${t("horses, trainers and results at Champ de Mars, Mauritius.")}`,
+    path: `/stables/${st.id}`,
+  });
+}
 
 export default async function StableDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();

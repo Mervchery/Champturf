@@ -1,8 +1,14 @@
 import { getT } from "@/lib/i18n/server";
 import { User } from "lucide-react";
 import { getOwners } from "@/lib/owners";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Owners"), description: t("Racehorse owners at Champ de Mars — horses owned and winnings."), path: "/owners" });
+}
 
 export default async function OwnersPage() {
   const { t, lang } = getT();

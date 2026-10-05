@@ -1,8 +1,14 @@
 import { getT } from "@/lib/i18n/server";
 import { getHorses } from "@/lib/horses";
 import HorsesGrid from "@/components/HorsesGrid";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Horses"), description: t("Every horse racing at Champ de Mars — form, trainer, owner and career record."), path: "/horses" });
+}
 
 export default async function HorsesPage() {
   const { t, lang } = getT();

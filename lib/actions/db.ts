@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { PUBLIC_DATA_TAG } from "@/lib/supabase/public";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminRole } from "@/lib/roles";
 
@@ -26,6 +27,7 @@ async function requireAdmin() {
 
 function refresh(paths: string[]) {
   for (const p of paths) revalidatePath(p);
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
 }
 
 // Turns a raw Postgres error into something worth showing an admin. Most of

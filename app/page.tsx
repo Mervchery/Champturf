@@ -8,7 +8,6 @@ import { getHorses } from "@/lib/horses";
 import { getJockeys } from "@/lib/jockeys";
 import { getNews } from "@/lib/news";
 
-export const revalidate = 0;
 
 export default async function HomePage() {
   const { t, lang } = getT();

@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createPublicClient as createClient } from "@/lib/supabase/public";
 import type { StableSummary } from "@/lib/trainers";
 
 export type RefSummary = { id: string; name: string };

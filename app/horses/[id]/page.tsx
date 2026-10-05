@@ -5,14 +5,33 @@ import { HorseIcon } from "@/components/RacingIcons";
 import { getHorseById, getRecentFormDetailed } from "@/lib/horses";
 import { fmtMoney } from "@/lib/format";
 import SilkImage from "@/components/SilkImage";
+import FollowButton from "@/components/FollowButton";
+import { getFollowState } from "@/lib/follows";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
+  const { t } = getT();
+  const h = await getHorseById(params.id);
+  if (!h) return { title: t("Horse not found"), robots: { index: false } };
+  const bits = [
+    h.age ? `${h.age}yo` : null,
+    h.sex ? t(h.sex) : null,
+    h.trainer ? `${t("Trainer")}: ${h.trainer.name}` : null,
+  ].filter(Boolean).join(" · ");
+  return pageMeta({
+    title: `${h.name} — ${t("Horse profile")}`,
+    description: `${h.name}${bits ? ` (${bits})` : ""}. ${t("Wins")}: ${h.wins}, ${t("Starts")}: ${h.starts}. ${t("Form, race history and odds movement at Champ de Mars, Mauritius.")}`,
+    path: `/horses/${h.id}`,
+  });
+}
 
 export default async function HorseDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const h = await getHorseById(params.id);
   if (!h) return notFound();
-  const formHistory = await getRecentFormDetailed(h.id);
+  const [formHistory, follow] = await Promise.all([getRecentFormDetailed(h.id), getFollowState()]);
   const form = formHistory.map((f) => String(f.position));
 
   return (
@@ -39,6 +58,9 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               {h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.breed ?? t("N/A")} · {h.color ? t(h.color) : t("N/A")} · {t("Born")} {h.origin ?? t("N/A")}
             </div>
             {h.rating != null && <span className="pill pill-gold mt-2 inline-block">{t("Rating")} {h.rating}</span>}
+            <div className="mt-4">
+              <FollowButton horseId={h.id} horseName={h.name} initialFollowing={follow.ids.has(h.id)} signedIn={follow.signedIn} />
+            </div>
           </div>
         </div>
       </div>

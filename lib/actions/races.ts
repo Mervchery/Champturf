@@ -1,6 +1,7 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
+import { PUBLIC_DATA_TAG } from "@/lib/supabase/public";
 import { createClient } from "@/lib/supabase/server";
 import { isAdminRole } from "@/lib/roles";
 
@@ -37,6 +38,7 @@ export async function createRace(input: RaceInput) {
   const { error } = await supabase.from("races").insert(input);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath("/races");
   revalidatePath("/");
 }
@@ -46,6 +48,7 @@ export async function updateRace(id: string, input: Partial<RaceInput>) {
   const { error } = await supabase.from("races").update(input).eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath("/races");
   revalidatePath(`/races/${id}`);
   revalidatePath("/");
@@ -56,6 +59,7 @@ export async function deleteRace(id: string) {
   const { error } = await supabase.from("races").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath("/races");
   revalidatePath("/");
 }
@@ -92,6 +96,7 @@ export async function upsertResult(input: ResultInput) {
     .upsert(input, { onConflict: "race_id,position" });
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath("/results");
   revalidatePath("/horses");
   revalidatePath(`/races/${input.race_id}`);
@@ -103,6 +108,7 @@ export async function deleteResult(id: string, raceId: string) {
   const { error } = await supabase.from("race_results").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath("/results");
   revalidatePath("/horses");
   revalidatePath(`/races/${raceId}`);
@@ -133,6 +139,7 @@ export async function createEntry(input: EntryInput) {
   const { error } = await supabase.from("race_entries").insert(input);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath(`/races/${input.race_id}`);
 }
 
@@ -144,6 +151,7 @@ export async function updateEntry(id: string, raceId: string, input: Partial<Ent
   const { error } = await supabase.from("race_entries").update(input).eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath(`/races/${raceId}`);
 }
 
@@ -152,6 +160,7 @@ export async function deleteEntry(id: string, raceId: string) {
   const { error } = await supabase.from("race_entries").delete().eq("id", id);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath(`/races/${raceId}`);
 }
 
@@ -167,6 +176,7 @@ export async function setRaceVideo(raceId: string, videoId: string | null) {
   const { error } = await supabase.from("races").update({ youtube_video_id: videoId }).eq("id", raceId);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath(`/races/${raceId}`);
 }
 
@@ -263,6 +273,7 @@ export async function findRaceVideoOnYoutube(raceId: string, query: string, race
   const { error } = await supabase.from("races").update({ youtube_video_id: videoId }).eq("id", raceId);
   if (error) throw new Error(error.message);
   revalidatePath("/admin");
+  revalidateTag(PUBLIC_DATA_TAG); // staff edits show up immediately, not after the 30s data cache
   revalidatePath(`/races/${raceId}`);
   return { ok: true, videoId };
 }

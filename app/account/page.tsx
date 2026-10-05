@@ -6,6 +6,10 @@ import { getT } from "@/lib/i18n/server";
 import { isAdminRole } from "@/lib/roles";
 import { dateLocale } from "@/lib/i18n";
 import SignOutButton from "@/components/SignOutButton";
+import PushToggle from "@/components/PushToggle";
+import FollowedHorsesList from "@/components/FollowedHorsesList";
+import NotificationsPanel from "@/components/NotificationsPanel";
+import { getFollowedHorses, getNotifications } from "@/lib/follows";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +24,7 @@ export default async function AccountPage() {
   const name = profile?.full_name || user.user_metadata?.full_name || user.user_metadata?.name || null;
   const provider = (user.app_metadata?.provider as string | undefined) ?? "email";
   const initial = (name || user.email || "?").trim().charAt(0).toUpperCase();
+  const [followed, notifications] = await Promise.all([getFollowedHorses(user.id), getNotifications(user.id, 20)]);
   const since = new Date(profile?.created_at ?? user.created_at).toLocaleDateString(dateLocale(lang), { year: "numeric", month: "long", day: "numeric" });
 
   return (
@@ -60,6 +65,22 @@ export default async function AccountPage() {
             )}
             <SignOutButton />
           </div>
+        </div>
+
+        <div className="card no-hover p-6 mt-6">
+          <h2 className="font-display text-xl">{t("Race-day alerts")}</h2>
+          <p className="text-sm opacity-65 mt-1 mb-4">{t("Follow a horse to hear when it is declared to run, when its odds move and how it finished.")}</p>
+          <PushToggle />
+        </div>
+
+        <div className="card no-hover p-6 mt-6">
+          <h2 className="font-display text-xl mb-2">{t("Horses you follow")}</h2>
+          <FollowedHorsesList initial={followed as any} />
+        </div>
+
+        <div className="card no-hover p-6 mt-6">
+          <h2 className="font-display text-xl mb-2">{t("Recent alerts")}</h2>
+          <NotificationsPanel items={notifications} />
         </div>
       </div>
     </section>

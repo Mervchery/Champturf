@@ -2,6 +2,32 @@
 // falls back to the English text. Horse, jockey, trainer, stable, owner and
 // race names are never passed through this table.
 export const fr: Record<string, string> = {
+  // Follow & race-day alerts
+  "Follow": "Suivre",
+  "Following": "Suivi",
+  "Stop alerts for {name}": "Arrêter les alertes pour {name}",
+  "Get alerts for {name}": "Recevoir des alertes pour {name}",
+  "Sign in to follow this horse": "Connectez-vous pour suivre ce cheval",
+  "Something went wrong — try again.": "Une erreur est survenue — réessayez.",
+  "Race-day alerts": "Alertes jour de course",
+  "Follow a horse to hear when it is declared to run, when its odds move and how it finished.": "Suivez un cheval pour savoir quand il est déclaré partant, quand sa cote bouge et comment il a terminé.",
+  "Horses you follow": "Chevaux que vous suivez",
+  "Recent alerts": "Alertes récentes",
+  "Runs & results": "Courses et résultats",
+  "Odds moves": "Mouvements de cote",
+  "You're not following any horses yet. Open a horse or a race card and tap Follow.": "Vous ne suivez aucun cheval pour l'instant. Ouvrez un cheval ou une course et touchez Suivre.",
+  "No alerts yet. When a horse you follow is declared, moves in the betting or runs, it shows up here.": "Aucune alerte pour l'instant. Quand un cheval que vous suivez est déclaré, voit sa cote bouger ou court, cela apparaît ici.",
+  "Mark all as read": "Tout marquer comme lu",
+  "Clear all": "Tout effacer",
+  "Alerts on for this device": "Alertes activées sur cet appareil",
+  "Turn on alerts for this device": "Activer les alertes sur cet appareil",
+  "Turn off": "Désactiver",
+  "Couldn't turn notifications on. Please try again.": "Impossible d'activer les notifications. Réessayez.",
+  "Couldn't turn notifications off. Please try again.": "Impossible de désactiver les notifications. Réessayez.",
+  "Notifications are blocked for this site. Allow them in your browser's site settings, then come back.": "Les notifications sont bloquées pour ce site. Autorisez-les dans les réglages de votre navigateur, puis revenez.",
+  "On iPhone, first tap Share → Add to Home Screen, then open Champ Turf from your Home Screen to turn alerts on.": "Sur iPhone, touchez d'abord Partager → Sur l'écran d'accueil, puis ouvrez Champ Turf depuis l'écran d'accueil pour activer les alertes.",
+  "This browser doesn't support push notifications. You'll still see your alerts below.": "Ce navigateur ne prend pas en charge les notifications push. Vous verrez quand même vos alertes ci-dessous.",
+  "Push notifications aren't set up on this site yet. You'll still see your alerts below.": "Les notifications push ne sont pas encore configurées sur ce site. Vous verrez quand même vos alertes ci-dessous.",
   // Navigation / chrome
   "Home": "Accueil",
   "Race Days": "Journées de courses",

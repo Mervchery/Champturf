@@ -4,8 +4,14 @@ import { CalendarDays, Flag, CloudSun } from "lucide-react";
 import { fmtMoney } from "@/lib/format";
 import { getRaceDays } from "@/lib/meetings";
 import { fmtDateLong } from "@/lib/i18n";
+import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 
-export const revalidate = 0;
+
+export function generateMetadata(): Metadata {
+  const { t } = getT();
+  return pageMeta({ title: t("Race days"), description: t("Every race meeting at Champ de Mars — upcoming race cards and past results."), path: "/race-days" });
+}
 
 export default async function RaceDaysPage() {
   const { t, lang } = getT();
