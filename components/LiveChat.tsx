@@ -3,7 +3,8 @@
 import { useT } from "@/components/LanguageProvider";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RealtimeChannel } from "@supabase/supabase-js";
-import { ArrowDown, Send } from "lucide-react";
+import Link from "next/link";
+import { ArrowDown, Lock, Send } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 // Banned words (keep lowercase). This is a client-side filter only — it
@@ -52,9 +53,9 @@ export default function LiveChat() {
   const [cooldownLeft, setCooldownLeft] = useState(0);
   const [unseen, setUnseen] = useState(0);
 
-  // Identity is generated after mount (not in useState initializer) so the
-  // server-rendered HTML and the first client render match. It's kept in
-  // localStorage so a refresh doesn't turn you into a different user.
+  // Chat is members-only. Identity comes from the signed-in account (never a
+  // random "User_123"), so messages are tied to a real profile.
+  const [auth, setAuth] = useState<"loading" | "out" | "in">("loading");
   const [identity, setIdentity] = useState<{ clientId: string; username: string } | null>(null);
 
   const lastSentRef = useRef(0);
@@ -62,25 +63,41 @@ export default function LiveChat() {
   const stickToBottomRef = useRef(true);
 
   useEffect(() => {
-    let clientId = "";
-    let username = "";
-    try {
-      clientId = localStorage.getItem("chat_client_id") || "";
-      username = localStorage.getItem("chat_username") || "";
-    } catch {}
-    if (!clientId) clientId = genId();
-    if (!username) username = `User_${Math.floor(Math.random() * 900) + 100}`;
-    try {
-      localStorage.setItem("chat_client_id", clientId);
-      localStorage.setItem("chat_username", username);
-    } catch {}
-    setIdentity({ clientId, username });
-  }, []);
+    let cancelled = false;
+    async function load() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (cancelled) return;
+      if (!user) { setIdentity(null); setAuth("out"); return; }
+      const { data: profile } = await supabase.from("profiles").select("full_name").eq("id", user.id).single();
+      if (cancelled) return;
+      const username = (
+        profile?.full_name ||
+        user.user_metadata?.full_name ||
+        user.user_metadata?.name ||
+        (user.email ? user.email.split("@")[0] : "") ||
+        "Member"
+      ).toString().trim().slice(0, 30);
+      setIdentity({ clientId: user.id, username });
+      setAuth("in");
+    }
+    load();
+    const { data: sub } = supabase.auth.onAuthStateChange(() => { load(); });
+    return () => { cancelled = true; sub.subscription.unsubscribe(); };
+  }, [supabase]);
 
   // Realtime subscription
   useEffect(() => {
+    if (auth !== "in") {
+      setChannel(null);
+      setMessages([]);
+      setStatus("connecting");
+      return;
+    }
+    // `private: true` makes Supabase check the realtime.messages policies in
+    // supabase/chat_members_only_migration.sql — so only signed-in users can
+    // read or send, even if someone bypasses this UI.
     const chatChannel = supabase.channel("live_chat_room", {
-      config: { broadcast: { self: true, ack: true } },
+      config: { private: true, broadcast: { self: true, ack: true } },
     });
 
     chatChannel
@@ -127,7 +144,7 @@ export default function LiveChat() {
       clearTimeout(timeout);
       supabase.removeChannel(chatChannel);
     };
-  }, [supabase]);
+  }, [supabase, auth]);
 
   // Auto-scroll to newest message, unless the reader scrolled up.
   useEffect(() => {
@@ -231,6 +248,39 @@ export default function LiveChat() {
   const statusDot =
     status === "live" ? "bg-emerald-500" : status === "connecting" ? "bg-amber-400 animate-pulse" : "bg-red-500";
   const statusLabel = status === "live" ? tr("Live") : status === "connecting" ? tr("Connecting…") : tr("Offline");
+
+  if (auth !== "in") {
+    return (
+      <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
+        <div className="px-3.5 py-3 border-b border-line flex items-center gap-2 text-sm font-semibold">
+          <Lock size={14} className="opacity-60" />
+          <span>{tr("Live chat")}</span>
+        </div>
+        <div className="flex-1 flex items-center justify-center text-center px-6">
+          {auth === "loading" ? (
+            <span className="text-xs opacity-50">{tr("Connecting…")}</span>
+          ) : (
+            <div className="max-w-[260px]">
+              <span className="mx-auto mb-3 flex items-center justify-center w-11 h-11 rounded-full bg-parchment2">
+                <Lock size={18} />
+              </span>
+              <h3 className="font-display text-lg">{tr("Sign in to join the chat")}</h3>
+              <p className="text-sm opacity-70 mt-1.5 mb-5">
+                {tr("Live chat is for Champ Turf members. Create a free account or sign in to chat during the races.")}
+              </p>
+              <div className="grid gap-2.5">
+                <Link href="/login?next=/live" className="btn btn-dark w-full justify-center">{tr("Sign in")}</Link>
+                <Link href="/login?next=/live&mode=signup" className="btn btn-outline w-full justify-center">{tr("Create an account")}</Link>
+              </div>
+              <p className="text-xs opacity-55 mt-4">
+                <Link href="/community-guidelines" className="underline">{tr("Community guidelines")}</Link>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
@@ -337,6 +387,9 @@ export default function LiveChat() {
           {cooldownLeft > 0 ? `${cooldownLeft}s` : (<><Send size={14} /> {tr("Send")}</>)}
         </button>
       </form>
+      <div className="px-3.5 py-1.5 border-t border-line text-[11px] opacity-55">
+        <Link href="/community-guidelines" className="underline">{tr("Community guidelines")}</Link>
+      </div>
     </div>
   );
 }

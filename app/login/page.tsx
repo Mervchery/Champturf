@@ -9,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 // One sign-in page for everyone. What a person can do afterwards depends only
 // on their role: staff reach /admin, members get the public site and /account.
-export default async function LoginPage({ searchParams }: { searchParams: { next?: string; error?: string } }) {
+export default async function LoginPage({ searchParams }: { searchParams: { next?: string; error?: string; mode?: string } }) {
   const { t } = getT();
   const next = searchParams.next ? safeNext(searchParams.next) : null;
   const error = searchParams.error;
@@ -27,7 +27,7 @@ export default async function LoginPage({ searchParams }: { searchParams: { next
 
   return (
     <section className="min-h-[70vh] flex flex-col items-center justify-center px-5 py-10 gap-4">
-      <AuthPanel next={next} notice={notice} />
+      <AuthPanel next={next} notice={notice} initialMode={searchParams.mode === "signup" ? "signup" : "signin"} />
       {user && error === "not_authorized" && (
         <div className="text-sm opacity-80 text-center">
           {t("Signed in as {email}.", { email: user.email ?? "" })} <SignOutButton variant="link" />

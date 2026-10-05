@@ -348,4 +348,20 @@ export const fr: Record<string, string> = {
   "Back to home": "Retour à l'accueil",
   "Something went wrong": "Une erreur est survenue",
   "We couldn't load this page. Please try again in a moment.": "Impossible de charger cette page. Veuillez réessayer dans un instant.",
+
+  // Policies & members-only chat
+  "LEGAL": "MENTIONS LÉGALES",
+  "Legal": "Mentions légales",
+  "Last updated": "Dernière mise à jour",
+  "Questions? Contact us at": "Une question ? Écrivez-nous à",
+  "Privacy Policy": "Politique de confidentialité",
+  "Terms of Use": "Conditions d'utilisation",
+  "Cookie Policy": "Politique de cookies",
+  "Community guidelines": "Règles de la communauté",
+  "Sign in to join the chat": "Connectez-vous pour rejoindre le chat",
+  "Live chat is for Champ Turf members. Create a free account or sign in to chat during the races.": "Le chat est réservé aux membres de Champ Turf. Créez un compte gratuit ou connectez-vous pour discuter pendant les courses.",
+  "Please accept the Terms and Privacy Policy to create an account.": "Veuillez accepter les conditions d'utilisation et la politique de confidentialité pour créer un compte.",
+  "I am 18 or over and I accept the": "J'ai 18 ans ou plus et j'accepte les",
+  "By continuing you accept our": "En continuant, vous acceptez nos",
+  "and": "et",
 };

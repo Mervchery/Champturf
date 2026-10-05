@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
-import { LayoutDashboard, LogIn, LogOut, User as UserIcon } from "lucide-react";
+import { LayoutDashboard, LogOut, User as UserIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { isAdminRole } from "@/lib/roles";
@@ -62,7 +62,7 @@ export default function UserMenu() {
   if (!me) {
     return (
       <Link href="/login" className="flex items-center gap-1.5 h-9 px-3 rounded-full bg-gold2 text-ink text-sm font-semibold" aria-label={t("Sign in")}>
-        <LogIn size={15} /> <span className="hidden sm:inline">{t("Sign in")}</span>
+        <UserIcon size={16} /> <span className="hidden sm:inline">{t("Sign in")}</span>
       </Link>
     );
   }

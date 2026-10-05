@@ -33,6 +33,12 @@ export default function Footer() {
         </div>
       </div>
       <div className="wrap flex flex-wrap gap-3 items-center justify-between mt-8 pt-4 border-t border-white/10 text-xs">
+        <nav aria-label={t("Legal")} className="w-full flex flex-wrap gap-x-5 gap-y-1">
+          <Link href="/privacy" className="hover:text-white transition-colors">{t("Privacy Policy")}</Link>
+          <Link href="/terms" className="hover:text-white transition-colors">{t("Terms of Use")}</Link>
+          <Link href="/cookies" className="hover:text-white transition-colors">{t("Cookie Policy")}</Link>
+          <Link href="/community-guidelines" className="hover:text-white transition-colors">{t("Community guidelines")}</Link>
+        </nav>
         <span>© 2026 Champ Turf. {t("Independent coverage — not affiliated with the Mauritius Turf Club or any official body.")}</span>
         <LanguageSwitch />
       </div>

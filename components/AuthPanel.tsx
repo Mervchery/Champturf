@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
@@ -28,10 +29,10 @@ function GoogleG() {
 
 const inputCls = "w-full px-3 py-2.5 border border-line rounded-md bg-parchment text-sm";
 
-export default function AuthPanel({ next, notice }: { next: string | null; notice?: string | null }) {
+export default function AuthPanel({ next, notice, initialMode = "signin" }: { next: string | null; notice?: string | null; initialMode?: Mode }) {
   const { t } = useT();
   const router = useRouter();
-  const [mode, setMode] = useState<Mode>("signin");
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -39,6 +40,7 @@ export default function AuthPanel({ next, notice }: { next: string | null; notic
   const [error, setError] = useState("");
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const callback = (target: string | null) =>
     `${window.location.origin}/auth/callback${target ? `?next=${encodeURIComponent(safeNext(target))}` : ""}`;
@@ -77,6 +79,7 @@ export default function AuthPanel({ next, notice }: { next: string | null; notic
     if (!password) { setError(t("Enter your password.")); return; }
 
     if (mode === "signup") {
+      if (!agreed) { setError(t("Please accept the Terms and Privacy Policy to create an account.")); return; }
       if (password.length < 8) { setError(t("Use at least 8 characters for your password.")); return; }
       if (password !== confirm) { setError(t("The two passwords don't match.")); return; }
       setLoading(true);
@@ -110,6 +113,7 @@ export default function AuthPanel({ next, notice }: { next: string | null; notic
 
   async function social(provider: string) {
     setError("");
+    if (mode === "signup" && !agreed) { setError(t("Please accept the Terms and Privacy Policy to create an account.")); return; }
     const { error: oauthError } = await createClient().auth.signInWithOAuth({
       provider: provider as any,
       options: { redirectTo: callback(next) },
@@ -206,7 +210,20 @@ export default function AuthPanel({ next, notice }: { next: string | null; notic
       </form>
 
       {mode === "signup" && (
-        <p className="text-xs opacity-55 mt-3 leading-relaxed">{t("By creating an account you confirm you are 18 or over.")}</p>
+        <label className="flex items-start gap-2 text-xs opacity-75 mt-3 leading-relaxed cursor-pointer">
+          <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} className="mt-0.5" />
+          <span>
+            {t("I am 18 or over and I accept the")}{" "}
+            <Link href="/terms" target="_blank" className="underline">{t("Terms of Use")}</Link>{" "}{t("and")}{" "}
+            <Link href="/privacy" target="_blank" className="underline">{t("Privacy Policy")}</Link>.
+          </span>
+        </label>
+      )}
+
+      {mode === "signin" && (
+        <p className="text-xs opacity-55 mt-4 text-center leading-relaxed">
+          {t("By continuing you accept our")} <Link href="/terms" className="underline">{t("Terms of Use")}</Link> {t("and")} <Link href="/privacy" className="underline">{t("Privacy Policy")}</Link>.
+        </p>
       )}
 
       <p className="text-sm text-center mt-5 opacity-80">
