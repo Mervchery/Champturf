@@ -41,7 +41,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-[100] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
+    <header className="sticky top-0 z-[100] pt-[env(safe-area-inset-top)] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
       <div className="wrap flex items-center gap-5 py-3.5">
         <button
           className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 border border-white/15 shrink-0"

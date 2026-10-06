@@ -3,6 +3,7 @@
 import { useEffect, useState, useTransition } from "react";
 import { BellRing, BellOff, Smartphone } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
+import InstallApp from "@/components/InstallApp";
 import { savePushSubscription, removePushSubscription } from "@/lib/actions/follows";
 
 type State = "loading" | "unsupported" | "ios-install" | "denied" | "off" | "on" | "unconfigured";
@@ -102,7 +103,10 @@ export default function PushToggle() {
         <p className="opacity-70 flex gap-2"><BellOff size={16} className="shrink-0 mt-0.5" /> {t("Notifications are blocked for this site. Allow them in your browser's site settings, then come back.")}</p>
       )}
       {state === "ios-install" && (
-        <p className="opacity-70 flex gap-2"><Smartphone size={16} className="shrink-0 mt-0.5" /> {t("On iPhone, first tap Share → Add to Home Screen, then open Champ Turf from your Home Screen to turn alerts on.")}</p>
+        <div>
+          <p className="opacity-70 flex gap-2"><Smartphone size={16} className="shrink-0 mt-0.5" /> {t("On iPhone, first tap Share → Add to Home Screen, then open Champ Turf from your Home Screen to turn alerts on.")}</p>
+          <div className="mt-3"><InstallApp className="btn btn-dark" /></div>
+        </div>
       )}
       {state === "unsupported" && <p className="opacity-70">{t("This browser doesn't support push notifications. You'll still see your alerts below.")}</p>}
       {state === "unconfigured" && <p className="opacity-70">{t("Push notifications aren't set up on this site yet. You'll still see your alerts below.")}</p>}

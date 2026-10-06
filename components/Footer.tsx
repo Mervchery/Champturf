@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { getT } from "@/lib/i18n/server";
 import LanguageSwitch from "@/components/LanguageSwitch";
+import InstallApp from "@/components/InstallApp";
 
 export default function Footer() {
   const { t } = getT();
   const link = "block text-sm py-1 text-white/75 hover:text-white transition-colors";
   return (
-    <footer className="bg-turf text-white/70 pt-12 pb-7 mt-16">
+    <footer className="bg-turf text-white/70 pt-12 mt-16 pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
       <div className="wrap flex flex-wrap gap-8 justify-between">
         <div className="max-w-[260px]">
           <div className="flex items-center gap-2.5 mb-2.5">
@@ -17,6 +18,7 @@ export default function Footer() {
           <p className="text-sm opacity-75 leading-relaxed">
             {t("The independent home of Mauritian horse racing — race data, profiles, and live coverage from Champ de Mars.")}
           </p>
+          <div className="mt-4"><InstallApp /></div>
         </div>
         <div>
           <h2 className="text-white text-sm mb-2.5">{t("Explore")}</h2>

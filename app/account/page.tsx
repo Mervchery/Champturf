@@ -7,6 +7,7 @@ import { isAdminRole } from "@/lib/roles";
 import { dateLocale } from "@/lib/i18n";
 import SignOutButton from "@/components/SignOutButton";
 import PushToggle from "@/components/PushToggle";
+import InstallApp from "@/components/InstallApp";
 import FollowedHorsesList from "@/components/FollowedHorsesList";
 import NotificationsPanel from "@/components/NotificationsPanel";
 import { getFollowedHorses, getNotifications } from "@/lib/follows";
@@ -65,6 +66,12 @@ export default async function AccountPage() {
             )}
             <SignOutButton />
           </div>
+        </div>
+
+        <div className="card no-hover p-6 mt-6">
+          <h2 className="font-display text-xl">{t("Get the app")}</h2>
+          <p className="text-sm opacity-70 mt-1 mb-4">{t("Add Champ Turf to your Home Screen to open it full screen in one tap.")}</p>
+          <InstallApp className="btn btn-dark" />
         </div>
 
         <div className="card no-hover p-6 mt-6">

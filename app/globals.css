@@ -67,7 +67,8 @@ body {
 .wrap {
   max-width: 1180px;
   margin: 0 auto;
-  padding: 0 24px;
+  /* Notch / rounded-corner safe in landscape when running from the Home Screen. */
+  padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
 }
 
 /* ---------- Surfaces ---------- */
@@ -564,7 +565,7 @@ tr:hover td {
 /* Thin gold progress bar across the top while a page navigation loads. */
 .nav-progress {
   position: fixed;
-  top: 0;
+  top: env(safe-area-inset-top);
   left: 0;
   height: 3px;
   width: 0;
@@ -725,4 +726,66 @@ input::placeholder,
 textarea::placeholder {
   color: var(--ink);
   opacity: 0.65;
+}
+
+/* ---------- Follow button ---------- */
+.follow-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 999px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s var(--ease), background 0.25s var(--ease), border-color 0.25s var(--ease), box-shadow 0.25s var(--ease), color 0.25s var(--ease);
+}
+.follow-btn:active { transform: scale(0.95); }
+.follow-btn:disabled { opacity: 0.75; cursor: progress; }
+
+/* Labelled version (horse profile, sits on the dark hero). */
+.follow-full {
+  min-height: 44px;
+  padding: 0 20px 0 15px;
+  font-size: 0.9rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #fff;
+}
+.follow-full .follow-ico { color: var(--gold-2); }
+.follow-full:hover { background: rgba(255, 255, 255, 0.18); border-color: #fff; }
+.follow-full[aria-pressed="true"] {
+  background: var(--gold-2);
+  border-color: var(--gold-2);
+  color: var(--ink);
+  box-shadow: 0 6px 18px rgba(228, 200, 120, 0.35);
+}
+.follow-full[aria-pressed="true"] .follow-ico { color: var(--ink); }
+
+/* Compact bell on race cards. 40px so it is an easy thumb target. */
+.follow-icon {
+  width: 40px;
+  height: 40px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  color: var(--ink);
+  box-shadow: var(--shadow-sm);
+}
+.follow-icon .follow-ico { color: #8a6a14; }
+.dark .follow-icon .follow-ico { color: var(--gold-2); }
+.follow-icon:hover { border-color: var(--gold); }
+.follow-icon[aria-pressed="true"] {
+  background: var(--gold-2);
+  border-color: var(--gold);
+}
+.follow-icon[aria-pressed="true"] .follow-ico,
+.dark .follow-icon[aria-pressed="true"] .follow-ico { color: var(--ink); }
+
+.follow-ring { transform-origin: 50% 0; animation: bellRing 0.7s var(--ease); }
+@keyframes bellRing {
+  0% { transform: rotate(0); }
+  20% { transform: rotate(18deg); }
+  40% { transform: rotate(-14deg); }
+  60% { transform: rotate(9deg); }
+  80% { transform: rotate(-4deg); }
+  100% { transform: rotate(0); }
 }
