@@ -39,18 +39,18 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
       </div>
       <section className="py-14">
         <div className="wrap">
-          <Link href="/jockeys" className="text-sm border-b border-ink pb-0.5">← {t("Back to jockeys")}</Link>
+          <Link href="/jockeys" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to jockeys")}</Link>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="panel"><div className="text-xs opacity-60">{t("Wins")}</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
-            <div className="panel"><div className="text-xs opacity-60">{t("Places")}</div><div className="font-mono font-semibold text-xl">{j.places}</div></div>
-            <div className="panel"><div className="text-xs opacity-60">{t("Win %")}</div><div className="font-mono font-semibold text-xl">{j.win_pct}%</div></div>
-            <div className="panel"><div className="text-xs opacity-60">{t("Suspensions")}</div><div className="font-mono font-semibold text-xl">{j.suspensions}</div></div>
+            <div className="panel"><div className="text-xs opacity-70">{t("Wins")}</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
+            <div className="panel"><div className="text-xs opacity-70">{t("Places")}</div><div className="font-mono font-semibold text-xl">{j.places}</div></div>
+            <div className="panel"><div className="text-xs opacity-70">{t("Win %")}</div><div className="font-mono font-semibold text-xl">{j.win_pct}%</div></div>
+            <div className="panel"><div className="text-xs opacity-70">{t("Suspensions")}</div><div className="font-mono font-semibold text-xl">{j.suspensions}</div></div>
           </div>
 
           {j.apprentice ? (
             <div className="panel mt-6">
-              <h4 className="text-sm font-semibold mb-3">{t("Apprenticeship")}</h4>
+              <h2 className="text-sm font-semibold mb-3">{t("Apprenticeship")}</h2>
               <table>
                 <tbody>
                   <tr><td>{t("Mentor jockey")}</td><td>{j.mentor ? <Link href={`/jockeys/${j.mentor.id}`} className="font-semibold">{j.mentor.name}</Link> : t("Unknown")}</td></tr>
@@ -61,9 +61,9 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
             </div>
           ) : (
             <div className="panel mt-6">
-              <h4 className="text-sm font-semibold mb-2">{t("Biography")}</h4>
+              <h2 className="text-sm font-semibold mb-2">{t("Biography")}</h2>
               <p className="text-sm opacity-70">{j.bio ?? t("N/A")}</p>
-              <h4 className="text-sm font-semibold mt-4 mb-1">{t("Achievements")}</h4>
+              <h2 className="text-sm font-semibold mt-4 mb-1">{t("Achievements")}</h2>
               <p className="text-sm opacity-70">{j.achievements ?? t("N/A")}</p>
             </div>
           )}

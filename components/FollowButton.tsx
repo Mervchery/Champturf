@@ -58,7 +58,7 @@ export default function FollowButton({
         <Icon size={variant === "icon" ? 16 : 15} />
         {variant === "full" && <span>{label}</span>}
       </button>
-      {error && <span className="text-xs text-coral mt-1">{t("Something went wrong — try again.")}</span>}
+      {error && <span className="text-xs text-coral-ink mt-1">{t("Something went wrong — try again.")}</span>}
     </span>
   );
 }

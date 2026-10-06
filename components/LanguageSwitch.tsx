@@ -26,7 +26,7 @@ export default function LanguageSwitch() {
 
   return (
     <div className={`lang-switch ${pending ? "is-pending" : ""}`} role="group" aria-label={t("Language")}>
-      <Globe size={14} className="opacity-60" aria-hidden="true" />
+      <Globe size={14} className="opacity-70" aria-hidden="true" />
       {OPTIONS.map((o) => (
         <button
           key={o.code}

@@ -160,7 +160,7 @@ function NewRaceForm({ onSubmit, onCancel }: { onSubmit: (input: any) => void; o
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-xs opacity-65 block mb-1.5">{label}</label>
+      <label className="text-xs opacity-70 block mb-1.5">{label}</label>
       {children}
     </div>
   );
@@ -199,19 +199,19 @@ function ClubFields({ club, onChange, timeFactors }: { club: Club; onChange: (c:
       <div className="text-xs font-semibold opacity-70 mb-2">Club data (optional)</div>
       <div className="flex gap-2 flex-wrap items-end">
         <div>
-          <label className="text-xs opacity-65 block mb-1">Rating</label>
+          <label className="text-xs opacity-70 block mb-1">Rating</label>
           <input type="number" className="admin-input w-20" value={club.rating} onChange={(e) => set({ rating: e.target.value })} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">HWT (kg)</label>
+          <label className="text-xs opacity-70 block mb-1">HWT (kg)</label>
           <input type="number" className="admin-input w-24" value={club.hwt} onChange={(e) => set({ hwt: e.target.value })} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">HWT last run</label>
+          <label className="text-xs opacity-70 block mb-1">HWT last run</label>
           <input type="number" className="admin-input w-24" value={club.hwtLast} onChange={(e) => set({ hwtLast: e.target.value })} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Equip (NA = none)</label>
+          <label className="text-xs opacity-70 block mb-1">Equip (NA = none)</label>
           <input className="admin-input w-28" placeholder="e.g. XA" value={club.equip} onChange={(e) => set({ equip: e.target.value.toUpperCase() })} />
         </div>
         <label className="text-xs flex items-center gap-1.5 pb-2.5">
@@ -219,22 +219,22 @@ function ClubFields({ club, onChange, timeFactors }: { club: Club; onChange: (c:
         </label>
         {club.gearChanged && (
           <div>
-            <label className="text-xs opacity-65 block mb-1">Previous gear</label>
+            <label className="text-xs opacity-70 block mb-1">Previous gear</label>
             <input className="admin-input w-24" placeholder="e.g. N" value={club.gearPrev} onChange={(e) => set({ gearPrev: e.target.value.toUpperCase() })} />
           </div>
         )}
         {timeFactors && (
           <>
             <div>
-              <label className="text-xs opacity-65 block mb-1">Fastest time</label>
+              <label className="text-xs opacity-70 block mb-1">Fastest time</label>
               <input className="admin-input w-28" placeholder="0:54.29" value={club.tfFastest} onChange={(e) => set({ tfFastest: e.target.value })} />
             </div>
             <div>
-              <label className="text-xs opacity-65 block mb-1">Days since</label>
+              <label className="text-xs opacity-70 block mb-1">Days since</label>
               <input className="admin-input w-24" placeholder="28 d" value={club.tfDays} onChange={(e) => set({ tfDays: e.target.value })} />
             </div>
             <div>
-              <label className="text-xs opacity-65 block mb-1">Best (last 3)</label>
+              <label className="text-xs opacity-70 block mb-1">Best (last 3)</label>
               <input className="admin-input w-28" placeholder="0:54.29" value={club.tfBest3} onChange={(e) => set({ tfBest3: e.target.value })} />
             </div>
           </>
@@ -262,16 +262,16 @@ function RaceDetailsEditor({ race, onSave }: { race: Race; onSave: (input: { rac
       <div className="text-xs font-semibold opacity-70 mb-2">Race details</div>
       <div className="flex gap-2 flex-wrap items-end">
         <div>
-          <label className="text-xs opacity-65 block mb-1">Race class</label>
+          <label className="text-xs opacity-70 block mb-1">Race class</label>
           <input className="admin-input w-28" placeholder="e.g. BM36" value={raceClass} onChange={(e) => setRaceClass(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Rails</label>
+          <label className="text-xs opacity-70 block mb-1">Rails</label>
           <input className="admin-input w-56" placeholder="e.g. 2.25m" value={rails} onChange={(e) => setRails(e.target.value)} />
         </div>
         {["1st", "2nd", "3rd", "4th"].map((label, i) => (
           <div key={label}>
-            <label className="text-xs opacity-65 block mb-1">Prize {label} (Rs)</label>
+            <label className="text-xs opacity-70 block mb-1">Prize {label} (Rs)</label>
             <input
               type="number" className="admin-input w-28" value={prizes[i]}
               onChange={(e) => setPrizes(prizes.map((p, j) => (j === i ? e.target.value : p)))}
@@ -339,9 +339,9 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
 
   return (
     <div className="panel mt-4">
-      <h4 className="text-sm font-semibold mb-3">
+      <h3 className="text-sm font-semibold mb-3">
         {race.status === "upcoming" ? "Entries" : "Results"} — {race.name}
-      </h4>
+      </h3>
 
       <RaceDetailsEditor
         race={race}
@@ -349,7 +349,7 @@ function RaceManagePanel({ race, horses, jockeys, notify, onChanged }: {
       />
 
       {loading ? (
-        <p className="text-sm opacity-60">Loading…</p>
+        <p className="text-sm opacity-70">Loading…</p>
       ) : race.status === "upcoming" ? (
         <EntriesEditor
           raceId={race.id}
@@ -420,7 +420,7 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
 
   return (
     <div className="panel mt-4">
-      <h4 className="text-sm font-semibold mb-3">Replay video</h4>
+      <h3 className="text-sm font-semibold mb-3">Replay video</h3>
       {race.youtube_video_id ? (
         <div className="flex items-center gap-3 mb-3">
           <span className="pill pill-gold">Linked: {race.youtube_video_id}</span>
@@ -429,11 +429,11 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
           </button>
         </div>
       ) : (
-        <p className="text-xs opacity-60 mb-3">No replay linked yet.</p>
+        <p className="text-xs opacity-70 mb-3">No replay linked yet.</p>
       )}
       <div className="flex gap-2 flex-wrap items-end mb-2.5">
         <div className="flex-1 min-w-[220px]">
-          <label className="text-xs opacity-65 block mb-1">YouTube search query</label>
+          <label className="text-xs opacity-70 block mb-1">YouTube search query</label>
           <input className="admin-input w-full" placeholder="What to search for…" value={query} onChange={(e) => setQuery(e.target.value)} />
         </div>
         <button className="btn btn-outline" onClick={autoFind} disabled={searching}>
@@ -442,12 +442,12 @@ function ReplayVideoEditor({ race, notify, onChanged }: { race: Race; notify: (m
       </div>
       <div className="flex gap-2 flex-wrap items-end">
         <div className="flex-1 min-w-[220px]">
-          <label className="text-xs opacity-65 block mb-1">Paste a YouTube URL</label>
+          <label className="text-xs opacity-70 block mb-1">Paste a YouTube URL</label>
           <input className="admin-input w-full" placeholder="https://youtube.com/watch?v=…" value={url} onChange={(e) => setUrl(e.target.value)} />
         </div>
         <button className="btn btn-dark" onClick={saveManual}>Save</button>
       </div>
-      <p className="text-xs opacity-50 mt-2.5">
+      <p className="text-xs opacity-70 mt-2.5">
         Auto-find searches YouTube for the query above (videos uploaded within 14 days of the race date, under 5 minutes) and saves the first match. You can also paste a link directly.
       </p>
     </div>
@@ -513,7 +513,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               </td>
             </tr>
           ))}
-          {entries.length === 0 && <tr><td colSpan={11} className="opacity-60 text-sm">No entries yet.</td></tr>}
+          {entries.length === 0 && <tr><td colSpan={11} className="opacity-70 text-sm">No entries yet.</td></tr>}
         </tbody>
       </table>
       {editingId && (
@@ -523,29 +523,29 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
       )}
       <div className="flex gap-2 flex-wrap items-end">
         <div>
-          <label className="text-xs opacity-65 block mb-1">No.</label>
+          <label className="text-xs opacity-70 block mb-1">No.</label>
           <input type="number" className="admin-input w-20" value={runnerNo} onChange={(e) => setRunnerNo(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Gate</label>
+          <label className="text-xs opacity-70 block mb-1">Gate</label>
           <input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Horse</label>
+          <label className="text-xs opacity-70 block mb-1">Horse</label>
           <select className="admin-input" value={horseId} onChange={(e) => setHorseId(e.target.value)}>
             <option value="">Select a registered horse…</option>
             {availableHorses.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Jockey</label>
+          <label className="text-xs opacity-70 block mb-1">Jockey</label>
           <select className="admin-input" value={jockeyId} onChange={(e) => setJockeyId(e.target.value)}>
             <option value="">Not yet assigned</option>
             {jockeys.map((j) => <option key={j.id} value={j.id}>{j.name}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Weight (kg)</label>
+          <label className="text-xs opacity-70 block mb-1">Weight (kg)</label>
           <input type="number" className="admin-input w-24" value={weight} onChange={(e) => setWeight(e.target.value)} />
         </div>
         <button
@@ -578,9 +578,9 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
         )}
       </div>
       <ClubFields club={club} onChange={setClub} timeFactors />
-      <p className="text-xs opacity-50 mt-2.5">Win/Place odds, gear letters and tips are imported automatically and shown read-only. Club data above is yours to edit.</p>
+      <p className="text-xs opacity-70 mt-2.5">Win/Place odds, gear letters and tips are imported automatically and shown read-only. Club data above is yours to edit.</p>
       {horses.length === 0 && (
-        <p className="text-xs opacity-60 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
+        <p className="text-xs opacity-70 mt-2.5">No horses registered yet — add horses first, under the Horses section.</p>
       )}
       <style>{`.admin-input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 0.84rem; }`}</style>
     </div>
@@ -639,47 +639,47 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
               </td>
             </tr>
           ))}
-          {results.length === 0 && <tr><td colSpan={11} className="opacity-60 text-sm">No result entered yet.</td></tr>}
+          {results.length === 0 && <tr><td colSpan={11} className="opacity-70 text-sm">No result entered yet.</td></tr>}
         </tbody>
       </table>
       <div className="flex gap-2 flex-wrap items-end">
         <div>
-          <label className="text-xs opacity-65 block mb-1">Position</label>
+          <label className="text-xs opacity-70 block mb-1">Position</label>
           <input type="number" className="admin-input w-20" value={position} onChange={(e) => setPosition(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">No.</label>
+          <label className="text-xs opacity-70 block mb-1">No.</label>
           <input type="number" className="admin-input w-20" value={runnerNo} onChange={(e) => setRunnerNo(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Gate</label>
+          <label className="text-xs opacity-70 block mb-1">Gate</label>
           <input type="number" className="admin-input w-20" value={gate} onChange={(e) => setGate(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Horse</label>
+          <label className="text-xs opacity-70 block mb-1">Horse</label>
           <select className="admin-input" value={horseId} onChange={(e) => setHorseId(e.target.value)}>
             <option value="">Select a horse…</option>
             {horseOptions.map((h) => <option key={h.id} value={h.id}>{h.name}</option>)}
           </select>
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Jockey</label>
+          <label className="text-xs opacity-70 block mb-1">Jockey</label>
           <input className="admin-input" value={jockey} onChange={(e) => setJockey(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Time</label>
+          <label className="text-xs opacity-70 block mb-1">Time</label>
           <input className="admin-input" placeholder="1:24.10" value={finishTime} onChange={(e) => setFinishTime(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Margin</label>
+          <label className="text-xs opacity-70 block mb-1">Margin</label>
           <input className="admin-input w-24" placeholder="1.5L" value={margin} onChange={(e) => setMargin(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Starting price</label>
+          <label className="text-xs opacity-70 block mb-1">Starting price</label>
           <input className="admin-input w-24" placeholder="5/2" value={startingPrice} onChange={(e) => setStartingPrice(e.target.value)} />
         </div>
         <div>
-          <label className="text-xs opacity-65 block mb-1">Perf. rating</label>
+          <label className="text-xs opacity-70 block mb-1">Perf. rating</label>
           <input type="number" className="admin-input w-24" value={performanceRating} onChange={(e) => setPerformanceRating(e.target.value)} />
         </div>
         <button
@@ -702,7 +702,7 @@ function ResultsEditor({ raceId, results, horseOptions, onSave, onDelete }: {
         </button>
       </div>
       <ClubFields club={club} onChange={setClub} timeFactors={false} />
-      <p className="text-xs opacity-60 mt-2.5">
+      <p className="text-xs opacity-70 mt-2.5">
         Enter every finisher, not just the podium — a horse's starts/unplaced count depends on a result row existing for it.
       </p>
       <style>{`.admin-input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); font-size: 0.84rem; }`}</style>

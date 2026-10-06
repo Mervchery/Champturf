@@ -25,20 +25,20 @@ export default async function OwnersPage() {
         <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {owners.map((o) => (
             <div key={o.id} className="card">
-              <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+              <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                 <User size={30} />
               </div>
               <div className="p-4">
-                <h4 className="font-semibold">{o.name}</h4>
+                <h2 className="font-semibold">{o.name}</h2>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{o.horses}</b>{t("Horses")}</div>
                   <div><b className="block font-mono text-sm">{o.wins}</b>{t("Career wins")}</div>
                 </div>
-                <div className="text-xs opacity-60 mt-2.5">{o.achievements ?? t("N/A")}</div>
+                <div className="text-xs opacity-70 mt-2.5">{o.achievements ?? t("N/A")}</div>
               </div>
             </div>
           ))}
-          {owners.length === 0 && <p className="text-sm opacity-60">{t("No owners yet.")}</p>}
+          {owners.length === 0 && <p className="text-sm opacity-70">{t("No owners yet.")}</p>}
         </div>
       </section>
     </div>

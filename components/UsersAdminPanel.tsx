@@ -21,7 +21,7 @@ export default function UsersAdminPanel({ profiles, notify }: { profiles: Profil
   return (
     <div>
       <h2 className="font-display text-2xl mb-5">Users &amp; roles</h2>
-      <p className="text-sm opacity-60 mb-4">
+      <p className="text-sm opacity-70 mb-4">
         Everyone who signs up appears here as a Member. Grant a role to give someone access to the dashboard.
       </p>
       <div className="panel !p-0 overflow-hidden">
@@ -43,7 +43,7 @@ export default function UsersAdminPanel({ profiles, notify }: { profiles: Profil
                 </td>
               </tr>
             ))}
-            {profiles.length === 0 && <tr><td colSpan={2} className="text-sm opacity-60">No users yet.</td></tr>}
+            {profiles.length === 0 && <tr><td colSpan={2} className="text-sm opacity-70">No users yet.</td></tr>}
           </tbody>
         </table>
       </div>

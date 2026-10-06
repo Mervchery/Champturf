@@ -14,18 +14,20 @@ export default async function Ticker() {
   const doubled = [...texts, ...texts];
 
   return (
-    <div className="bg-gold2 text-ink overflow-hidden whitespace-nowrap border-y border-black/5">
+    <section aria-label={t("Latest headlines")} className="bg-gold2 text-ink overflow-hidden whitespace-nowrap border-y border-black/5">
       <div className="inline-flex gap-10 py-2.5 animate-[scroll_32s_linear_infinite]">
-        {doubled.map((t, i) => (
-          <span key={i} className="text-xs font-semibold inline-flex items-center gap-2">
+        {doubled.map((text, i) => (
+          // The list is repeated so the marquee loops seamlessly; only the first
+          // copy is exposed to screen readers.
+          <span key={i} aria-hidden={i >= texts.length ? true : undefined} className="text-xs font-semibold inline-flex items-center gap-2">
             <Diamond size={10} fill="currentColor" />
-            {t}
+            {text}
           </span>
         ))}
       </div>
       <style>{`
         @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
       `}</style>
-    </div>
+    </section>
   );
 }

@@ -34,16 +34,16 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
         </button>
       </div>
 
-      {filtered.length === 0 && <p className="text-sm opacity-60">{t("No results match your search.")}</p>}
+      {filtered.length === 0 && <p className="text-sm opacity-70">{t("No results match your search.")}</p>}
 
       {filtered.map((r) => (
         <div key={r.id} className="panel mb-4">
           <div className="flex justify-between flex-wrap gap-2">
-            <h4 className="font-semibold">{r.name}</h4>
-            <span className="text-sm opacity-60">{r.race_date} · {r.course} · {r.distance}</span>
+            <h2 className="font-semibold">{r.name}</h2>
+            <span className="text-sm opacity-70">{r.race_date} · {r.course} · {r.distance}</span>
           </div>
           {r.results.length === 0 ? (
-            <p className="text-sm opacity-60 mt-2">{t("No result entered yet.")}</p>
+            <p className="text-sm opacity-70 mt-2">{t("No result entered yet.")}</p>
           ) : (
             <table className="mt-3">
               <thead><tr><th>{t("Pos")}</th><th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Jockey")}</th><th>{t("Time")}</th></tr></thead>

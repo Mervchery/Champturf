@@ -17,9 +17,9 @@ export default async function SearchPage({ searchParams }: { searchParams: { q?:
   return (
     <section className="py-10">
       <div className="wrap">
-        <h2 className="font-display text-2xl mb-5">{t("Search results for")} &ldquo;{q}&rdquo;</h2>
+        <h1 className="font-display text-2xl mb-5">{t("Search results for")} &ldquo;{q}&rdquo;</h1>
         {results.length === 0 ? (
-          <p className="text-sm opacity-60">{t("No matches found.")}</p>
+          <p className="text-sm opacity-70">{t("No matches found.")}</p>
         ) : (
           <div className="panel">
             {results.map((r, i) => (

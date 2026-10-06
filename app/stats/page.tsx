@@ -40,7 +40,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
         <div className="wrap">
           <div className="flex gap-1 border-b border-line mb-7 overflow-x-auto">
             {TABS.map(([id, label]) => (
-              <Link key={id} href={`/stats?tab=${id}`} className={`pb-2.5 pr-5 text-sm whitespace-nowrap border-b-2 ${tab === id ? "border-coral font-semibold" : "border-transparent opacity-55"}`}>
+              <Link key={id} href={`/stats?tab=${id}`} className={`pb-2.5 pr-5 text-sm whitespace-nowrap border-b-2 ${tab === id ? "border-coral font-semibold" : "border-transparent opacity-70"}`}>
                 {t(label)}
               </Link>
             ))}

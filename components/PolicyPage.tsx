@@ -24,7 +24,7 @@ export default function PolicyPage({ title, intro, sections, current }: {
         <div className="wrap">
           <span className="text-xs font-semibold text-gold2">{t("LEGAL")}</span>
           <h1 className="text-3xl font-display mt-1">{t(title)}</h1>
-          <p className="text-sm text-white/60 mt-1">{t("Last updated")}: {SITE.updated}</p>
+          <p className="text-sm text-white/75 mt-1">{t("Last updated")}: {SITE.updated}</p>
         </div>
       </div>
       <section className="py-8 md:py-12">
@@ -56,7 +56,7 @@ export default function PolicyPage({ title, intro, sections, current }: {
                 )}
               </div>
             ))}
-            <p className="mt-8 text-sm opacity-60">
+            <p className="mt-8 text-sm opacity-70">
               {t("Questions? Contact us at")} <a className="underline" href={`mailto:${SITE.contactEmail}`}>{SITE.contactEmail}</a>.
             </p>
           </article>

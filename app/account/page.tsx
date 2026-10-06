@@ -30,7 +30,7 @@ export default async function AccountPage() {
   return (
     <section className="py-12">
       <div className="wrap max-w-xl">
-        <span className="text-xs font-semibold text-coral">{t("YOUR ACCOUNT")}</span>
+        <span className="text-xs font-semibold text-coral-ink">{t("YOUR ACCOUNT")}</span>
         <h1 className="font-display text-3xl mt-1 mb-6">{t("My account")}</h1>
 
         <div className="card no-hover p-6">
@@ -43,18 +43,18 @@ export default async function AccountPage() {
             )}
             <div className="min-w-0">
               <div className="font-semibold truncate">{name ?? user.email}</div>
-              {name && <div className="text-sm opacity-65 truncate">{user.email}</div>}
+              {name && <div className="text-sm opacity-70 truncate">{user.email}</div>}
               <span className={`pill mt-1.5 inline-block ${isStaff ? "pill-gold" : "pill-outline"}`}>{isStaff ? profile?.role : t("Member")}</span>
             </div>
           </div>
 
           <dl className="mt-6 grid grid-cols-2 gap-4 text-sm">
             <div>
-              <dt className="text-xs opacity-55">{t("Signed in with")}</dt>
+              <dt className="text-xs opacity-70">{t("Signed in with")}</dt>
               <dd className="font-medium capitalize">{provider === "email" ? t("Email") : provider}</dd>
             </div>
             <div>
-              <dt className="text-xs opacity-55">{t("Member since")}</dt>
+              <dt className="text-xs opacity-70">{t("Member since")}</dt>
               <dd className="font-medium">{since}</dd>
             </div>
           </dl>
@@ -69,7 +69,7 @@ export default async function AccountPage() {
 
         <div className="card no-hover p-6 mt-6">
           <h2 className="font-display text-xl">{t("Race-day alerts")}</h2>
-          <p className="text-sm opacity-65 mt-1 mb-4">{t("Follow a horse to hear when it is declared to run, when its odds move and how it finished.")}</p>
+          <p className="text-sm opacity-70 mt-1 mb-4">{t("Follow a horse to hear when it is declared to run, when its odds move and how it finished.")}</p>
           <PushToggle />
         </div>
 

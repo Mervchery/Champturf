@@ -50,7 +50,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
 
       <section className="py-10">
         <div className="wrap">
-          <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">← {t("All race days")}</Link>
+          <Link href="/race-days" className="inline-block text-sm border-b border-ink pb-1">← {t("All race days")}</Link>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6 mb-10">
             <div className="stat-tile"><div className="v">{races.length}</div><div className="l">{t("Races")}</div></div>
@@ -65,9 +65,9 @@ export default async function RaceDayPage({ params }: { params: { date: string }
                 <Trophy size={20} className="text-ink" />
               </div>
               <div>
-                <span className="text-xs font-semibold opacity-60">{t("FEATURED RACE")}</span>
+                <span className="text-xs font-semibold opacity-70">{t("FEATURED RACE")}</span>
                 <div className="font-display text-lg leading-snug">{featured.name}</div>
-                <div className="text-xs opacity-60 mt-0.5">{featured.distance} · {fmtMoney(featured.prize, lang)}</div>
+                <div className="text-xs opacity-70 mt-0.5">{featured.distance} · {fmtMoney(featured.prize, lang)}</div>
               </div>
             </div>
           )}
@@ -83,7 +83,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
                     {r.status === "completed" && <span className="pill">{t("Result in")}</span>}
                   </div>
                   <div className="font-display text-base mt-1.5 truncate">{r.name}</div>
-                  <div className="text-xs opacity-60 mt-0.5">{r.distance} · {fmtMoney(r.prize, lang)}</div>
+                  <div className="text-xs opacity-70 mt-0.5">{r.distance} · {fmtMoney(r.prize, lang)}</div>
                 </div>
               </Link>
             ))}

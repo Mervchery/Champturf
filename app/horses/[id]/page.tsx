@@ -66,7 +66,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
       </div>
       <section className="py-14">
         <div className="wrap">
-          <Link href="/horses" className="text-sm border-b border-ink pb-0.5">← {t("Back to horses")}</Link>
+          <Link href="/horses" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to horses")}</Link>
 
           <h2 className="font-display text-xl mt-7 mb-4">{t("Career record")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-2">
@@ -79,7 +79,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
             <div className="panel min-w-0">
-              <h4 className="text-sm font-semibold mb-3">{t("Connections")}</h4>
+              <h3 className="text-sm font-semibold mb-3">{t("Connections")}</h3>
               <table>
                 <tbody>
                   <tr><td>{t("Owner")}</td><td>{h.owner ? <Link href="/owners" className="font-semibold hover:underline">{h.owner.name}</Link> : t("Unknown")}</td></tr>
@@ -90,9 +90,9 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               </table>
             </div>
             <div className="panel">
-              <h4 className="text-sm font-semibold mb-3">{t("Recent form")}</h4>
+              <h3 className="text-sm font-semibold mb-3">{t("Recent form")}</h3>
               {form.length === 0 ? (
-                <p className="text-sm opacity-60">{t("No results recorded for this horse yet.")}</p>
+                <p className="text-sm opacity-70">{t("No results recorded for this horse yet.")}</p>
               ) : (
                 <div className="flex gap-2">
                   {form.map((f, i) => (
@@ -105,7 +105,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
 
           <h2 className="font-display text-xl mb-4">{t("Race history")}</h2>
           {formHistory.length === 0 ? (
-            <p className="text-sm opacity-60">{t("No races recorded for this horse yet.")}</p>
+            <p className="text-sm opacity-70">{t("No races recorded for this horse yet.")}</p>
           ) : (
             <div className="panel !p-0 overflow-hidden">
               <table>
@@ -115,7 +115,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                     <tr key={i}>
                       <td><span className={`pill ${f.position === 1 ? "pill-gold" : "pill-outline"}`}>{f.position}</span></td>
                       <td><Link href={`/races/${f.raceId}`} className="hover:underline">{f.raceName}</Link></td>
-                      <td className="text-xs opacity-60">{f.raceDate}</td>
+                      <td className="text-xs opacity-70">{f.raceDate}</td>
                     </tr>
                   ))}
                 </tbody>

@@ -7,6 +7,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Champ Turf — Mauritius Horse Racing",
     short_name: "Champ Turf",
     description: "Race cards, live odds movement, results and horse records for every meeting at Champ de Mars.",
+    id: "/",
     start_url: "/",
     scope: "/",
     display: "standalone",

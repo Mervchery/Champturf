@@ -72,9 +72,9 @@ export default function AdminDashboard({
   return (
     <div className="grid grid-cols-1 md:grid-cols-[220px_1fr] min-h-[75vh]">
       <aside className="bg-turf text-white p-4 md:p-6 flex md:flex-col gap-1 overflow-x-auto">
-        <div className="hidden md:block text-xs opacity-60 mb-4">
+        <div className="hidden md:block text-xs opacity-70 mb-4">
           Signed in as <b className="text-gold2">{email}</b>
-          <div className="text-white/50 mt-0.5">{role}</div>
+          <div className="text-white/75 mt-0.5">{role}</div>
         </div>
         {SECTIONS.map(([id, label, Icon]) => (
           <button
@@ -97,7 +97,7 @@ export default function AdminDashboard({
         </div>
       </aside>
 
-      <main className="p-5 md:p-8 bg-parchment relative">
+      <div className="p-5 md:p-8 bg-parchment relative">
         {toast && (
           <div className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-ink text-parchment px-5 py-3 rounded-full text-sm z-50">
             {toast}
@@ -114,7 +114,7 @@ export default function AdminDashboard({
               <Kpi label="Published articles" value={news.length} />
             </div>
             <div className="panel">
-              <h4 className="text-sm font-semibold mb-3">At a glance</h4>
+              <h3 className="text-sm font-semibold mb-3">At a glance</h3>
               <table>
                 <tbody>
                   <tr><td>Trainers</td><td>{trainers.length}</td></tr>
@@ -147,7 +147,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "raceDays" && "Add a row here for any date that already has races to attach weather and track condition to that meeting — races themselves are still managed under Races."}
         </p>
 
@@ -182,7 +182,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "horses" && "Wins/placed/starts/earnings aren't editable here — they're computed automatically from entered race results. Owner/Trainer are picked from existing records, not typed — renaming one updates every horse that references it. Stable is derived from the horse's trainer — only set it by hand if the trainer isn't linked to a stable yet. Silk image is filled in automatically; only set it by hand for a new arrival or to correct one."}
         </p>
 
@@ -207,7 +207,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "jockeys" && "Wins/places/win %/rides aren't editable here — they're computed automatically from entered race results."}
         </p>
 
@@ -232,7 +232,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "apprentices" && "Mentor is picked from existing professional jockeys, not typed — renaming a jockey updates every apprentice that references them as mentor. Wins/places/rides aren't editable here — computed automatically from race results, same as professional jockeys."}
         </p>
 
@@ -254,7 +254,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "trainers" && "Stable is picked from existing records, not typed — renaming a stable updates every trainer (and horse) that references it. Wins/horses trained/ranking aren't editable here — computed automatically from race results and each horse's current trainer."}
         </p>
 
@@ -282,7 +282,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "stables" && "Horses (count) isn't editable here — computed automatically from how many horses currently have this stable assigned. Linking a trainer here pulls in every horse that trainer has, and horses assigned to that trainer later follow automatically. Stable silks aren't imported — set them by hand."}
         </p>
 
@@ -302,7 +302,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "owners" && "Horses (count) and wins aren't editable here — computed automatically from the horses currently assigned to this owner and their race results."}
         </p>
 
@@ -378,7 +378,7 @@ export default function AdminDashboard({
             ]}
           />
         )}
-        <p className="text-xs opacity-50 mt-3">
+        <p className="text-xs opacity-70 mt-3">
           {section === "ticker" && "This feeds the scrolling ticker shown at the top of every page. If the list is empty, a single default message shows instead. Order controls left-to-right position — items with the same order fall back to creation order."}
         </p>
 
@@ -391,7 +391,7 @@ export default function AdminDashboard({
               sections) and the public <code>/stats</code> page updates immediately.
             </p>
             <div className="panel">
-              <h4 className="text-sm font-semibold mb-3">Current #1 by wins</h4>
+              <h3 className="text-sm font-semibold mb-3">Current #1 by wins</h3>
               <table>
                 <tbody>
                   <tr><td>Horse</td><td>{[...horses].sort((a, b) => b.wins - a.wins)[0]?.name ?? "—"}</td></tr>
@@ -404,7 +404,7 @@ export default function AdminDashboard({
         )}
 
         {section === "users" && <UsersAdminPanel profiles={profiles} notify={notify} />}
-      </main>
+      </div>
     </div>
   );
 }
@@ -413,7 +413,7 @@ function Kpi({ label, value }: { label: string; value: number }) {
   return (
     <div className="panel">
       <div className="font-mono text-2xl font-semibold">{value}</div>
-      <div className="text-xs opacity-60 mt-1">{label}</div>
+      <div className="text-xs opacity-70 mt-1">{label}</div>
     </div>
   );
 }

@@ -110,7 +110,7 @@ export default function EntityAdminPanel({
               ) : null,
             ])}
             {rows.length === 0 && (
-              <tr><td colSpan={columns.length + 1} className="text-sm opacity-60">No rows yet.</td></tr>
+              <tr><td colSpan={columns.length + 1} className="text-sm opacity-70">No rows yet.</td></tr>
             )}
           </tbody>
         </table>
@@ -157,7 +157,7 @@ function EntityForm({ fields, initial, onSubmit, onCancel }: {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
         {fields.map((f) => (
           <div key={f.key} className={f.type === "textarea" ? "sm:col-span-2" : ""}>
-            <label className="text-xs opacity-65 block mb-1.5">{f.label}</label>
+            <label className="text-xs opacity-70 block mb-1.5">{f.label}</label>
             {f.type === "checkbox" ? (
               <input type="checkbox" checked={!!values[f.key]} onChange={(e) => setField(f.key, e.target.checked)} className="w-4 h-4" />
             ) : f.type === "textarea" ? (

@@ -14,13 +14,15 @@ const config: Config = {
         gold: "var(--gold)",
         gold2: "var(--gold-2)",
         coral: "var(--coral)",
+        // Coral as *text* — a lighter tint in dark mode, where the fill colour above is too dark to read.
+        "coral-ink": "var(--coral-ink)",
         surface: "var(--surface)",
         line: "var(--line)",
       },
       fontFamily: {
-        display: ["Fraunces", "serif"],
-        sans: ["'IBM Plex Sans'", "sans-serif"],
-        mono: ["'IBM Plex Mono'", "monospace"],
+        display: ["var(--font-display)", "serif"],
+        sans: ["var(--font-sans)", "sans-serif"],
+        mono: ["var(--font-mono)", "monospace"],
       },
       borderRadius: {
         card: "16px",

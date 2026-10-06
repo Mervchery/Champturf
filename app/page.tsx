@@ -54,8 +54,8 @@ export default async function HomePage() {
           {feature ? (
             <div className="bg-white/[0.06] border border-white/15 rounded backdrop-blur-md p-5">
               <span className="text-[0.7rem] font-semibold text-gold2">{t("FEATURED RACE OF THE WEEK")}</span>
-              <h3 className="text-white text-2xl mt-2 font-display">{feature.name}</h3>
-              <div className="text-white/65 text-sm mt-1.5">
+              <h2 className="text-white text-2xl mt-2 font-display">{feature.name}</h2>
+              <div className="text-white/75 text-sm mt-1.5">
                 {feature.course} · {feature.distance} · {fmtMoney(feature.prize, lang)}
               </div>
               <Countdown target={`${feature.race_date}T${feature.race_time}`} />
@@ -63,7 +63,7 @@ export default async function HomePage() {
           ) : (
             <div className="bg-white/[0.06] border border-white/15 rounded backdrop-blur-md p-5">
               <span className="text-[0.7rem] font-semibold text-gold2">{t("NO UPCOMING RACE SCHEDULED")}</span>
-              <p className="text-white/65 text-sm mt-2">{t("Check back soon for the next meeting.")}</p>
+              <p className="text-white/75 text-sm mt-2">{t("Check back soon for the next meeting.")}</p>
             </div>
           )}
         </div>
@@ -74,23 +74,23 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Recent results")}</h2>
-            <Link href="/results" className="text-sm border-b border-ink pb-0.5">{t("Full results centre")} →</Link>
+            <Link href="/results" className="inline-block text-sm border-b border-ink pb-1">{t("Full results centre")} →</Link>
           </div>
           {completedWithResults.length === 0 ? (
-            <p className="text-sm opacity-60">{t("No results yet.")}</p>
+            <p className="text-sm opacity-70">{t("No results yet.")}</p>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
               {completedWithResults.map((r) => {
                 const win = r.results[0];
                 return (
                   <Link key={r.id} href={`/races/${r.id}`} className="card">
-                    <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                    <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                       <Trophy size={32} />
                     </div>
                     <div className="p-4">
                       <span className="pill pill-coral">{r.race_date}</span>
-                      <h4 className="mt-2 font-semibold">{r.name}</h4>
-                      <div className="text-xs opacity-60 mt-1">
+                      <h3 className="mt-2 font-semibold">{r.name}</h3>
+                      <div className="text-xs opacity-70 mt-1">
                         {win ? t("Winner: {horse} — {jockey}, {time}", { horse: win.horses?.name ?? "—", jockey: win.jockey, time: win.finish_time ?? "" }) : t("Result pending")}
                       </div>
                     </div>
@@ -108,15 +108,15 @@ export default async function HomePage() {
           <div>
             <div className="flex justify-between items-end mb-4">
               <h2 className="font-display text-xl">{t("Leading horses")}</h2>
-              <Link href="/stats" className="text-sm border-b border-ink pb-0.5">{t("Statistics centre")} →</Link>
+              <Link href="/stats" className="inline-block text-sm border-b border-ink pb-1">{t("Statistics centre")} →</Link>
             </div>
             <div className="panel">
               {topHorses.map((h, i) => (
                 <Link key={h.id} href={`/horses/${h.id}`} className="grid grid-cols-[32px_1fr_auto] gap-3.5 items-center py-3 border-b border-line last:border-0">
-                  <div className="font-mono text-sm text-coral font-semibold">{i + 1}</div>
+                  <div className="font-mono text-sm text-coral-ink font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{h.name}</div>
-                    <div className="text-xs opacity-60">{h.trainer?.name ?? t("Unknown")}</div>
+                    <div className="text-xs opacity-70">{h.trainer?.name ?? t("Unknown")}</div>
                   </div>
                   <div className="font-mono font-semibold text-right">{h.wins}{t("W")}</div>
                 </Link>
@@ -126,15 +126,15 @@ export default async function HomePage() {
           <div>
             <div className="flex justify-between items-end mb-4">
               <h2 className="font-display text-xl">{t("Leading jockeys")}</h2>
-              <Link href="/stats" className="text-sm border-b border-ink pb-0.5">{t("Statistics centre")} →</Link>
+              <Link href="/stats" className="inline-block text-sm border-b border-ink pb-1">{t("Statistics centre")} →</Link>
             </div>
             <div className="panel">
               {topJockeys.map((j, i) => (
                 <Link key={j.id} href={`/jockeys/${j.id}`} className="grid grid-cols-[32px_1fr_auto] gap-3.5 items-center py-3 border-b border-line last:border-0">
-                  <div className="font-mono text-sm text-coral font-semibold">{i + 1}</div>
+                  <div className="font-mono text-sm text-coral-ink font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{j.name}</div>
-                    <div className="text-xs opacity-60">{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</div>
+                    <div className="text-xs opacity-70">{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</div>
                   </div>
                   <div className="font-mono font-semibold text-right">{j.wins}{t("W")}</div>
                 </Link>
@@ -149,17 +149,17 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Upcoming race days")}</h2>
-            <Link href="/race-days" className="text-sm border-b border-ink pb-0.5">{t("See calendar")} →</Link>
+            <Link href="/race-days" className="inline-block text-sm border-b border-ink pb-1">{t("See calendar")} →</Link>
           </div>
           {upcoming.length === 0 ? (
-            <p className="text-sm opacity-60">{t("No upcoming races scheduled.")}</p>
+            <p className="text-sm opacity-70">{t("No upcoming races scheduled.")}</p>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
               {upcoming.map((r) => (
                 <Link key={r.id} href={`/races/${r.id}`} className="card p-4">
                   <span className="pill pill-gold">{r.race_date}</span>
-                  <h4 className="mt-2 text-sm font-semibold">{r.name}</h4>
-                  <div className="text-xs opacity-60 mt-1">{r.distance} · {fmtMoney(r.prize, lang)}</div>
+                  <h3 className="mt-2 text-sm font-semibold">{r.name}</h3>
+                  <div className="text-xs opacity-70 mt-1">{r.distance} · {fmtMoney(r.prize, lang)}</div>
                 </Link>
               ))}
             </div>
@@ -172,18 +172,18 @@ export default async function HomePage() {
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Latest news")}</h2>
-            <Link href="/news" className="text-sm border-b border-ink pb-0.5">{t("All news")} →</Link>
+            <Link href="/news" className="inline-block text-sm border-b border-ink pb-1">{t("All news")} →</Link>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {news.slice(0, 3).map((n) => (
               <div key={n.id} className="card">
-                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                   <Newspaper size={28} />
                 </div>
                 <div className="p-4">
                   <span className="pill">{t(n.category)}</span>
-                  <h4 className="mt-2 font-semibold">{n.title}</h4>
-                  <div className="text-xs opacity-55 mt-2">{n.article_date}</div>
+                  <h3 className="mt-2 font-semibold">{n.title}</h3>
+                  <div className="text-xs opacity-70 mt-2">{n.article_date}</div>
                 </div>
               </div>
             ))}

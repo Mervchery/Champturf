@@ -2,7 +2,7 @@ import { GallopLoader, RunnerSkeleton, SkeletonLine } from "@/components/PageLoa
 
 export default function RaceLoading() {
   return (
-    <div>
+    <div data-route-loading>
       <div className="detail-hero">
         <div className="wrap">
           <SkeletonLine w={120} h={12} className="!bg-white/20" />

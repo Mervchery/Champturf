@@ -2,6 +2,14 @@
 // falls back to the English text. Horse, jockey, trainer, stable, owner and
 // race names are never passed through this table.
 export const fr: Record<string, string> = {
+  // Friendly auth errors
+  "Wrong email or password. If you don't have an account yet, create one below.": "E-mail ou mot de passe incorrect. Si vous n'avez pas encore de compte, créez-en un ci-dessous.",
+  "Please confirm your email first — check your inbox for the link.": "Veuillez d'abord confirmer votre e-mail — consultez votre boîte de réception.",
+  "That password is too weak. Use at least 8 characters.": "Ce mot de passe est trop faible. Utilisez au moins 8 caractères.",
+  "Too many attempts. Please wait a minute and try again.": "Trop de tentatives. Patientez une minute puis réessayez.",
+  "That email address doesn't look right.": "Cette adresse e-mail ne semble pas valide.",
+  "Can't reach the server. Check your connection and try again.": "Impossible de joindre le serveur. Vérifiez votre connexion et réessayez.",
+  "Something went wrong. Please try again.": "Une erreur est survenue. Veuillez réessayer.",
   // Follow & race-day alerts
   "Follow": "Suivre",
   "Following": "Suivi",
@@ -378,6 +386,8 @@ export const fr: Record<string, string> = {
   // Policies & members-only chat
   "LEGAL": "MENTIONS LÉGALES",
   "Legal": "Mentions légales",
+  "Main navigation": "Navigation principale",
+  "Latest headlines": "Dernières nouvelles",
   "Last updated": "Dernière mise à jour",
   "Questions? Contact us at": "Une question ? Écrivez-nous à",
   "Privacy Policy": "Politique de confidentialité",

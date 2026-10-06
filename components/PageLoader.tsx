@@ -10,7 +10,7 @@ export function GallopLoader({ label = "Loading the field…" }: { label?: strin
         <HorseIcon size={32} className="loader-horse" />
         <div className="loader-ground" />
       </div>
-      <span className="text-xs opacity-60">{t(label)}</span>
+      <span className="text-xs opacity-70">{t(label)}</span>
     </div>
   );
 }

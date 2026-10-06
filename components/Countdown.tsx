@@ -29,7 +29,7 @@ export default function Countdown({ target }: { target: string }) {
       {items.map(([label, value]) => (
         <div key={label} className="text-center">
           <div className="font-mono text-2xl font-semibold text-gold2">{String(value).padStart(2, "0")}</div>
-          <div className="text-[0.65rem] text-white/60 mt-0.5">{t(label)}</div>
+          <div className="text-[0.65rem] text-white/75 mt-0.5">{t(label)}</div>
         </div>
       ))}
     </div>

@@ -51,7 +51,7 @@ export default async function RaceDaysPage() {
             </>
           )}
 
-          {days.length === 0 && <p className="text-sm opacity-60">{t("No race days yet.")}</p>}
+          {days.length === 0 && <p className="text-sm opacity-70">{t("No race days yet.")}</p>}
         </div>
       </section>
     </div>
@@ -68,15 +68,15 @@ function RaceDayCard({ day }: { day: Awaited<ReturnType<typeof getRaceDays>>[num
         <span className={`pill ${day.status === "upcoming" ? "pill-gold" : "pill-outline"}`}>
           {day.status === "mixed" ? t("In progress") : day.status === "upcoming" ? t("Upcoming") : t("Completed")}
         </span>
-        <CalendarDays size={16} className="opacity-40" />
+        <CalendarDays size={16} className="opacity-70" />
       </div>
       <h3 className="font-display text-lg leading-snug">{dateLabel}</h3>
-      <div className="text-sm opacity-60 mt-1">{day.course}</div>
+      <div className="text-sm opacity-70 mt-1">{day.course}</div>
       <div className="flex items-center gap-4 mt-4 text-xs">
         <span className="flex items-center gap-1.5 opacity-70"><Flag size={13} /> {t(day.raceCount === 1 ? "{n} race" : "{n} races", { n: day.raceCount })}</span>
         {day.weather && <span className="flex items-center gap-1.5 opacity-70"><CloudSun size={13} /> {day.weather}</span>}
       </div>
-      <div className="mt-3 font-mono text-sm font-semibold">{fmtMoney(day.totalPrize, lang)} <span className="font-sans font-normal opacity-50 text-xs">{t("total purse")}</span></div>
+      <div className="mt-3 font-mono text-sm font-semibold">{fmtMoney(day.totalPrize, lang)} <span className="font-sans font-normal opacity-70 text-xs">{t("total purse")}</span></div>
     </Link>
   );
 }

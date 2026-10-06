@@ -45,11 +45,11 @@ export default function ResetPasswordPage() {
           <p className="text-sm mt-3">{t("Password updated.")}</p>
         ) : (
           <form onSubmit={onSubmit} className="mt-5">
-            <label className="text-xs opacity-65 block mb-1.5" htmlFor="rp-pass">{t("New password")}</label>
+            <label className="text-xs opacity-70 block mb-1.5" htmlFor="rp-pass">{t("New password")}</label>
             <input id="rp-pass" type="password" className={`${inputCls} mb-3.5`} value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" />
-            <label className="text-xs opacity-65 block mb-1.5" htmlFor="rp-confirm">{t("Confirm password")}</label>
+            <label className="text-xs opacity-70 block mb-1.5" htmlFor="rp-confirm">{t("Confirm password")}</label>
             <input id="rp-confirm" type="password" className={inputCls} value={confirm} onChange={(e) => setConfirm(e.target.value)} autoComplete="new-password" />
-            {error && <div role="alert" className="text-coral text-sm mt-3">{error}</div>}
+            {error && <div role="alert" className="text-coral-ink text-sm mt-3">{error}</div>}
             <button type="submit" disabled={loading || ready === null} className="btn btn-dark w-full justify-center mt-5 disabled:opacity-60">
               {loading ? t("Please wait…") : t("Update password")}
             </button>

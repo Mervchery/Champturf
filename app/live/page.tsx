@@ -47,9 +47,9 @@ export default async function LivePage() {
                   <StreamPlayer stream={stream} />
                 </>
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-white/50">
+                <div className="w-full h-full flex items-center justify-center text-white/75">
                   <div className="text-center px-4">
-                    <Play size={28} className="mx-auto opacity-60" />
+                    <Play size={28} className="mx-auto opacity-70" />
                     <div className="text-sm mt-2">{t("No live stream right now — check back during a race day.")}</div>
                   </div>
                 </div>
@@ -62,11 +62,11 @@ export default async function LivePage() {
             <div className="flex justify-between items-end mb-3">
               <h2 className="text-xl font-display">{t("Replay archive")}</h2>
             </div>
-            {replays.length === 0 && <p className="text-sm opacity-60">{t("No completed races yet.")}</p>}
+            {replays.length === 0 && <p className="text-sm opacity-70">{t("No completed races yet.")}</p>}
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
               {replays.map((r) => (
                 <Link key={r.id} href={`/races/${r.id}`} className="card overflow-hidden">
-                  <div className="relative h-[110px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                  <div className="relative h-[110px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                     {r.youtube_video_id && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
@@ -85,8 +85,8 @@ export default async function LivePage() {
                     </span>
                   </div>
                   <div className="p-3">
-                    <h4 className="text-sm font-semibold">{r.name}</h4>
-                    <div className="text-xs opacity-60">{r.race_date}</div>
+                    <h3 className="text-sm font-semibold">{r.name}</h3>
+                    <div className="text-xs opacity-70">{r.race_date}</div>
                   </div>
                 </Link>
               ))}

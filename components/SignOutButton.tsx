@@ -19,7 +19,7 @@ export default function SignOutButton({ variant = "button" }: { variant?: "butto
   }
 
   if (variant === "link") {
-    return <button type="button" onClick={signOut} disabled={busy} className="underline font-semibold">{t("Sign out")}</button>;
+    return <button type="button" onClick={signOut} disabled={busy} className="tap underline font-semibold">{t("Sign out")}</button>;
   }
   return (
     <button type="button" onClick={signOut} disabled={busy} className="btn btn-outline disabled:opacity-60">

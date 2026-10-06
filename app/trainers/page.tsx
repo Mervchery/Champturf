@@ -31,7 +31,7 @@ export default async function TrainersPage() {
                     bottom-right edge — one integrated emblem instead of two
                     separate circles floating side by side. */}
                 <div className="relative w-16 h-16 shrink-0">
-                  <div className="w-full h-full rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-white/60 overflow-hidden">
+                  <div className="w-full h-full rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-white/75 overflow-hidden">
                     {tr.photo_url ? (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={tr.photo_url} alt={tr.name} className="w-full h-full object-cover" />
@@ -47,8 +47,8 @@ export default async function TrainersPage() {
                 </div>
               </div>
               <div className="p-4">
-                <h4 className="font-semibold">{tr.name}</h4>
-                <div className="text-xs opacity-60 mt-1">{tr.stable?.name ?? t("Unknown")}</div>
+                <h2 className="font-semibold">{tr.name}</h2>
+                <div className="text-xs opacity-70 mt-1">{tr.stable?.name ?? t("Unknown")}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{tr.wins}</b>{t("Wins")}</div>
                   <div><b className="block font-mono text-sm">{tr.horses}</b>{t("Horses")}</div>

@@ -57,11 +57,23 @@ export default function UserMenu() {
 
   const circle = "flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15";
 
-  if (!loaded) return <span className={`${circle} opacity-50`} aria-hidden="true" />;
+  const signInBtn = "flex items-center gap-1.5 h-9 px-3 rounded-full bg-gold2 text-ink text-sm font-semibold";
+
+  // Until the session check finishes we don't know whether this is "Sign in" or an
+  // avatar. Most visitors are signed out, so reserve exactly the footprint of the
+  // "Sign in" button (same markup, invisible, not focusable) — the header no longer
+  // re-flows when the answer arrives.
+  if (!loaded) {
+    return (
+      <span className={`${signInBtn} invisible`} aria-hidden="true">
+        <UserIcon size={16} /> <span className="hidden sm:inline">{t("Sign in")}</span>
+      </span>
+    );
+  }
 
   if (!me) {
     return (
-      <Link href="/login" className="flex items-center gap-1.5 h-9 px-3 rounded-full bg-gold2 text-ink text-sm font-semibold" aria-label={t("Sign in")}>
+      <Link href="/login" className={signInBtn} aria-label={t("Sign in")}>
         <UserIcon size={16} /> <span className="hidden sm:inline">{t("Sign in")}</span>
       </Link>
     );
@@ -89,7 +101,7 @@ export default function UserMenu() {
         <div role="menu" className="absolute right-0 mt-2 w-60 rounded-xl bg-surface text-ink shadow-lg border border-line z-50 overflow-hidden">
           <div className="px-4 py-3 border-b border-line">
             <div className="text-sm font-semibold truncate">{me.name ?? me.email}</div>
-            {me.name && <div className="text-xs opacity-60 truncate">{me.email}</div>}
+            {me.name && <div className="text-xs opacity-70 truncate">{me.email}</div>}
           </div>
           <Link href="/account" role="menuitem" onClick={() => setOpen(false)} className="flex items-center gap-2.5 px-4 py-2.5 text-sm hover:bg-black/5">
             <UserIcon size={15} /> {t("My account")}

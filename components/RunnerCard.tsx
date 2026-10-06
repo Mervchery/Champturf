@@ -22,7 +22,7 @@ function PrizeWon({ position, racePrize, prizeSplit }: { position: number; raceP
   if (real != null) return <>{fmtMoney(real, lang)}</>;
   // …otherwise the 60/20/10 estimate used for horse earnings — display only.
   const pct = position === 1 ? 0.6 : position === 2 ? 0.2 : position === 3 ? 0.1 : 0;
-  if (pct === 0) return <span className="opacity-50">—</span>;
+  if (pct === 0) return <span className="opacity-70">—</span>;
   return <>{fmtMoney(Math.round(racePrize * pct), lang)}</>;
 }
 
@@ -81,7 +81,7 @@ function Person({ kind, name, href }: { kind: "Jockey" | "Trainer"; name: string
       <span className="min-w-0">
         <span className="person-label">{t(kind)}</span>
         <span className="person-name">
-          {name ? (href ? <Link href={href} className="hover:underline">{name}</Link> : name) : <span className="opacity-50">{t("Unknown")}</span>}
+          {name ? (href ? <Link href={href} className="hover:underline">{name}</Link> : name) : <span className="opacity-70">{t("Unknown")}</span>}
         </span>
       </span>
     </div>
@@ -101,7 +101,7 @@ function Stat({ label, children }: { label: string; children: React.ReactNode })
 function GearValue({ gear, equip, changed, prev }: { gear: string | null | undefined; equip?: string | null; changed?: boolean; prev?: string | null }) {
   const { t } = getT();
   // The Jockey Club's official gear code wins when we have it; otherwise Supertote's letters.
-  if (equip && equip.toUpperCase() === "NA") return <span className="opacity-40">—</span>; // official: no gear
+  if (equip && equip.toUpperCase() === "NA") return <span className="opacity-70">—</span>; // official: no gear
   if (equip) {
     return (
       <span
@@ -113,7 +113,7 @@ function GearValue({ gear, equip, changed, prev }: { gear: string | null | undef
     );
   }
   const items = (gear ?? "").split(",").map((g) => g.trim()).filter(Boolean);
-  if (items.length === 0) return <span className="opacity-40">—</span>;
+  if (items.length === 0) return <span className="opacity-70">—</span>;
   return (
     <span className="inline-flex gap-1 flex-wrap justify-center">
       {items.map((g) => <span key={g} className="gear-chip">{g}</span>)}
@@ -123,13 +123,13 @@ function GearValue({ gear, equip, changed, prev }: { gear: string | null | undef
 
 /** Horse weight with its change since the last run, e.g. 507 (−1). */
 function HwtValue({ hwt, last }: { hwt: number | null; last: number | null }) {
-  if (hwt == null) return <span className="opacity-40">—</span>;
+  if (hwt == null) return <span className="opacity-70">—</span>;
   const diff = last != null ? hwt - last : null;
   return (
     <span className="inline-flex flex-col items-center leading-tight">
       <span>{hwt}</span>
       {diff != null && diff !== 0 && (
-        <span className={`text-[0.6rem] font-semibold ${diff > 0 ? "text-emerald-600" : "text-red-500"}`}>
+        <span className={`text-[0.6rem] font-semibold ${diff > 0 ? "text-emerald-700 dark:text-emerald-400" : "text-red-700 dark:text-red-400"}`}>
           {diff > 0 ? "+" : "−"}{Math.abs(diff)}
         </span>
       )}
@@ -194,7 +194,7 @@ function HorseName({ horse }: { horse: HorseSummary | null }) {
   const { t } = getT();
   return horse
     ? <Link href={`/horses/${horse.id}`} className="font-semibold text-[1.02rem] leading-tight hover:underline">{horse.name}</Link>
-    : <span className="font-semibold opacity-50">{t("Unknown")}</span>;
+    : <span className="font-semibold opacity-70">{t("Unknown")}</span>;
 }
 
 const delayFor = (index?: number) => ({ "--delay": `${Math.min(index ?? 0, 12) * 55}ms` } as React.CSSProperties);
@@ -228,7 +228,7 @@ export function EntryRow({
             <HorseName horse={horse} />
             {isTipped && <TipPill />}
           </div>
-          <div className="text-xs opacity-60 mt-0.5">{ageSex(horse, t)}</div>
+          <div className="text-xs opacity-70 mt-0.5">{ageSex(horse, t)}</div>
         </div>
         {follow && horse && (
           <div className="shrink-0 self-start">
@@ -261,7 +261,7 @@ export function EntryRow({
           <FormRing wins={horse.wins} places={places} starts={horse.starts} />
           <div className="text-xs opacity-70 leading-snug">
             <span className="font-semibold">{horse.wins}</span>{t("W")}-<span className="font-semibold">{places}</span>{t("P")}
-            <span className="opacity-50"> {t("from {n}", { n: horse.starts })} · </span>
+            <span className="opacity-70"> {t("from {n}", { n: horse.starts })} · </span>
             <span className="whitespace-nowrap">{fmtMoney(horse.earnings, lang)}</span>
           </div>
           {form && form.length > 0 && (
@@ -295,7 +295,7 @@ export function ResultRow({
         <div className="runner-rail">
           <div className="flex flex-col items-center gap-1">
             <div className={`runner-number ${podiumClass(position)}`}>{position}</div>
-            <span className="text-[0.6rem] font-semibold opacity-55 leading-none">{ordinal(lang, position)}</span>
+            <span className="text-[0.6rem] font-semibold opacity-70 leading-none">{ordinal(lang, position)}</span>
           </div>
           <SilkImage url={horse?.silk_image_url} title={horse?.name} size={44} fallback />
         </div>
@@ -304,11 +304,11 @@ export function ResultRow({
             <HorseName horse={horse} />
             {isTipped && <TipPill />}
           </div>
-          <div className="text-xs opacity-60 mt-0.5">{margin ?? ageSex(horse, t)}</div>
+          <div className="text-xs opacity-70 mt-0.5">{margin ?? ageSex(horse, t)}</div>
         </div>
         <div className="text-right shrink-0">
           <div className="font-mono text-sm leading-tight">{finishTime ?? t("N/A")}</div>
-          <div className="text-xs opacity-60 mt-0.5"><PrizeWon position={position} racePrize={racePrize} prizeSplit={prizeSplit} /></div>
+          <div className="text-xs opacity-70 mt-0.5"><PrizeWon position={position} racePrize={racePrize} prizeSplit={prizeSplit} /></div>
         </div>
       </div>
 

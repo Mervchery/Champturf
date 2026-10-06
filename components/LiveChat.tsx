@@ -253,18 +253,18 @@ export default function LiveChat() {
     return (
       <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
         <div className="px-3.5 py-3 border-b border-line flex items-center gap-2 text-sm font-semibold">
-          <Lock size={14} className="opacity-60" />
+          <Lock size={14} className="opacity-70" />
           <span>{tr("Live chat")}</span>
         </div>
         <div className="flex-1 flex items-center justify-center text-center px-6">
           {auth === "loading" ? (
-            <span className="text-xs opacity-50">{tr("Connecting…")}</span>
+            <span className="text-xs opacity-70">{tr("Connecting…")}</span>
           ) : (
             <div className="max-w-[260px]">
               <span className="mx-auto mb-3 flex items-center justify-center w-11 h-11 rounded-full bg-parchment2">
                 <Lock size={18} />
               </span>
-              <h3 className="font-display text-lg">{tr("Sign in to join the chat")}</h3>
+              <h2 className="font-display text-lg">{tr("Sign in to join the chat")}</h2>
               <p className="text-sm opacity-70 mt-1.5 mb-5">
                 {tr("Live chat is for Champ Turf members. Create a free account or sign in to chat during the races.")}
               </p>
@@ -272,8 +272,8 @@ export default function LiveChat() {
                 <Link href="/login?next=/live" className="btn btn-dark w-full justify-center">{tr("Sign in")}</Link>
                 <Link href="/login?next=/live&mode=signup" className="btn btn-outline w-full justify-center">{tr("Create an account")}</Link>
               </div>
-              <p className="text-xs opacity-55 mt-4">
-                <Link href="/community-guidelines" className="underline">{tr("Community guidelines")}</Link>
+              <p className="text-xs opacity-70 mt-4">
+                <Link href="/community-guidelines" className="tap underline">{tr("Community guidelines")}</Link>
               </p>
             </div>
           )}
@@ -289,7 +289,7 @@ export default function LiveChat() {
         <div className="flex items-center gap-2 text-sm font-semibold">
           <span className={`inline-block w-2 h-2 rounded-full ${statusDot}`} aria-hidden />
           <span>{tr("Live chat")}</span>
-          <span className="text-xs font-normal opacity-60">{statusLabel}</span>
+          <span className="text-xs font-normal opacity-70">{statusLabel}</span>
         </div>
         <span className="text-xs opacity-75 truncate">
           {identity ? (
@@ -311,7 +311,7 @@ export default function LiveChat() {
           className="h-full overflow-y-auto overscroll-contain p-3.5 text-sm space-y-2"
         >
           {messages.length === 0 ? (
-            <div className="h-full flex items-center justify-center text-center opacity-50 text-xs px-6">
+            <div className="h-full flex items-center justify-center text-center opacity-70 text-xs px-6">
               {status === "offline"
                 ? tr("Chat is unavailable right now. Please check your connection and refresh.")
                 : tr("No messages yet. Say something about the race.")}
@@ -325,8 +325,8 @@ export default function LiveChat() {
                   className={`rounded-lg px-2.5 py-1.5 break-words ${mine ? "bg-coral/10" : ""}`}
                 >
                   <div className="flex items-baseline gap-2">
-                    <b className="text-coral">{mine ? tr("You") : m.sender}</b>
-                    <span className="text-[11px] opacity-40">{formatTime(m.sentAt)}</span>
+                    <b className="text-coral-ink">{mine ? tr("You") : m.sender}</b>
+                    <span className="text-[11px] opacity-70">{formatTime(m.sentAt)}</span>
                   </div>
                   <div>{m.message}</div>
                 </div>
@@ -348,7 +348,7 @@ export default function LiveChat() {
 
       {/* Error */}
       {errorMessage && (
-        <div role="alert" className="px-3.5 py-1.5 text-xs text-red-500 bg-red-500/10 border-t border-red-500/20">
+        <div role="alert" className="px-3.5 py-1.5 text-xs text-red-700 dark:text-red-400 bg-red-500/10 border-t border-red-500/20">
           {errorMessage}
         </div>
       )}
@@ -370,7 +370,7 @@ export default function LiveChat() {
           {remaining <= 30 && (
             <span
               className={`absolute right-2 top-1/2 -translate-y-1/2 text-[11px] tabular-nums ${
-                remaining <= 10 ? "text-red-500" : "opacity-50"
+                remaining <= 10 ? "text-red-700 dark:text-red-400" : "opacity-70"
               }`}
               aria-hidden
             >
@@ -382,13 +382,13 @@ export default function LiveChat() {
           type="submit"
           disabled={!canSend}
           aria-label={tr("Send message")}
-          className="px-4 py-3 text-coral font-semibold text-sm flex items-center gap-1.5 disabled:opacity-40 min-w-[64px] justify-center"
+          className="px-4 py-3 text-coral-ink font-semibold text-sm flex items-center gap-1.5 disabled:opacity-40 min-w-[64px] justify-center"
         >
           {cooldownLeft > 0 ? `${cooldownLeft}s` : (<><Send size={14} /> {tr("Send")}</>)}
         </button>
       </form>
-      <div className="px-3.5 py-1.5 border-t border-line text-[11px] opacity-55">
-        <Link href="/community-guidelines" className="underline">{tr("Community guidelines")}</Link>
+      <div className="px-3.5 py-0.5 border-t border-line text-[11px] opacity-70">
+        <Link href="/community-guidelines" className="tap underline">{tr("Community guidelines")}</Link>
       </div>
     </div>
   );

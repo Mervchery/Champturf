@@ -83,14 +83,14 @@ export default function PushToggle() {
     });
   }
 
-  if (state === "loading") return <div className="text-sm opacity-50">…</div>;
+  if (state === "loading") return <div className="text-sm opacity-70">…</div>;
 
   return (
     <div className="text-sm">
       {state === "on" && (
         <div className="flex items-center gap-3 flex-wrap">
           <span className="pill pill-gold inline-flex items-center gap-1"><BellRing size={12} /> {t("Alerts on for this device")}</span>
-          <button type="button" onClick={disable} disabled={pending} className="underline opacity-70 disabled:opacity-40">{t("Turn off")}</button>
+          <button type="button" onClick={disable} disabled={pending} className="tap underline opacity-70 disabled:opacity-40">{t("Turn off")}</button>
         </div>
       )}
       {state === "off" && (
@@ -106,7 +106,7 @@ export default function PushToggle() {
       )}
       {state === "unsupported" && <p className="opacity-70">{t("This browser doesn't support push notifications. You'll still see your alerts below.")}</p>}
       {state === "unconfigured" && <p className="opacity-70">{t("Push notifications aren't set up on this site yet. You'll still see your alerts below.")}</p>}
-      {error && <p className="text-coral mt-2">{error}</p>}
+      {error && <p className="text-coral-ink mt-2">{error}</p>}
     </div>
   );
 }

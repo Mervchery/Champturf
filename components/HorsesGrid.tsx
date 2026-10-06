@@ -33,11 +33,11 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
           <option value="name">{t("Sort: name A–Z")}</option>
         </select>
       </div>
-      {list.length === 0 && <p className="text-sm opacity-60">{t("No horses match your search.")}</p>}
+      {list.length === 0 && <p className="text-sm opacity-70">{t("No horses match your search.")}</p>}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {list.map((h) => (
           <Link key={h.id} href={`/horses/${h.id}`} className="card">
-            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50 relative">
+            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75 relative">
               {h.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
@@ -51,8 +51,8 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
               )}
             </div>
             <div className="p-4">
-              <h4 className="font-semibold">{h.name}</h4>
-              <div className="text-xs opacity-60 mt-1">{h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.color ? t(h.color) : t("N/A")}</div>
+              <h2 className="font-semibold">{h.name}</h2>
+              <div className="text-xs opacity-70 mt-1">{h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.color ? t(h.color) : t("N/A")}</div>
               <div className="flex gap-3.5 mt-3 text-xs">
                 <div><b className="block font-mono text-sm">{h.wins}</b>{t("Wins")}</div>
                 <div><b className="block font-mono text-sm">{h.seconds + h.thirds}</b>{t("Placed")}</div>

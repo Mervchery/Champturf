@@ -34,18 +34,18 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
               <Link key={c} href={`/news?cat=${encodeURIComponent(c)}`} className={`pill ${cat === c ? "pill-gold" : "pill-outline"}`}>{t(c)}</Link>
             ))}
           </div>
-          {list.length === 0 && <p className="text-sm opacity-60">{t("No articles yet.")}</p>}
+          {list.length === 0 && <p className="text-sm opacity-70">{t("No articles yet.")}</p>}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
             {list.map((n) => (
               <div key={n.id} className="card">
-                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                   <Newspaper size={28} />
                 </div>
                 <div className="p-4">
                   <span className="pill">{t(n.category)}</span>
-                  <h4 className="mt-2 font-semibold">{n.title}</h4>
-                  <p className="text-sm opacity-60 mt-1.5">{n.excerpt ?? t("N/A")}</p>
-                  <div className="text-xs opacity-55 mt-2.5">{n.article_date}</div>
+                  <h2 className="mt-2 font-semibold">{n.title}</h2>
+                  <p className="text-sm opacity-70 mt-1.5">{n.excerpt ?? t("N/A")}</p>
+                  <div className="text-xs opacity-70 mt-2.5">{n.article_date}</div>
                 </div>
               </div>
             ))}

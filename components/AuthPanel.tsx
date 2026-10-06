@@ -27,6 +27,20 @@ function GoogleG() {
   );
 }
 
+// Supabase's own messages ("Invalid login credentials") read like a bug. Map them to plain language.
+function friendlyAuthError(err: { message?: string; code?: string; status?: number } | null | undefined, t: (k: string) => string): string {
+  const code = err?.code ?? "";
+  const msg = (err?.message ?? "").toLowerCase();
+  if (code === "invalid_credentials" || msg.includes("invalid login")) return t("Wrong email or password. If you don't have an account yet, create one below.");
+  if (code === "email_not_confirmed" || msg.includes("not confirmed")) return t("Please confirm your email first — check your inbox for the link.");
+  if (code === "user_already_exists" || msg.includes("already registered")) return t("That email already has an account — sign in instead.");
+  if (code === "weak_password" || msg.includes("password should")) return t("That password is too weak. Use at least 8 characters.");
+  if (code === "over_request_rate_limit" || code === "over_email_send_rate_limit" || err?.status === 429) return t("Too many attempts. Please wait a minute and try again.");
+  if (code === "email_address_invalid" || msg.includes("invalid email")) return t("That email address doesn't look right.");
+  if (msg.includes("fetch") || msg.includes("network")) return t("Can't reach the server. Check your connection and try again.");
+  return t("Something went wrong. Please try again.");
+}
+
 const inputCls = "w-full px-3 py-2.5 border border-line rounded-md bg-parchment text-sm";
 
 export default function AuthPanel({ next, notice, initialMode = "signin" }: { next: string | null; notice?: string | null; initialMode?: Mode }) {
@@ -41,12 +55,16 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
   const [info, setInfo] = useState("");
   const [loading, setLoading] = useState(false);
   const [agreed, setAgreed] = useState(false);
+  const [noAccountHint, setNoAccountHint] = useState(false);
 
+  // Use the canonical site address (NEXT_PUBLIC_SITE_URL) so emails and Google always return to
+  // your real domain — never to a *.vercel.app address — even if the app was opened from one.
+  const origin = () => (process.env.NEXT_PUBLIC_SITE_URL ?? "").replace(/\/+$/, "") || window.location.origin;
   const callback = (target: string | null) =>
-    `${window.location.origin}/auth/callback${target ? `?next=${encodeURIComponent(safeNext(target))}` : ""}`;
+    `${origin()}/auth/callback${target ? `?next=${encodeURIComponent(safeNext(target))}` : ""}`;
 
   function switchMode(m: Mode) {
-    setMode(m); setError(""); setInfo(""); setPassword(""); setConfirm("");
+    setMode(m); setError(""); setInfo(""); setNoAccountHint(false); setPassword(""); setConfirm("");
   }
 
   async function goAfterSignIn(userId: string) {
@@ -61,7 +79,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    setError(""); setInfo("");
+    setError(""); setInfo(""); setNoAccountHint(false);
     const supabase = createClient();
     const cleanEmail = email.trim();
 
@@ -89,7 +107,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
         options: { emailRedirectTo: callback(next), data: name.trim() ? { full_name: name.trim() } : undefined },
       });
       setLoading(false);
-      if (signUpError) { setError(signUpError.message); return; }
+      if (signUpError) { setError(friendlyAuthError(signUpError, t)); return; }
       // Supabase answers with an empty identities list when the email is already registered.
       if (data.user && (data.user.identities?.length ?? 0) === 0) {
         setError(t("That email already has an account — sign in instead."));
@@ -104,7 +122,8 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
     const { data, error: signInError } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
     if (signInError || !data.user) {
       setLoading(false);
-      setError(signInError?.message ?? t("Couldn't sign you in."));
+      setError(signInError ? friendlyAuthError(signInError, t) : t("Couldn't sign you in."));
+      if (signInError && (signInError.code === "invalid_credentials" || /invalid login/i.test(signInError.message))) setNoAccountHint(true);
       return;
     }
     await goAfterSignIn(data.user.id);
@@ -118,7 +137,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
       provider: provider as any,
       options: { redirectTo: callback(next) },
     });
-    if (oauthError) setError(oauthError.message);
+    if (oauthError) setError(friendlyAuthError(oauthError, t));
   }
 
   const title = mode === "signup" ? t("Create your account") : mode === "forgot" ? t("Reset your password") : t("Welcome back");
@@ -126,7 +145,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
 
   return (
     <div className="w-full max-w-[400px] card no-hover p-8">
-      <span className="text-xs font-semibold text-coral">{t("YOUR ACCOUNT")}</span>
+      <span className="text-xs font-semibold text-coral-ink">{t("YOUR ACCOUNT")}</span>
       <h1 className="font-display text-2xl mt-1.5">{title}</h1>
       <p className="text-sm opacity-70 mt-1.5 mb-5">
         {mode === "signup"
@@ -136,7 +155,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
             : t("Sign in to your Champ Turf account.")}
       </p>
 
-      {notice && <div className="text-coral text-sm mb-4 bg-parchment2 p-3 rounded-md">{notice}</div>}
+      {notice && <div className="text-coral-ink text-sm mb-4 bg-parchment2 p-3 rounded-md">{notice}</div>}
 
       {mode !== "forgot" && PROVIDERS.length > 0 && (
         <>
@@ -153,7 +172,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
               </button>
             ))}
           </div>
-          <div className="flex items-center gap-3 my-5 text-xs opacity-50">
+          <div className="flex items-center gap-3 my-5 text-xs opacity-70">
             <span className="flex-1 h-px bg-line" /> {t("or")} <span className="flex-1 h-px bg-line" />
           </div>
         </>
@@ -162,12 +181,12 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
       <form onSubmit={onSubmit} noValidate>
         {mode === "signup" && (
           <>
-            <label className="text-xs opacity-65 block mb-1.5" htmlFor="auth-name">{t("Name (optional)")}</label>
+            <label className="text-xs opacity-70 block mb-1.5" htmlFor="auth-name">{t("Name (optional)")}</label>
             <input id="auth-name" className={`${inputCls} mb-3.5`} value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" />
           </>
         )}
 
-        <label className="text-xs opacity-65 block mb-1.5" htmlFor="auth-email">{t("Email")}</label>
+        <label className="text-xs opacity-70 block mb-1.5" htmlFor="auth-email">{t("Email")}</label>
         <input
           id="auth-email" type="email" className={`${inputCls} mb-3.5`} value={email}
           onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" autoComplete="email"
@@ -176,9 +195,9 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
         {mode !== "forgot" && (
           <>
             <div className="flex justify-between items-baseline mb-1.5">
-              <label className="text-xs opacity-65" htmlFor="auth-password">{t("Password")}</label>
+              <label className="text-xs opacity-70" htmlFor="auth-password">{t("Password")}</label>
               {mode === "signin" && (
-                <button type="button" className="text-xs underline opacity-70" onClick={() => switchMode("forgot")}>
+                <button type="button" className="tap text-xs underline opacity-70" onClick={() => switchMode("forgot")}>
                   {t("Forgot password?")}
                 </button>
               )}
@@ -193,7 +212,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
 
         {mode === "signup" && (
           <>
-            <label className="text-xs opacity-65 block mb-1.5 mt-3.5" htmlFor="auth-confirm">{t("Confirm password")}</label>
+            <label className="text-xs opacity-70 block mb-1.5 mt-3.5" htmlFor="auth-confirm">{t("Confirm password")}</label>
             <input
               id="auth-confirm" type="password" className={inputCls} value={confirm}
               onChange={(e) => setConfirm(e.target.value)} placeholder="••••••••" autoComplete="new-password"
@@ -201,7 +220,17 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
           </>
         )}
 
-        {error && <div role="alert" className="text-coral text-sm mt-3">{error}</div>}
+        {error && (
+          <div role="alert" className="text-coral-ink text-sm mt-3">
+            {error}
+            {noAccountHint && mode === "signin" && (
+              <div className="mt-2 flex gap-4 flex-wrap">
+                <button type="button" className="tap underline font-semibold" onClick={() => switchMode("signup")}>{t("Create an account")}</button>
+                <button type="button" className="tap underline" onClick={() => switchMode("forgot")}>{t("Forgot password?")}</button>
+              </div>
+            )}
+          </div>
+        )}
         {info && <div role="status" className="text-sm mt-3 bg-parchment2 p-3 rounded-md">{info}</div>}
 
         <button type="submit" disabled={loading} className="btn btn-dark w-full justify-center mt-5 disabled:opacity-60">
@@ -221,7 +250,7 @@ export default function AuthPanel({ next, notice, initialMode = "signin" }: { ne
       )}
 
       {mode === "signin" && (
-        <p className="text-xs opacity-55 mt-4 text-center leading-relaxed">
+        <p className="text-xs opacity-70 mt-4 text-center leading-relaxed">
           {t("By continuing you accept our")} <Link href="/terms" className="underline">{t("Terms of Use")}</Link> {t("and")} <Link href="/privacy" className="underline">{t("Privacy Policy")}</Link>.
         </p>
       )}

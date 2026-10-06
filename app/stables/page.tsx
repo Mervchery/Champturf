@@ -33,14 +33,14 @@ export default async function StablesPage() {
                     <SilkImage url={s.silk_image_url} size={48} title={s.name} />
                   </div>
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-white/25 flex items-center justify-center text-white/60 shrink-0">
+                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-white/25 flex items-center justify-center text-white/75 shrink-0">
                     <Shirt size={26} />
                   </div>
                 )}
               </div>
               <div className="p-4">
-                <h4 className="font-semibold truncate">{s.name}</h4>
-                <div className="text-xs opacity-60 mt-1">{s.location ?? t("N/A")} · {t("Owner")}: {s.owner ?? t("Unknown")}</div>
+                <h2 className="font-semibold truncate">{s.name}</h2>
+                <div className="text-xs opacity-70 mt-1">{s.location ?? t("N/A")} · {t("Owner")}: {s.owner ?? t("Unknown")}</div>
                 <div className="flex gap-3.5 mt-3 text-xs">
                   <div><b className="block font-mono text-sm">{s.horses}</b>{t("Horses")}</div>
                   <div><b className="block font-mono text-sm">{s.staff}</b>{t("Staff")}</div>
@@ -48,7 +48,7 @@ export default async function StablesPage() {
               </div>
             </Link>
           ))}
-          {stables.length === 0 && <p className="text-sm opacity-60">{t("No stables yet.")}</p>}
+          {stables.length === 0 && <p className="text-sm opacity-70">{t("No stables yet.")}</p>}
         </div>
       </section>
     </div>

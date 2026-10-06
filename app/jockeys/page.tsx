@@ -28,23 +28,23 @@ export default async function JockeysPage({ searchParams }: { searchParams: { ta
       <section className="py-14">
         <div className="wrap">
           <div className="flex gap-1 border-b border-line mb-7">
-            <Link href="/jockeys?tab=pro" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "pro" ? "border-coral font-semibold" : "border-transparent opacity-55"}`}>
+            <Link href="/jockeys?tab=pro" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "pro" ? "border-coral font-semibold" : "border-transparent opacity-70"}`}>
               {t("Professional")}
             </Link>
-            <Link href="/jockeys?tab=apprentice" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "apprentice" ? "border-coral font-semibold" : "border-transparent opacity-55"}`}>
+            <Link href="/jockeys?tab=apprentice" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "apprentice" ? "border-coral font-semibold" : "border-transparent opacity-70"}`}>
               {t("Apprentice / trainee")}
             </Link>
           </div>
-          {list.length === 0 && <p className="text-sm opacity-60">{t("None yet.")}</p>}
+          {list.length === 0 && <p className="text-sm opacity-70">{t("None yet.")}</p>}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
             {list.map((j) => (
               <Link key={j.id} href={`/jockeys/${j.id}`} className="card">
-                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/50">
+                <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75">
                   <JockeyIcon size={34} />
                 </div>
                 <div className="p-4">
-                  <h4 className="font-semibold">{j.name}</h4>
-                  <div className="text-xs opacity-60 mt-1">{j.nationality ? t("nat:" + j.nationality) : ""}{j.apprentice ? ` · ${t("Apprentice")} (${j.allowance})` : ""}</div>
+                  <h2 className="font-semibold">{j.name}</h2>
+                  <div className="text-xs opacity-70 mt-1">{j.nationality ? t("nat:" + j.nationality) : ""}{j.apprentice ? ` · ${t("Apprentice")} (${j.allowance})` : ""}</div>
                   <div className="flex gap-3.5 mt-3 text-xs">
                     <div><b className="block font-mono text-sm">{j.wins}</b>{t("Wins")}</div>
                     <div><b className="block font-mono text-sm">{j.win_pct}%</b>{t("Win rate")}</div>

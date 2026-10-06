@@ -22,18 +22,18 @@ export default function NotificationsPanel({ items }: { items: AppNotification[]
   const unread = list.filter((n) => !n.read_at).length;
 
   if (list.length === 0) {
-    return <p className="text-sm opacity-65">{t("No alerts yet. When a horse you follow is declared, moves in the betting or runs, it shows up here.")}</p>;
+    return <p className="text-sm opacity-70">{t("No alerts yet. When a horse you follow is declared, moves in the betting or runs, it shows up here.")}</p>;
   }
 
   return (
     <div>
       <div className="flex gap-4 text-xs mb-2">
         {unread > 0 && (
-          <button type="button" disabled={pending} className="underline" onClick={() => start(async () => { await markAllNotificationsRead(); setList((l) => l.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() }))); })}>
+          <button type="button" disabled={pending} className="tap underline" onClick={() => start(async () => { await markAllNotificationsRead(); setList((l) => l.map((n) => ({ ...n, read_at: n.read_at ?? new Date().toISOString() }))); })}>
             {t("Mark all as read")}
           </button>
         )}
-        <button type="button" disabled={pending} className="underline opacity-70" onClick={() => start(async () => { await clearNotifications(); setList([]); router.refresh(); })}>
+        <button type="button" disabled={pending} className="tap underline opacity-70" onClick={() => start(async () => { await clearNotifications(); setList([]); router.refresh(); })}>
           {t("Clear all")}
         </button>
       </div>
@@ -44,11 +44,11 @@ export default function NotificationsPanel({ items }: { items: AppNotification[]
           return (
             <li key={n.id}>
               <Link href={n.url} className="flex gap-3 py-3 hover:bg-[var(--line)] -mx-2 px-2 rounded-lg">
-                <span className={`mt-0.5 shrink-0 ${n.read_at ? "opacity-40" : "text-coral"}`}><Icon kind={n.kind} title={title} /></span>
+                <span className={`mt-0.5 shrink-0 ${n.read_at ? "opacity-70" : "text-coral-ink"}`}><Icon kind={n.kind} title={title} /></span>
                 <span className="min-w-0">
                   <span className={`block text-sm ${n.read_at ? "" : "font-semibold"}`}>{title}</span>
                   <span className="block text-xs opacity-70 mt-0.5">{body}</span>
-                  <span className="block text-[0.7rem] opacity-45 mt-1">
+                  <span className="block text-[0.7rem] opacity-70 mt-1">
                     {new Date(n.created_at).toLocaleString(lang === "fr" ? "fr-FR" : "en-GB", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", timeZone: "Indian/Mauritius" })}
                   </span>
                 </span>

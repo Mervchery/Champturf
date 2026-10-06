@@ -51,7 +51,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
 
       <section className="py-14">
         <div className="wrap">
-          <Link href="/stables" className="text-sm border-b border-ink pb-0.5">← {t("Back to stables")}</Link>
+          <Link href="/stables" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to stables")}</Link>
 
           <h2 className="font-display text-xl mt-7 mb-4">{t("Career statistics")}</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
@@ -67,7 +67,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
 
           {stats.recentForm.length > 0 && (
             <div className="mb-10">
-              <h4 className="text-sm font-semibold mb-2">{t("Recent form")}</h4>
+              <h3 className="text-sm font-semibold mb-2">{t("Recent form")}</h3>
               <div className="flex gap-2">
                 {stats.recentForm.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"}`}>{f}</span>)}
               </div>
@@ -78,7 +78,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
             <div className="min-w-0">
               <h2 className="font-display text-xl mb-4">{t("Horses in this stable")}</h2>
               {horses.length === 0 ? (
-                <p className="text-sm opacity-60">{t("No horses currently assigned to this stable.")}</p>
+                <p className="text-sm opacity-70">{t("No horses currently assigned to this stable.")}</p>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {horses.map((h) => (
@@ -86,7 +86,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
                       <SilkImage fallback url={h.silk_image_url} size={26} title={h.name} />
                       <div className="min-w-0">
                         <div className="text-sm font-semibold truncate">{h.name}</div>
-                        <div className="text-xs opacity-60">{h.wins}{t("W")} · {h.starts} {t("starts")}</div>
+                        <div className="text-xs opacity-70">{h.wins}{t("W")} · {h.starts} {t("starts")}</div>
                       </div>
                     </Link>
                   ))}
@@ -95,13 +95,13 @@ export default async function StableDetailPage({ params }: { params: { id: strin
 
               <h2 className="font-display text-xl mt-8 mb-4">{t("Trainers")}</h2>
               {trainers.length === 0 ? (
-                <p className="text-sm opacity-60">{t("No trainers currently linked to this stable.")}</p>
+                <p className="text-sm opacity-70">{t("No trainers currently linked to this stable.")}</p>
               ) : (
                 <div className="flex flex-col gap-2">
                   {trainers.map((tr) => (
                     <Link key={tr.id} href={`/trainers/${tr.id}`} className="card p-3 flex items-center justify-between">
                       <span className="text-sm font-semibold">{tr.name}</span>
-                      <span className="text-xs opacity-60">{tr.wins} {t("wins")}</span>
+                      <span className="text-xs opacity-70">{tr.wins} {t("wins")}</span>
                     </Link>
                   ))}
                 </div>
@@ -111,7 +111,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
             <div className="min-w-0">
               <h2 className="font-display text-xl mb-4">{t("Recent results")}</h2>
               {stats.recentResults.length === 0 ? (
-                <p className="text-sm opacity-60">{t("No results recorded yet.")}</p>
+                <p className="text-sm opacity-70">{t("No results recorded yet.")}</p>
               ) : (
                 <div className="panel !p-0 overflow-x-auto">
                   <table>
@@ -122,7 +122,7 @@ export default async function StableDetailPage({ params }: { params: { id: strin
                           <td><span className={`pill ${r.position === 1 ? "pill-gold" : "pill-outline"}`}>{r.position}</span></td>
                           <td><Link href={`/horses/${r.horseId}`} className="hover:underline">{r.horseName}</Link></td>
                           <td><Link href={`/races/${r.raceId}`} className="hover:underline">{r.raceName}</Link></td>
-                          <td className="text-xs opacity-60">{r.raceDate}</td>
+                          <td className="text-xs opacity-70">{r.raceDate}</td>
                         </tr>
                       ))}
                     </tbody>
