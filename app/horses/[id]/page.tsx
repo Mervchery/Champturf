@@ -64,7 +64,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
           </div>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <Link href="/horses" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to horses")}</Link>
 
@@ -80,7 +80,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-10">
             <div className="panel min-w-0">
               <h3 className="text-sm font-semibold mb-3">{t("Connections")}</h3>
-              <table>
+              <table className="kv">
                 <tbody>
                   <tr><td>{t("Owner")}</td><td>{h.owner ? <Link href="/owners" className="font-semibold hover:underline">{h.owner.name}</Link> : t("Unknown")}</td></tr>
                   <tr><td>{t("Trainer")}</td><td>{h.trainer ? <Link href={`/trainers/${h.trainer.id}`} className="font-semibold hover:underline">{h.trainer.name}</Link> : t("Unknown")}</td></tr>
@@ -108,14 +108,14 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             <p className="text-sm opacity-70">{t("No races recorded for this horse yet.")}</p>
           ) : (
             <div className="panel !p-0 overflow-hidden">
-              <table>
+              <table className="data-table">
                 <thead><tr><th>{t("Pos")}</th><th>{t("Race")}</th><th>{t("Date")}</th></tr></thead>
                 <tbody>
                   {formHistory.map((f, i) => (
                     <tr key={i}>
                       <td><span className={`pill ${f.position === 1 ? "pill-gold" : "pill-outline"}`}>{f.position}</span></td>
-                      <td><Link href={`/races/${f.raceId}`} className="hover:underline">{f.raceName}</Link></td>
-                      <td className="text-xs opacity-70">{f.raceDate}</td>
+                      <td data-title><Link href={`/races/${f.raceId}`} className="hover:underline">{f.raceName}</Link></td>
+                      <td data-label={t("Date")} className="text-xs opacity-70">{f.raceDate}</td>
                     </tr>
                   ))}
                 </tbody>

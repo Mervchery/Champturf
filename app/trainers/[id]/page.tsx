@@ -60,7 +60,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
         </div>
       </div>
 
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <Link href="/trainers" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to trainers")}</Link>
 
@@ -111,15 +111,15 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
                 <p className="text-sm opacity-70">{t("No results recorded yet.")}</p>
               ) : (
                 <div className="panel !p-0 overflow-x-auto">
-                  <table>
+                  <table className="data-table">
                     <thead><tr><th>{t("Pos")}</th><th>{t("Horse")}</th><th>{t("Race")}</th><th>{t("Date")}</th></tr></thead>
                     <tbody>
                       {stats.recentResults.map((r, i) => (
                         <tr key={i}>
                           <td><span className={`pill ${r.position === 1 ? "pill-gold" : "pill-outline"}`}>{r.position}</span></td>
-                          <td><Link href={`/horses/${r.horseId}`} className="hover:underline">{r.horseName}</Link></td>
-                          <td><Link href={`/races/${r.raceId}`} className="hover:underline">{r.raceName}</Link></td>
-                          <td className="text-xs opacity-70">{r.raceDate}</td>
+                          <td data-title><Link href={`/horses/${r.horseId}`} className="hover:underline">{r.horseName}</Link></td>
+                          <td data-label={t("Race")}><Link href={`/races/${r.raceId}`} className="hover:underline">{r.raceName}</Link></td>
+                          <td data-label={t("Date")} className="text-xs opacity-70">{r.raceDate}</td>
                         </tr>
                       ))}
                     </tbody>

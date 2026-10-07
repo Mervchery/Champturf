@@ -251,7 +251,7 @@ export default function LiveChat() {
 
   if (auth !== "in") {
     return (
-      <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
+      <div className="card no-hover flex flex-col h-[min(420px,72dvh)] sm:h-[480px] md:h-[560px] overflow-hidden">
         <div className="px-3.5 py-3 border-b border-line flex items-center gap-2 text-sm font-semibold">
           <Lock size={14} className="opacity-70" />
           <span>{tr("Live chat")}</span>
@@ -283,7 +283,7 @@ export default function LiveChat() {
   }
 
   return (
-    <div className="card no-hover flex flex-col h-[420px] sm:h-[480px] md:h-[560px] overflow-hidden">
+    <div className="card no-hover flex flex-col h-[min(420px,72dvh)] sm:h-[480px] md:h-[560px] overflow-hidden">
       {/* Header */}
       <div className="px-3.5 py-3 border-b border-line flex justify-between items-center gap-3">
         <div className="flex items-center gap-2 text-sm font-semibold">

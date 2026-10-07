@@ -68,7 +68,12 @@ body {
   max-width: 1180px;
   margin: 0 auto;
   /* Notch / rounded-corner safe in landscape when running from the Home Screen. */
-  padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
+  padding: 0 max(16px, env(safe-area-inset-right)) 0 max(16px, env(safe-area-inset-left));
+}
+@media (min-width: 640px) {
+  .wrap {
+    padding: 0 max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
+  }
 }
 
 /* ---------- Surfaces ---------- */
@@ -80,23 +85,27 @@ body {
   box-shadow: var(--shadow-sm);
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease), border-color 0.35s var(--ease);
 }
-.card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-lg);
+@media (hover: hover) {
+  .card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-lg);
+}
 }
 /* For a .card that isn't a link to anything (e.g. the trainers grid,
    which has nothing to navigate to) — same resting look, but without the
    lift-on-hover that implies it's clickable. */
-.card.no-hover:hover {
-  transform: none;
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) {
+  .card.no-hover:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}
 }
 
 .panel {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: var(--radius-md);
-  padding: 24px;
+  padding: 16px;
   overflow-x: auto;
   box-shadow: var(--shadow-sm);
 }
@@ -117,9 +126,11 @@ body {
   box-shadow: var(--shadow-sm);
   transition: transform 0.35s var(--ease), box-shadow 0.35s var(--ease);
 }
-.stat-tile:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .stat-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
 }
 .stat-tile .v {
   font-family: var(--font-mono), monospace;
@@ -201,16 +212,20 @@ a.pill {
   color: var(--ink);
   box-shadow: var(--shadow-sm);
 }
-.btn-gold:hover {
-  filter: brightness(1.05);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .btn-gold:hover {
+    filter: brightness(1.05);
+    box-shadow: var(--shadow-md);
+}
 }
 .btn-dark {
   background: var(--turf);
   color: #fbf8f0;
 }
-.btn-dark:hover {
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .btn-dark:hover {
+    box-shadow: var(--shadow-md);
+}
 }
 .btn-outline {
   border: 1px solid var(--ink);
@@ -222,8 +237,10 @@ a.pill {
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
 }
-.btn-ghost:hover {
-  border-color: #fff;
+@media (hover: hover) {
+  .btn-ghost:hover {
+    border-color: #fff;
+}
 }
 
 /* ---------- Tables (kept for admin + dense data views) ---------- */
@@ -248,8 +265,129 @@ td {
   border-bottom: 1px solid var(--line);
   vertical-align: middle;
 }
-tr:hover td {
-  background: var(--parchment-2);
+@media (hover: hover) {
+  tr:hover td {
+    background: var(--parchment-2);
+  }
+}
+
+/* Two-column key/value tables (profile "Connections" etc.) never need to scroll. */
+table.kv {
+  min-width: 0;
+}
+
+/* Data tables are mobile-first: on a phone every row becomes a compact card —
+   rank/position badge, the name as a title, and the remaining columns as small
+   "Label value" pairs underneath (labels come from each cell's data-label).
+   From 640px up they are ordinary tables again. The header row stays in the DOM,
+   visually hidden, so screen readers still get proper column headers. */
+table.data-table {
+  min-width: 0;
+  display: block;
+}
+.data-table thead {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+.data-table tbody {
+  display: block;
+}
+.data-table tr {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 16px;
+  position: relative;
+  padding: 12px 0 12px 44px;
+  border-bottom: 1px solid var(--line);
+}
+.data-table tbody tr:last-child {
+  border-bottom: 0;
+}
+.data-table td {
+  display: block;
+  padding: 0;
+  border: 0;
+  font-size: 0.8rem;
+  order: 1;
+}
+.data-table td:first-child {
+  position: absolute;
+  left: 0;
+  top: 12px;
+  width: 32px;
+  order: 0;
+  font-family: var(--font-mono), monospace;
+  font-weight: 600;
+  opacity: 0.7;
+}
+.data-table td[data-title] {
+  flex: 1 1 100%;
+  order: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+.data-table td[data-label]::before {
+  content: attr(data-label);
+  margin-right: 6px;
+  font-size: 0.68rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+.data-table tbody tr:first-child {
+  padding-top: 4px;
+}
+.data-table tbody tr:first-child td:first-child {
+  top: 4px;
+}
+
+@media (min-width: 640px) {
+  table.data-table {
+    display: table;
+    min-width: 460px;
+  }
+  .data-table thead {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+  }
+  .data-table tbody {
+    display: table-row-group;
+  }
+  .data-table tr {
+    display: table-row;
+    padding: 0;
+    border: 0;
+  }
+  .data-table tbody tr:last-child {
+    border: 0;
+  }
+  .data-table td {
+    display: table-cell;
+    padding: 11px 10px;
+    border-bottom: 1px solid var(--line);
+    font-size: inherit;
+  }
+  .data-table td:first-child {
+    position: static;
+    width: auto;
+    font-family: inherit;
+    font-weight: inherit;
+    opacity: 1;
+  }
+  .data-table td[data-title] {
+    font-size: inherit;
+    font-weight: inherit;
+  }
+  .data-table td[data-label]::before {
+    content: none;
+  }
 }
 
 /* ---------- Runner row (race card) ---------- */
@@ -266,9 +404,11 @@ tr:hover td {
      transform and block the hover lift below. Staggered via --delay. */
   animation: riseIn 0.55s var(--ease) var(--delay, 0ms) backwards;
 }
-.runner-row:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+@media (hover: hover) {
+  .runner-row:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
 }
 .runner-row:active {
   transform: scale(0.992);
@@ -325,7 +465,7 @@ tr:hover td {
 .dark .person-icon { background: rgba(228, 200, 120, 0.14); color: var(--gold-2); }
 .person-label {
   display: block;
-  font-size: 0.58rem;
+  font-size: 0.64rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -359,7 +499,7 @@ tr:hover td {
 }
 .stat-cell + .stat-cell { border-left: 1px solid var(--line); }
 .stat-label {
-  font-size: 0.55rem;
+  font-size: 0.62rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -408,7 +548,9 @@ tr:hover td {
   box-shadow: var(--shadow-sm);
   transition: transform 0.2s var(--ease), filter 0.2s var(--ease);
 }
-.odds-pill:hover { transform: translateY(-1px); filter: brightness(1.06); }
+@media (hover: hover) {
+  .odds-pill:hover {   transform: translateY(-1px); filter: brightness(1.06); }
+}
 .odds-win { background: linear-gradient(135deg, #0f5c46, #1f7a5c); }
 .odds-place { background: linear-gradient(135deg, #1d4e89, #2f6db5); }
 .odds-pill.is-empty { filter: grayscale(0.85) opacity(0.7); }
@@ -471,7 +613,7 @@ tr:hover td {
 .detail-hero {
   background: linear-gradient(180deg, var(--turf), var(--turf-2));
   color: #fbf8f0;
-  padding: 48px 0;
+  padding: 32px 0;
   position: relative;
   overflow: hidden;
 }
@@ -623,7 +765,9 @@ tr:hover td {
   color: rgba(255, 255, 255, 0.8);
   transition: background 0.25s var(--ease), color 0.25s var(--ease), transform 0.15s var(--ease);
 }
-.lang-btn:hover { color: #fff; }
+@media (hover: hover) {
+  .lang-btn:hover {   color: #fff; }
+}
 .lang-btn:active { transform: scale(0.95); }
 .lang-btn.is-active {
   background: var(--gold-2);
@@ -637,7 +781,9 @@ tr:hover td {
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
   transition: transform 0.35s var(--ease);
 }
-a:hover > .brand-logo { transform: rotate(-6deg) scale(1.06); }
+@media (hover: hover) {
+  a:hover > .brand-logo { transform: rotate(-6deg) scale(1.06); }
+}
 
 /* Gear that changed since the last run: warm outline + asterisk. */
 .gear-chip.is-changed {
@@ -752,7 +898,9 @@ textarea::placeholder {
   color: #fff;
 }
 .follow-full .follow-ico { color: var(--gold-2); }
-.follow-full:hover { background: rgba(255, 255, 255, 0.18); border-color: #fff; }
+@media (hover: hover) {
+  .follow-full:hover {   background: rgba(255, 255, 255, 0.18); border-color: #fff; }
+}
 .follow-full[aria-pressed="true"] {
   background: var(--gold-2);
   border-color: var(--gold-2);
@@ -772,7 +920,9 @@ textarea::placeholder {
 }
 .follow-icon .follow-ico { color: #8a6a14; }
 .dark .follow-icon .follow-ico { color: var(--gold-2); }
-.follow-icon:hover { border-color: var(--gold); }
+@media (hover: hover) {
+  .follow-icon:hover {   border-color: var(--gold); }
+}
 .follow-icon[aria-pressed="true"] {
   background: var(--gold-2);
   border-color: var(--gold);
@@ -788,4 +938,10 @@ textarea::placeholder {
   60% { transform: rotate(9deg); }
   80% { transform: rotate(-4deg); }
   100% { transform: rotate(0); }
+}
+
+/* Larger screens get the roomier spacing. (Base values above are the phone ones.) */
+@media (min-width: 768px) {
+  .panel { padding: 24px; }
+  .detail-hero { padding: 48px 0; }
 }

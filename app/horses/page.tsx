@@ -22,7 +22,7 @@ export default async function HorsesPage() {
           <h1 className="text-3xl font-display mt-1">{t("Horses")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <HorsesGrid horses={horses} />
         </div>

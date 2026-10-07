@@ -36,7 +36,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
           <h1 className="text-3xl font-display mt-1">{t("Statistics centre")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex gap-1 border-b border-line mb-7 overflow-x-auto">
             {TABS.map(([id, label]) => (
@@ -47,41 +47,41 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
           </div>
           <div className="panel">
             {tab === "horses" && (
-              <table>
+              <table className="data-table">
                 <thead><tr><th>#</th><th>{t("Horse")}</th><th>{t("Trainer")}</th><th>{t("Starts")}</th><th>{t("Wins")}</th><th>{t("Placed")}</th><th>{t("Earnings")}</th></tr></thead>
                 <tbody>
                   {[...horses].sort((a, b) => b.wins - a.wins).map((h, i) => (
-                    <tr key={h.id}><td>{i + 1}</td><td>{h.name}</td><td>{h.trainer?.name ?? t("Unknown")}</td><td>{h.starts}</td><td>{h.wins}</td><td>{h.seconds + h.thirds}</td><td>{fmtMoney(h.earnings, lang)}</td></tr>
+                    <tr key={h.id}><td>{i + 1}</td><td data-title>{h.name}</td><td data-label={t("Trainer")}>{h.trainer?.name ?? t("Unknown")}</td><td data-label={t("Starts")}>{h.starts}</td><td data-label={t("Wins")}>{h.wins}</td><td data-label={t("Placed")}>{h.seconds + h.thirds}</td><td data-label={t("Earnings")}>{fmtMoney(h.earnings, lang)}</td></tr>
                   ))}
                 </tbody>
               </table>
             )}
             {tab === "jockeys" && (
-              <table>
+              <table className="data-table">
                 <thead><tr><th>#</th><th>{t("Jockey")}</th><th>{t("Nationality")}</th><th>{t("Rides")}</th><th>{t("Wins")}</th><th>{t("Win %")}</th></tr></thead>
                 <tbody>
                   {[...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).map((j, i) => (
-                    <tr key={j.id}><td>{i + 1}</td><td>{j.name}</td><td>{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</td><td>{j.rides}</td><td>{j.wins}</td><td>{j.win_pct}%</td></tr>
+                    <tr key={j.id}><td>{i + 1}</td><td data-title>{j.name}</td><td data-label={t("Nationality")}>{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</td><td data-label={t("Rides")}>{j.rides}</td><td data-label={t("Wins")}>{j.wins}</td><td data-label={t("Win %")}>{j.win_pct}%</td></tr>
                   ))}
                 </tbody>
               </table>
             )}
             {tab === "trainers" && (
-              <table>
+              <table className="data-table">
                 <thead><tr><th>#</th><th>{t("Trainer")}</th><th>{t("Stable")}</th><th>{t("Horses")}</th><th>{t("Wins")}</th></tr></thead>
                 <tbody>
                   {[...trainers].sort((a, b) => b.wins - a.wins).map((tr, i) => (
-                    <tr key={tr.id}><td>{i + 1}</td><td>{tr.name}</td><td>{tr.stable?.name ?? t("Unknown")}</td><td>{tr.horses}</td><td>{tr.wins}</td></tr>
+                    <tr key={tr.id}><td>{i + 1}</td><td data-title>{tr.name}</td><td data-label={t("Stable")}>{tr.stable?.name ?? t("Unknown")}</td><td data-label={t("Horses")}>{tr.horses}</td><td data-label={t("Wins")}>{tr.wins}</td></tr>
                   ))}
                 </tbody>
               </table>
             )}
             {tab === "stables" && (
-              <table>
+              <table className="data-table">
                 <thead><tr><th>#</th><th>{t("Stable")}</th><th>{t("Location")}</th><th>{t("Horses")}</th><th>{t("Staff")}</th></tr></thead>
                 <tbody>
                   {[...stables].sort((a, b) => b.horses - a.horses).map((s, i) => (
-                    <tr key={s.id}><td>{i + 1}</td><td>{s.name}</td><td>{s.location}</td><td>{s.horses}</td><td>{s.staff}</td></tr>
+                    <tr key={s.id}><td>{i + 1}</td><td data-title>{s.name}</td><td data-label={t("Location")}>{s.location}</td><td data-label={t("Horses")}>{s.horses}</td><td data-label={t("Staff")}>{s.staff}</td></tr>
                   ))}
                 </tbody>
               </table>

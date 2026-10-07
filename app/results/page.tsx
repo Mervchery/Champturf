@@ -22,7 +22,7 @@ export default async function ResultsPage() {
           <h1 className="text-3xl font-display mt-1">{t("Race results")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <ResultsSearch races={races} />
         </div>

@@ -26,7 +26,7 @@ export default async function NewsPage({ searchParams }: { searchParams: { cat?:
           <h1 className="text-3xl font-display mt-1">{t("News & reports")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex gap-2 flex-wrap mb-7">
             <Link href="/news" className={`pill ${!cat ? "pill-gold" : "pill-outline"}`}>{t("All")}</Link>

@@ -25,7 +25,7 @@ export default async function JockeysPage({ searchParams }: { searchParams: { ta
           <h1 className="text-3xl font-display mt-1">{t("Jockeys & apprentices")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex gap-1 border-b border-line mb-7">
             <Link href="/jockeys?tab=pro" className={`pb-2.5 pr-5 text-sm border-b-2 ${tab === "pro" ? "border-coral font-semibold" : "border-transparent opacity-70"}`}>

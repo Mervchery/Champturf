@@ -22,7 +22,7 @@ export default async function TrainersPage() {
           <h1 className="text-3xl font-display mt-1">{t("Trainers")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5">
           {trainers.map((tr) => (
             <div key={tr.id} className="card no-hover">

@@ -7,7 +7,7 @@ export default function Footer() {
   const { t } = getT();
   const link = "block text-sm py-1 text-white/75 hover:text-white transition-colors";
   return (
-    <footer className="bg-turf text-white/70 pt-12 mt-16 pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
+    <footer className="bg-turf text-white/70 pt-10 md:pt-12 mt-12 md:mt-16 pb-[calc(1.75rem+env(safe-area-inset-bottom))]">
       <div className="wrap flex flex-wrap gap-8 justify-between">
         <div className="max-w-[260px]">
           <div className="flex items-center gap-2.5 mb-2.5">

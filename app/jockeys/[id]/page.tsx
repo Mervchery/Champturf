@@ -37,7 +37,7 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
           </div>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <Link href="/jockeys" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to jockeys")}</Link>
 
@@ -51,7 +51,7 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
           {j.apprentice ? (
             <div className="panel mt-6">
               <h2 className="text-sm font-semibold mb-3">{t("Apprenticeship")}</h2>
-              <table>
+              <table className="kv">
                 <tbody>
                   <tr><td>{t("Mentor jockey")}</td><td>{j.mentor ? <Link href={`/jockeys/${j.mentor.id}`} className="font-semibold">{j.mentor.name}</Link> : t("Unknown")}</td></tr>
                   <tr><td>{t("Apprentice allowance")}</td><td>{j.allowance ?? t("N/A")}</td></tr>

@@ -70,7 +70,7 @@ export default async function HomePage() {
       </section>
 
       {/* RECENT RESULTS */}
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Recent results")}</h2>
@@ -103,7 +103,7 @@ export default async function HomePage() {
       </section>
 
       {/* LEADERBOARDS */}
-      <section className="py-14 bg-parchment2">
+      <section className="py-10 md:py-14 bg-parchment2">
         <div className="wrap grid grid-cols-1 md:grid-cols-2 gap-10">
           <div>
             <div className="flex justify-between items-end mb-4">
@@ -145,7 +145,7 @@ export default async function HomePage() {
       </section>
 
       {/* UPCOMING RACES */}
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Upcoming race days")}</h2>
@@ -168,7 +168,7 @@ export default async function HomePage() {
       </section>
 
       {/* NEWS */}
-      <section className="pb-14">
+      <section className="pb-10 md:pb-14">
         <div className="wrap">
           <div className="flex justify-between items-end mb-7 flex-wrap gap-4">
             <h2 className="font-display text-3xl">{t("Latest news")}</h2>

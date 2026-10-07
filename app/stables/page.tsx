@@ -23,7 +23,7 @@ export default async function StablesPage() {
           <h1 className="text-3xl font-display mt-1">{t("Stables")}</h1>
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
           {stables.map((s) => (
             <Link key={s.id} href={`/stables/${s.id}`} className="card">

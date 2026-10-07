@@ -121,7 +121,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           )}
         </div>
       </div>
-      <section className="py-14">
+      <section className="py-10 md:py-14">
         <div className="wrap">
           <div className="flex flex-wrap gap-4 justify-between items-center">
             <Link href="/race-days" className="inline-block text-sm border-b border-ink pb-1">← {t("All race days")}</Link>
@@ -258,7 +258,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 <div className="panel mt-8">
                   <h2 className="font-display text-xl">{t("Time factors")}</h2>
                   <div className="overflow-x-auto mt-3">
-                    <table>
+                    <table className="data-table">
                       <thead>
                         <tr>
                           <th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Fastest time")}</th><th>{t("Days since")}</th><th>{t("Best (last 3 starts)")}</th>
@@ -268,10 +268,10 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                         {timeFactors.map((e) => (
                           <tr key={e.id}>
                             <td>{e.runner_no ?? "—"}</td>
-                            <td>{e.horses?.name ?? t("Unknown")}</td>
-                            <td className="tabular-nums">{e.tf_fastest ?? "—"}</td>
-                            <td>{e.tf_days_since ?? "—"}</td>
-                            <td className="tabular-nums">{e.tf_best3 ?? "—"}</td>
+                            <td data-title>{e.horses?.name ?? t("Unknown")}</td>
+                            <td data-label={t("Fastest time")} className="tabular-nums">{e.tf_fastest ?? "—"}</td>
+                            <td data-label={t("Days since")}>{e.tf_days_since ?? "—"}</td>
+                            <td data-label={t("Best (last 3 starts)")} className="tabular-nums">{e.tf_best3 ?? "—"}</td>
                           </tr>
                         ))}
                       </tbody>

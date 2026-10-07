@@ -45,16 +45,16 @@ export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
           {r.results.length === 0 ? (
             <p className="text-sm opacity-70 mt-2">{t("No result entered yet.")}</p>
           ) : (
-            <table className="mt-3">
+            <table className="data-table mt-3">
               <thead><tr><th>{t("Pos")}</th><th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Jockey")}</th><th>{t("Time")}</th></tr></thead>
               <tbody>
                 {r.results.map((row) => (
                   <tr key={row.id}>
                     <td>{ordinal(lang, row.position)}</td>
-                    <td className="tabular-nums opacity-70">{row.runner_no ?? t("N/A")}</td>
-                    <td>{row.horses?.name ?? "—"}</td>
-                    <td>{row.jockey}</td>
-                    <td className="font-mono">{row.finish_time}</td>
+                    <td data-label={t("No.")} className="tabular-nums opacity-70">{row.runner_no ?? t("N/A")}</td>
+                    <td data-title>{row.horses?.name ?? "—"}</td>
+                    <td data-label={t("Jockey")}>{row.jockey}</td>
+                    <td data-label={t("Time")} className="font-mono">{row.finish_time}</td>
                   </tr>
                 ))}
               </tbody>
