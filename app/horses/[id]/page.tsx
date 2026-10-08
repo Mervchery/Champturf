@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { HorseIcon } from "@/components/RacingIcons";
 import { getHorseById, getHorseProfileExtras, type HorseProfileExtras } from "@/lib/horses";
 import { fmtDateLong } from "@/lib/i18n";
-import { fmtTime, mauritiusDate, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
+import { fmtOdds, fmtTime, mauritiusDate, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
 import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
 import EmptyState from "@/components/EmptyState";
@@ -111,7 +111,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                 <div>
                   <div className="stat-label">{t("Win")}</div>
                   <div className="font-mono font-bold mt-0.5 flex items-center gap-1.5">
-                    {next.odds ?? "—"}
+                    {fmtOdds(next.odds) ?? "—"}
                     {nextDir && (nextDir === "down"
                       ? <ArrowDown size={13} strokeWidth={3} className="text-emerald-600" aria-label={t("Firming")} />
                       : <ArrowUp size={13} strokeWidth={3} className="text-red-600" aria-label={t("Drifting")} />)}
@@ -216,7 +216,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                       <td data-label={t("Distance")} className="text-xs">{r.distance ?? "—"}</td>
                       <td data-label={t("Jockey")} className="text-xs">{r.jockeyId ? <Link href={`/jockeys/${r.jockeyId}`} className="hover:underline">{r.jockeyName}</Link> : (r.jockeyName ?? "—")}</td>
                       <td data-label={t("Trainer")} className="text-xs">{r.trainerName ?? "—"}</td>
-                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums">{r.odds ?? "—"}</td>
+                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums">{fmtOdds(r.odds) ?? "—"}</td>
                       <td data-label={t("Time")} className="text-xs font-mono">{r.time ?? "—"}</td>
                     </tr>
                   ))}

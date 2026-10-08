@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ArrowDown, ArrowUp, Star } from "lucide-react";
 import { getT } from "@/lib/i18n/server";
-import { oddsDirection, parseOdds } from "@/lib/raceState";
+import { fmtOdds, oddsDirection, parseOdds } from "@/lib/raceState";
 import type { RaceEntry } from "@/lib/races";
 
 type Row = {
@@ -54,12 +54,12 @@ export default function MarketBoard({ entries }: { entries: RaceEntry[] }) {
         <div className="flex flex-wrap gap-2 mt-3">
           {firmest && firmest.change! < 0 && (
             <span className="mover mover-down">
-              <ArrowDown size={12} strokeWidth={3} /> {t("Firming")}: <strong>{firmest.entry.horses?.name ?? "—"}</strong> {firmest.entry.odds_open} → {firmest.entry.odds}
+              <ArrowDown size={12} strokeWidth={3} /> {t("Firming")}: <strong>{firmest.entry.horses?.name ?? "—"}</strong> {fmtOdds(firmest.entry.odds_open)} → {fmtOdds(firmest.entry.odds)}
             </span>
           )}
           {drifter && drifter.change! > 0 && (
             <span className="mover mover-up">
-              <ArrowUp size={12} strokeWidth={3} /> {t("Drifting")}: <strong>{drifter.entry.horses?.name ?? "—"}</strong> {drifter.entry.odds_open} → {drifter.entry.odds}
+              <ArrowUp size={12} strokeWidth={3} /> {t("Drifting")}: <strong>{drifter.entry.horses?.name ?? "—"}</strong> {fmtOdds(drifter.entry.odds_open)} → {fmtOdds(drifter.entry.odds)}
             </span>
           )}
         </div>
@@ -86,7 +86,7 @@ export default function MarketBoard({ entries }: { entries: RaceEntry[] }) {
                 </div>
                 <div className="text-[0.7rem] opacity-65 truncate">
                   {e.jockeys?.name ?? t("Unknown")}
-                  {e.odds_open && r.change != null ? ` · ${t("Opened {n}", { n: e.odds_open })}` : ""}
+                  {e.odds_open && r.change != null ? ` · ${t("Opened {n}", { n: fmtOdds(e.odds_open) ?? "" })}` : ""}
                 </div>
               </div>
               <div className="text-right shrink-0 flex items-center gap-2">
@@ -94,8 +94,8 @@ export default function MarketBoard({ entries }: { entries: RaceEntry[] }) {
                   ? <ArrowDown size={13} strokeWidth={3} className="text-emerald-600" aria-label={t("Firming")} />
                   : <ArrowUp size={13} strokeWidth={3} className="text-red-600" aria-label={t("Drifting")} />)}
                 <div>
-                  <div className="font-mono font-bold tabular-nums leading-tight">{e.odds ?? "—"}</div>
-                  <div className="text-[0.65rem] opacity-60 font-mono leading-tight">{e.place_odds ? `${t("Place")} ${e.place_odds}` : ""}</div>
+                  <div className="font-mono font-bold tabular-nums leading-tight">{fmtOdds(e.odds) ?? "—"}</div>
+                  <div className="text-[0.65rem] opacity-60 font-mono leading-tight">{e.place_odds ? `${t("Place")} ${fmtOdds(e.place_odds)}` : ""}</div>
                 </div>
               </div>
             </li>

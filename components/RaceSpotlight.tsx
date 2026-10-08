@@ -7,7 +7,7 @@ import Countdown from "@/components/Countdown";
 import { useNow } from "@/lib/useNow";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
-import { fmtTime, getRacePhase, mauritiusDate, oddsDirection, pickBoardState } from "@/lib/raceState";
+import { fmtOdds, fmtTime, getRacePhase, mauritiusDate, oddsDirection, pickBoardState } from "@/lib/raceState";
 
 export type SpotRunner = { no: number | null; name: string; odds: string | null; oddsPrev: string | null };
 
@@ -129,7 +129,7 @@ export default function RaceSpotlight({ races, serverNow, variant = "panel" }: P
                   {dir && (dir === "down"
                     ? <ArrowDown size={12} strokeWidth={3} className="text-emerald-500 shrink-0" aria-label={t("Firming")} />
                     : <ArrowUp size={12} strokeWidth={3} className="text-red-500 shrink-0" aria-label={t("Drifting")} />)}
-                  <span className={`font-mono font-semibold tabular-nums ${hero ? "text-gold2" : ""}`}>{r.odds}</span>
+                  <span className={`font-mono font-semibold tabular-nums ${hero ? "text-gold2" : ""}`}>{fmtOdds(r.odds)}</span>
                 </li>
               );
             })}

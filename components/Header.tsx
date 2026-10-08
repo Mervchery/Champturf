@@ -4,7 +4,7 @@ import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Menu, X, Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
 import { useRaceStatus } from "@/lib/useRaceStatus";
@@ -35,7 +35,7 @@ export default function Header() {
   // Close the menu whenever the page changes, and let the bottom tab bar's "More" open it.
   useEffect(() => { setOpen(false); setSearchOpen(false); }, [pathname]);
   useEffect(() => {
-    const openMenu = () => { setOpen(true); setSearchOpen(false); };
+    const openMenu = () => { setOpen((v) => !v); setSearchOpen(false); }; // "More" in the tab bar toggles it
     window.addEventListener("ct:open-menu", openMenu);
     return () => window.removeEventListener("ct:open-menu", openMenu);
   }, []);
@@ -56,14 +56,6 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-[100] pt-[env(safe-area-inset-top)] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
       <div className="wrap flex items-center gap-3 md:gap-5 py-2 md:py-3.5">
-        <button
-          className="md:hidden flex items-center justify-center w-9 h-9 rounded-lg bg-white/10 border border-white/15 shrink-0"
-          aria-label={t("Menu")}
-          onClick={() => { setOpen((v) => !v); setSearchOpen(false); }}
-        >
-          {open ? <X size={18} /> : <Menu size={18} />}
-        </button>
-
         <Link href="/" className="flex items-center gap-2 md:gap-2.5 font-display text-lg md:text-xl font-bold shrink-0" aria-label="Champ Turf">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="" width={38} height={38} className="brand-logo w-8 h-8 md:w-[38px] md:h-[38px]" />

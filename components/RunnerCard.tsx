@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { fmtOdds } from "@/lib/raceState";
 import SilkImage from "@/components/SilkImage";
 import FollowButton from "@/components/FollowButton";
 import { fmtMoney } from "@/lib/format";
@@ -146,14 +147,14 @@ function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & 
   const now = Number(value), before = Number(prev);
   if (!Number.isFinite(now) || !Number.isFinite(before) || now === before) return null;
   const up = now > before; // bigger number = longer price = drifting
-  const diff = Math.abs(now - before);
+  const diff = Math.abs(now - before) * 10; // shown x10, like the prices
   const fresh = !!changedAt && Date.now() - new Date(changedAt).getTime() < 15 * 60 * 1000;
-  const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: open })}` : ""}`;
+  const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: fmtOdds(prev) ?? prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: fmtOdds(open) ?? open })}` : ""}`;
   const Icon = up ? ArrowUp : ArrowDown;
   return (
     <span className={`odds-move ${up ? "is-up" : "is-down"} ${fresh ? "is-fresh" : ""}`} title={label} aria-label={label}>
       <Icon size={11} strokeWidth={3} />
-      {Number.isInteger(diff) ? diff : diff.toFixed(1)}
+      {Math.round(diff * 100) / 100}
     </span>
   );
 }
@@ -165,7 +166,7 @@ function OddsPill({ kind, value, prev, open, changedAt }: { kind: "win" | "place
       <span className="odds-label">{kind === "win" ? t("Win") : t("Place")}</span>
       <span className="odds-right">
         <MoveBadge value={value} prev={prev} open={open} changedAt={changedAt} />
-        <span className="odds-value">{value ?? "—"}</span>
+        <span className="odds-value">{fmtOdds(value) ?? "—"}</span>
       </span>
     </div>
   );

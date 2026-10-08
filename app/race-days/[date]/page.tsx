@@ -7,7 +7,7 @@ import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
 import { getMeetingBoard, toSpotRace } from "@/lib/raceDay";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
-import { fmtTime, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
+import { fmtOdds, fmtTime, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
 import { PodiumList } from "@/components/Podium";
 import RaceStrip from "@/components/RaceStrip";
 import RaceSpotlight from "@/components/RaceSpotlight";
@@ -131,7 +131,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
                             {dir && (dir === "down"
                               ? <ArrowDown size={12} strokeWidth={3} className="text-emerald-600 shrink-0" aria-label={t("Firming")} />
                               : <ArrowUp size={12} strokeWidth={3} className="text-red-600 shrink-0" aria-label={t("Drifting")} />)}
-                            <span className="font-mono font-semibold tabular-nums">{m.odds}</span>
+                            <span className="font-mono font-semibold tabular-nums">{fmtOdds(m.odds)}</span>
                           </li>
                         );
                       })}

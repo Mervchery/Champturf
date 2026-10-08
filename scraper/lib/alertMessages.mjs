@@ -33,7 +33,8 @@ export function dateLabel(isoDate, lang) {
 }
 
 const hhmm = (t) => (t ? String(t).slice(0, 5) : "");
-const fmt = (n) => (Number.isInteger(n) ? String(n) : String(n));
+// Prices are shown x10 everywhere on the site (12 -> 120); alerts match. Move detection above stays on raw values.
+const fmt = (n) => String(Math.round(Number(String(n).replace(",", ".")) * 10 * 100) / 100);
 
 /** Build the {en, fr} title/body pair for one alert. */
 export function buildMessage(kind, d) {
@@ -42,7 +43,7 @@ export function buildMessage(kind, d) {
     const extra = (lang) => [
       d.runnerNo != null ? (lang === "fr" ? `n° ${d.runnerNo}` : `No. ${d.runnerNo}`) : null,
       d.jockey ? (lang === "fr" ? `jockey ${d.jockey}` : `jockey ${d.jockey}`) : null,
-      d.odds ? (lang === "fr" ? `cote ${d.odds}` : `win ${d.odds}`) : null,
+      d.odds ? (lang === "fr" ? `cote ${fmt(d.odds)}` : `win ${fmt(d.odds)}`) : null,
     ].filter(Boolean);
     return {
       en: { title: `${d.horse} is declared to run`, body: [`${d.raceName}`, when("en"), ...extra("en")].join(" · ") },

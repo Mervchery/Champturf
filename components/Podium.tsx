@@ -3,7 +3,7 @@ import SilkImage from "@/components/SilkImage";
 import { getT } from "@/lib/i18n/server";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { fmtMoney } from "@/lib/format";
-import { fmtTime } from "@/lib/raceState";
+import { fmtOdds, fmtTime } from "@/lib/raceState";
 import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
 import { ChevronRight } from "lucide-react";
 import type { PodiumRow, ResultRace } from "@/lib/raceDay";
@@ -51,7 +51,7 @@ export function PodiumList({ rows, showTime = true }: { rows: PodiumRow[]; showT
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-mono font-semibold tabular-nums leading-tight">{p.odds ?? "—"}</div>
+            <div className="font-mono font-semibold tabular-nums leading-tight">{fmtOdds(p.odds) ?? "—"}</div>
             <div className="text-[0.68rem] opacity-60 leading-tight mt-0.5">
               {showTime && p.time ? <span className="font-mono">{p.time}</span> : p.odds ? t("SP") : ""}
             </div>
