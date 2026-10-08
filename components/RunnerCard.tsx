@@ -335,7 +335,7 @@ export function ResultRow({
       </div>
 
       <div className="stats-grid">
-        <Stat label="Horse No.">{number ?? t("N/A")}</Stat>
+        <Stat label="No.">{number ?? t("N/A")}</Stat>
         <Stat label="Gate">{gate ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
         {rating != null && <Stat label="Rating">{rating}</Stat>}
