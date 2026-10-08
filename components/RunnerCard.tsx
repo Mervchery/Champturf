@@ -259,7 +259,8 @@ export function EntryRow({
       </div>
 
       <div className="stats-grid">
-        {gate != null && <Stat label="Gate">{gate}</Stat>}
+        <Stat label="Horse No.">{number ?? t("N/A")}</Stat>
+        <Stat label="Gate">{gate ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
         <Stat label="Rating">{rating ?? horse?.rating ?? t("N/A")}</Stat>
         {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
@@ -335,7 +336,7 @@ export function ResultRow({
 
       <div className="stats-grid">
         <Stat label="Horse No.">{number ?? t("N/A")}</Stat>
-        {gate != null && <Stat label="Gate">{gate}</Stat>}
+        <Stat label="Gate">{gate ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
         {rating != null && <Stat label="Rating">{rating}</Stat>}
         {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
