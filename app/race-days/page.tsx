@@ -1,6 +1,9 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { CalendarDays, Flag, CloudSun } from "lucide-react";
+import EmptyState from "@/components/EmptyState";
+import LiveRefresh from "@/components/LiveRefresh";
+import { mauritiusDate } from "@/lib/raceState";
 import { fmtMoney } from "@/lib/format";
 import { getRaceDays } from "@/lib/meetings";
 import { fmtDateLong } from "@/lib/i18n";
@@ -16,8 +19,11 @@ export function generateMetadata(): Metadata {
 export default async function RaceDaysPage() {
   const { t, lang } = getT();
   const days = await getRaceDays();
-  const upcoming = days.filter((d) => d.status !== "completed");
+  const today = mauritiusDate(Date.now());
+  // Soonest meeting first (getRaceDays returns newest first, which suits the past list but not this one).
+  const upcoming = days.filter((d) => d.status !== "completed").sort((a, b) => a.race_date.localeCompare(b.race_date));
   const completed = days.filter((d) => d.status === "completed");
+  const hasToday = upcoming.some((d) => d.race_date === today);
 
   return (
     <div>
@@ -28,6 +34,7 @@ export default async function RaceDaysPage() {
           <p className="text-white/70 text-sm mt-2 max-w-[52ch]">
             {t("Every meeting at Champ de Mars, grouped by race day — pick a date to see the full card.")}
           </p>
+          {hasToday && <div className="mt-4"><LiveRefresh intervalSec={60} className="on-dark" /></div>}
         </div>
       </div>
 
@@ -37,7 +44,7 @@ export default async function RaceDaysPage() {
             <>
               <h2 className="font-display text-2xl mb-5">{t("Upcoming")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-14">
-                {upcoming.map((d) => <RaceDayCard key={d.race_date} day={d} />)}
+                {upcoming.map((d) => <RaceDayCard key={d.race_date} day={d} today={today} />)}
               </div>
             </>
           )}
@@ -46,27 +53,36 @@ export default async function RaceDaysPage() {
             <>
               <h2 className="font-display text-2xl mb-5">{t("Past meetings")}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                {completed.map((d) => <RaceDayCard key={d.race_date} day={d} />)}
+                {completed.map((d) => <RaceDayCard key={d.race_date} day={d} today={today} />)}
               </div>
             </>
           )}
 
-          {days.length === 0 && <p className="text-sm opacity-70">{t("No race days yet.")}</p>}
+          {days.length === 0 && (
+            <EmptyState
+              icon={<CalendarDays size={22} />}
+              title={t("No race days yet.")}
+              hint={t("Meetings are normally held on Saturdays and Sundays. They appear here as soon as the card is published.")}
+            />
+          )}
         </div>
       </section>
     </div>
   );
 }
 
-function RaceDayCard({ day }: { day: Awaited<ReturnType<typeof getRaceDays>>[number] }) {
+function RaceDayCard({ day, today }: { day: Awaited<ReturnType<typeof getRaceDays>>[number]; today: string }) {
   const { t, lang } = getT();
   const dateLabel = fmtDateLong(lang, day.race_date);
 
   return (
     <Link href={`/race-days/${day.race_date}`} className="card fade-in p-5 block">
       <div className="flex items-center justify-between mb-3">
-        <span className={`pill ${day.status === "upcoming" ? "pill-gold" : "pill-outline"}`}>
-          {day.status === "mixed" ? t("In progress") : day.status === "upcoming" ? t("Upcoming") : t("Completed")}
+        <span className="flex items-center gap-1.5">
+          <span className={`pill ${day.status === "upcoming" ? "pill-gold" : "pill-outline"}`}>
+            {day.status === "mixed" ? t("In progress") : day.status === "upcoming" ? t("Upcoming") : t("Completed")}
+          </span>
+          {day.race_date === today && <span className="pill pill-coral">{t("Today")}</span>}
         </span>
         <CalendarDays size={16} className="opacity-70" />
       </div>

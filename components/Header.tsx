@@ -2,11 +2,12 @@
 
 import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { Menu, X, Search } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 import UserMenu from "./UserMenu";
+import { useRaceStatus } from "@/lib/useRaceStatus";
 
 const NAV_ITEMS = [
   ["/", "Home"],
@@ -28,6 +29,18 @@ export default function Header() {
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
+  const pathname = usePathname() || "/";
+  const status = useRaceStatus();
+
+  // Close the menu whenever the page changes, and let the bottom tab bar's "More" open it.
+  useEffect(() => { setOpen(false); setSearchOpen(false); }, [pathname]);
+  useEffect(() => {
+    const openMenu = () => { setOpen(true); setSearchOpen(false); };
+    window.addEventListener("ct:open-menu", openMenu);
+    return () => window.removeEventListener("ct:open-menu", openMenu);
+  }, []);
+
+  const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   function submitSearch(e: React.FormEvent) {
     e.preventDefault();
@@ -62,9 +75,11 @@ export default function Header() {
             <Link
               key={href}
               href={href}
-              className="whitespace-nowrap text-sm px-3 py-2 rounded-full text-white/80 hover:text-white hover:bg-white/5 transition"
+              aria-current={isActive(href) ? "page" : undefined}
+              className={`whitespace-nowrap text-sm px-3 py-2 rounded-full transition inline-flex items-center gap-1.5 ${isActive(href) ? "text-white bg-white/10" : "text-white/80 hover:text-white hover:bg-white/5"}`}
             >
               {t(label)}
+              {href === "/live" && status.live && <span className="live-dot" aria-label={t("LIVE")} />}
             </Link>
           ))}
         </nav>
@@ -112,15 +127,17 @@ export default function Header() {
       )}
 
       {open && (
-        <nav aria-label={t("Main navigation")} className="md:hidden flex flex-col gap-1 px-4 pb-4">
+        <nav aria-label={t("Main navigation")} className="md:hidden grid grid-cols-2 gap-2 px-4 pb-4 max-h-[calc(100dvh-8rem)] overflow-y-auto">
           {NAV_ITEMS.map(([href, label]) => (
             <Link
               key={href}
               href={href}
               onClick={() => setOpen(false)}
-              className="px-3 py-3 rounded-lg text-sm border-b border-white/5"
+              aria-current={isActive(href) ? "page" : undefined}
+              className={`px-3.5 min-h-[46px] flex items-center justify-between rounded-xl text-sm border ${isActive(href) ? "bg-white/15 border-white/25 font-semibold" : "bg-white/5 border-white/10"}`}
             >
               {t(label)}
+              {href === "/live" && status.live && <span className="live-dot" aria-label={t("LIVE")} />}
             </Link>
           ))}
         </nav>

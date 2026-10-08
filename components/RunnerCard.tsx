@@ -197,6 +197,19 @@ function HorseName({ horse }: { horse: HorseSummary | null }) {
     : <span className="font-semibold opacity-70">{t("Unknown")}</span>;
 }
 
+/** Recent finishing positions, newest first: wins gold, places solid, the rest muted. */
+function FormPills({ form, daysSince }: { form: string[]; daysSince?: string | null }) {
+  const { t } = getT();
+  return (
+    <div className="flex items-center gap-1.5 flex-wrap justify-end" aria-label={t("Recent form")}>
+      {daysSince && <span className="text-[0.62rem] opacity-65 mr-1 whitespace-nowrap">{t("Last run {n}d ago", { n: daysSince })}</span>}
+      {form.map((f, i) => (
+        <span key={i} className={`form-pill ${f === "1" ? "is-win" : f === "2" || f === "3" ? "is-place" : ""}`} title={i === 0 ? t("Latest run") : undefined}>{f}</span>
+      ))}
+    </div>
+  );
+}
+
 const delayFor = (index?: number) => ({ "--delay": `${Math.min(index ?? 0, 12) * 55}ms` } as React.CSSProperties);
 
 function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, string | number>) => string) {
@@ -205,12 +218,14 @@ function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, st
 }
 
 export function EntryRow({
-  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, index, follow,
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, daysSince = null, index, follow,
 }: BaseProps & {
   gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
   oddsPrev?: string | null; placeOddsPrev?: string | null; oddsOpen?: string | null; placeOddsOpen?: string | null; oddsChangedAt?: string | null;
   form?: string[];
+  // Days since the horse last ran (from the Jockey Club time factors), when known.
+  daysSince?: string | null;
   // When set, a small "follow for alerts" bell is shown next to the horse's name.
   follow?: { signedIn: boolean; following: boolean };
 }) {
@@ -265,16 +280,16 @@ export function EntryRow({
             <span className="whitespace-nowrap">{fmtMoney(horse.earnings, lang)}</span>
           </div>
           {form && form.length > 0 && (
-            <div className="flex gap-1 ml-auto flex-wrap justify-end" aria-label={t("Recent form")}>
-              {form.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"} !text-[0.6rem] !py-0.5`}>{f}</span>)}
-            </div>
+            <div className="ml-auto"><FormPills form={form} daysSince={daysSince} /></div>
           )}
         </div>
       )}
-      {!(horse && horse.starts > 0) && form && form.length > 0 && (
-        <div className="flex gap-1 mt-3 flex-wrap">
-          {form.map((f, i) => <span key={i} className={`pill ${f === "1" ? "pill-gold" : "pill-outline"} !text-[0.6rem] !py-0.5`}>{f}</span>)}
-        </div>
+      {!(horse && horse.starts > 0) && (
+        form && form.length > 0 ? (
+          <div className="mt-3"><FormPills form={form} daysSince={daysSince} /></div>
+        ) : (
+          <div className="mt-3 text-xs opacity-65">{t("First-time starter — no previous runs recorded.")}</div>
+        )
       )}
     </div>
   );

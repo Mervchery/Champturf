@@ -1,66 +1,62 @@
 "use client";
 
 import { useT } from "@/components/LanguageProvider";
-import { useMemo, useState } from "react";
-import { Download } from "lucide-react";
-import { ordinal } from "@/lib/i18n";
-import type { Race, RaceResult } from "@/lib/races";
+import { useMemo, useState, type ReactNode } from "react";
+import { Download, Search } from "lucide-react";
+import { fmtDateLong } from "@/lib/i18n";
 
-type RaceWithResults = Race & { results: RaceResult[] };
+export type ResultItem = {
+  id: string;
+  date: string;
+  /** Lower-cased names of every finisher, jockey and trainer. */
+  search: string;
+  /** The race's result card, rendered on the server. */
+  node: ReactNode;
+};
 
-export default function ResultsSearch({ races }: { races: RaceWithResults[] }) {
+/** Search box + print button over the results list, grouped by race day. The cards are
+ *  rendered on the server and passed in; this only decides which stay visible. */
+export default function ResultsSearch({ items }: { items: ResultItem[] }) {
   const { t, lang } = useT();
   const [q, setQ] = useState("");
 
-  const filtered = useMemo(() => {
-    const query = q.toLowerCase();
-    return races.filter((r) => {
-      const blob = (r.name + " " + r.results.map((x) => (x.horses?.name ?? "") + " " + x.jockey).join(" ")).toLowerCase();
-      return blob.includes(query);
-    });
-  }, [q, races]);
+  const groups = useMemo(() => {
+    const query = q.trim().toLowerCase();
+    const shown = query ? items.filter((i) => i.search.includes(query)) : items;
+    const byDate = new Map<string, ResultItem[]>();
+    for (const it of shown) byDate.set(it.date, [...(byDate.get(it.date) ?? []), it]);
+    return [...byDate.entries()];
+  }, [q, items]);
 
   return (
     <div>
-      <div className="flex flex-col sm:flex-row gap-2.5 mb-7">
-        <input
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          placeholder={t("Search by horse, jockey, trainer, race…")}
-          className="px-3.5 py-2 border border-line rounded-full bg-surface text-sm flex-1"
-        />
-        <button onClick={() => window.print()} className="btn btn-outline print:hidden">
+      <div className="flex flex-col sm:flex-row gap-2.5 mb-5 print:hidden">
+        <label className="relative flex-1">
+          <span className="sr-only">{t("Search by horse, jockey, trainer, race…")}</span>
+          <Search size={15} className="absolute left-3.5 top-1/2 -translate-y-1/2 opacity-60 pointer-events-none" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            type="search"
+            inputMode="search"
+            placeholder={t("Search by horse, jockey, trainer, race…")}
+            className="w-full pl-10 pr-3.5 min-h-[44px] border border-line rounded-full bg-surface text-sm"
+          />
+        </label>
+        <button onClick={() => window.print()} className="btn btn-outline">
           <Download size={15} /> {t("Print / save as PDF")}
         </button>
       </div>
 
-      {filtered.length === 0 && <p className="text-sm opacity-70">{t("No results match your search.")}</p>}
+      {groups.length === 0 && <p className="text-sm opacity-70 py-6 text-center">{t("No results match your search.")}</p>}
 
-      {filtered.map((r) => (
-        <div key={r.id} className="panel mb-4">
-          <div className="flex justify-between flex-wrap gap-2">
-            <h2 className="font-semibold">{r.name}</h2>
-            <span className="text-sm opacity-70">{r.race_date} · {r.course} · {r.distance}</span>
+      {groups.map(([date, list]) => (
+        <section key={date} className="mb-8" id={`day-${date}`}>
+          <h2 className="font-display text-xl mb-3">{fmtDateLong(lang, date)}</h2>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            {list.map((it) => <div key={it.id}>{it.node}</div>)}
           </div>
-          {r.results.length === 0 ? (
-            <p className="text-sm opacity-70 mt-2">{t("No result entered yet.")}</p>
-          ) : (
-            <table className="data-table mt-3">
-              <thead><tr><th>{t("Pos")}</th><th>{t("No.")}</th><th>{t("Horse")}</th><th>{t("Jockey")}</th><th>{t("Time")}</th></tr></thead>
-              <tbody>
-                {r.results.map((row) => (
-                  <tr key={row.id}>
-                    <td>{ordinal(lang, row.position)}</td>
-                    <td data-label={t("No.")} className="tabular-nums opacity-70">{row.runner_no ?? t("N/A")}</td>
-                    <td data-title>{row.horses?.name ?? "—"}</td>
-                    <td data-label={t("Jockey")}>{row.jockey}</td>
-                    <td data-label={t("Time")} className="font-mono">{row.finish_time}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-        </div>
+        </section>
       ))}
     </div>
   );

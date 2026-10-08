@@ -8,6 +8,22 @@ role-gated admin dashboard backed by **Supabase Auth**.
 Icons are from [lucide-react](https://lucide.dev) plus a few bespoke SVGs in
 `components/RacingIcons.tsx` — no emoji anywhere in the UI.
 
+## v9 — live race days (October 2026)
+
+Built on v8 with **no database changes and no scraper changes**: v9 only reads the tables the scraper already fills.
+
+- **Race states.** The database still has two statuses (`upcoming` / `completed`). `lib/raceState.ts` derives the rest from the start time in Mauritius time (UTC+4): *Upcoming → Off in n min (15 min before) → LIVE (first 10 min after the off) → Result pending → Finished*. A race with no result 3 h after the off shows "No result". Badges, countdowns, the race strip and banners follow the visitor's clock, so they flip at the off with no refresh.
+- **Automatic updates.** `components/LiveRefresh.tsx` re-renders the current page on the server every 15 s (around the off) to 90 s (a day out) and swaps the new odds / status / result in, keeping scroll and state. It pauses in background tabs and offline. Data still comes through the shared 30 s cache, so visitors share one query. `/api/race-status` + `lib/useRaceStatus.ts` drive the nav LIVE dot (one shared 30 s poll).
+- **Race page**: phase badge, countdown, sticky R1…Rn strip, state banner, ranked betting market with firming/drifting and biggest movers, podium summary for finished races, prev/next race, one-query form for the whole field.
+- **Race-day dashboard** (`/race-days/[date]`): next/live race spotlight, jump strip, one card per race (market leaders or podium).
+- **Homepage**: next race / LIVE card with countdown first (above the headline on phones), today's strip, latest results as 1-2-3 cards.
+- **Results centre**: grouped by race day, podium with jockey, trainer, SP and time, date chips, search, "Show earlier meetings" (no longer loads every race ever).
+- **Horse profile**: next run, strike rates, average finish, days since last run, previous runs (field size, jockey, trainer, SP, time), splits by distance and jockey.
+- **Mobile**: bottom tab bar (Home / Race day / Results / Live / More), 44 px targets, header menu closes on navigation.
+- **Polish**: `EmptyState`, route skeletons for race day, results, horse and live pages, retry + home on errors, French strings for everything new.
+
+Notes: the "Photo finish gallery" placeholder on race pages was removed (it only showed the word "Image"). Signed-in members run the Supabase session check in middleware on each `/races` and `/horses` refresh; if that ever matters, raise the intervals in `refreshIntervalSec`. Not built or run here (no network): run `npm install && npm run build` before deploying.
+
 ## What's real vs. mocked
 
 Every entity in the app is now backed by real Supabase tables with real

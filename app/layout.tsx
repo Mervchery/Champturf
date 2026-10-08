@@ -8,6 +8,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import Ticker from "@/components/Ticker";
 import NavProgress from "@/components/NavProgress";
+import MobileTabBar from "@/components/MobileTabBar";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { siteUrl } from "@/lib/site";
 
@@ -70,6 +71,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Ticker />
           <main>{children}</main>
           <Footer />
+          <MobileTabBar />
         </LanguageProvider>
       </body>
     </html>
