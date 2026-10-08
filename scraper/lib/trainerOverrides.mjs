@@ -20,10 +20,47 @@
 // genuinely changes trainers later, update its horses.trainer_id
 // directly in the admin dashboard instead of editing this file.
 export const TRAINER_OVERRIDES = {
+  // The "R. Gujadhur" trainer
   "rapidash": "R. Gujadhur",
   "future-swing": "R. Gujadhur",
+
+  // The plain "Gujadhur" trainer
+  "afrique": "Gujadhur",
+  "allez-moris": "Gujadhur",
+  "amancio": "Gujadhur",
+  "ashikule": "Gujadhur",
+  "at-my-command": "Gujadhur",
+  "blue-bay": "Gujadhur",
+  "boardwalk-breeze": "Gujadhur",
+  "boom-town": "Gujadhur",
   "courtly": "Gujadhur",
+  "crescent": "Gujadhur",
+  "diamond-days": "Gujadhur",
+  "future-frequency": "Gujadhur",
+  "grand-bay": "Gujadhur",
+  "join-the-dots": "Gujadhur",
+  "let-it-be-said": "Gujadhur",
+  "makazole": "Gujadhur",
+  "mercenary": "Gujadhur",
+  "midnight-flyer": "Gujadhur",
+  "montien": "Gujadhur",
+  "monumental": "Gujadhur",
+  "moonlight-trader": "Gujadhur",
+  "new-world": "Gujadhur",
+  "paved-with-gold": "Gujadhur",
+  "port-louis": "Gujadhur",
+  "river-hawk": "Gujadhur",
+  "smarten-up": "Gujadhur",
+  "soldier-boy": "Gujadhur",
+  "sun-blushed": "Gujadhur",
+  "taskmaster": "Gujadhur",
+  "the-centurion": "Gujadhur",
+  "the-mauritian": "Gujadhur",
   "view-of-the-world": "Gujadhur",
+  "wugug": "Gujadhur",
+  "zeus": "Gujadhur",
+  "zil-moris": "Gujadhur",
+  "zoomie": "Gujadhur",
 };
 
 export function resolveTrainerName(horseSlug, scrapedName) {

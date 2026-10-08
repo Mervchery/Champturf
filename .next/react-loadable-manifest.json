@@ -2,7 +2,7 @@
   "components/StreamPlayer.tsx -> hls.js": {
     "id": 3915,
     "files": [
-      "static/chunks/a4634e51.d790ddc0fb28b2d4.js"
+      "static/chunks/a4634e51.87d8615e6a59a477.js"
     ]
   },
   "node_modules/@supabase/auth-js/dist/module/lib/helpers.js -> @supabase/node-fetch": {
@@ -20,7 +20,7 @@
   "node_modules/@supabase/realtime-js/dist/module/RealtimeClient.js -> ws": {
     "id": 7035,
     "files": [
-      "static/chunks/35.03ae917f238a8966.js"
+      "static/chunks/7035.cb726032edead13d.js"
     ]
   },
   "node_modules/@supabase/storage-js/dist/module/lib/helpers.js -> @supabase/node-fetch": {

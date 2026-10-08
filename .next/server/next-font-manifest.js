@@ -1,1 +1,1 @@
-self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{},"appUsingSizeAdjust":false,"pagesUsingSizeAdjust":false}';
+self.__NEXT_FONT_MANIFEST='{"pages":{},"app":{"/workspaces/Champturf/app/layout":["static/media/6e8c7cb283336a9d-s.p.woff2","static/media/d3ebbfd689654d3a-s.p.woff2","static/media/98e207f02528a563-s.p.woff2","static/media/db96af6b531dc71f-s.p.woff2","static/media/26d4368bf94c0ec4-s.p.woff2"]},"appUsingSizeAdjust":true,"pagesUsingSizeAdjust":false}';

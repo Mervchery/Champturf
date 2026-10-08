@@ -13,8 +13,8 @@ export default function MobileTabBar() {
   const pathname = usePathname() || "/";
   const status = useRaceStatus();
 
-  // "Race day" goes straight to the meeting the site is about right now when we know it.
-  const raceDayHref = status.date ? `/race-days/${status.date}` : "/race-days";
+  // "Race day" goes straight to the next race when we know it, else the current meeting, else the calendar.
+  const raceDayHref = status.next ? `/races/${status.next.id}` : status.date ? `/race-days/${status.date}` : "/race-days";
 
   const tabs: { href: string; label: string; icon: React.ReactNode; active: boolean; live?: boolean }[] = [
     { href: "/", label: t("Home"), icon: <Home size={20} />, active: pathname === "/" },

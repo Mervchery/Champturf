@@ -4,13 +4,12 @@ import { notFound } from "next/navigation";
 import { ArrowDown, ArrowUp, ChevronRight, Trophy } from "lucide-react";
 import { getMeetingInfo } from "@/lib/meetings";
 import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
-import { getMeetingBoard, toSpotRace } from "@/lib/raceDay";
+import { getMeetingBoard } from "@/lib/raceDay";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
 import { fmtOdds, fmtTime, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
 import { PodiumList } from "@/components/Podium";
 import RaceStrip from "@/components/RaceStrip";
-import RaceSpotlight from "@/components/RaceSpotlight";
 import RacePhaseBadge from "@/components/RacePhaseBadge";
 import LiveRefresh from "@/components/LiveRefresh";
 import type { Metadata } from "next";
@@ -63,16 +62,14 @@ export default async function RaceDayPage({ params }: { params: { date: string }
         </div>
       </div>
 
-      <RaceStrip races={strip} serverNow={nowMs} mode="anchor" sticky />
+      <RaceStrip races={strip} serverNow={nowMs} sticky />
 
       <section className="py-6 md:py-10">
         <div className="wrap">
           <Link href="/race-days" className="inline-block text-sm border-b border-ink pb-1">← {t("All race days")}</Link>
 
           <div className="mt-5">
-            {open.length > 0 ? (
-              <RaceSpotlight races={open.map(toSpotRace)} serverNow={nowMs} variant="panel" />
-            ) : (
+            {open.length === 0 && (
               <div className="panel flex items-center gap-4">
                 <div className="w-11 h-11 rounded-full bg-gold2 flex items-center justify-center shrink-0"><Trophy size={20} className="text-ink" /></div>
                 <div className="min-w-0">

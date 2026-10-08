@@ -2,7 +2,7 @@
   "name": "champ-turf",
   "version": "9.0.0",
   "private": true,
-  "description": "Champ Turf \u2014 Mauritius horse racing platform",
+  "description": "Champ Turf — Mauritius horse racing platform",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -15,24 +15,24 @@
     "gen:vapid": "npx web-push generate-vapid-keys"
   },
   "dependencies": {
+    "@supabase/ssr": "0.4.0",
+    "@supabase/supabase-js": "2.44.4",
+    "hls.js": "1.5.13",
+    "lucide-react": "0.400.0",
     "next": "14.2.5",
     "react": "18.3.1",
     "react-dom": "18.3.1",
-    "hls.js": "1.5.13",
-    "lucide-react": "0.400.0",
-    "@supabase/ssr": "0.4.0",
-    "@supabase/supabase-js": "2.44.4",
     "web-push": "3.6.7"
   },
   "devDependencies": {
-    "typescript": "5.4.5",
     "@types/node": "20.12.12",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
-    "tailwindcss": "3.4.4",
-    "postcss": "8.4.38",
+    "@types/web-push": "3.6.3",
     "autoprefixer": "10.4.19",
-    "cheerio": "1.0.0",
-    "@types/web-push": "3.6.3"
+    "cheerio": "^1.0.0",
+    "postcss": "8.4.38",
+    "tailwindcss": "3.4.4",
+    "typescript": "5.4.5"
   }
 }

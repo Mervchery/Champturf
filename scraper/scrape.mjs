@@ -153,8 +153,8 @@ async function scrapeRace(raceUrl) {
 
   for (const [entryIndex, entry] of parsed.entries.entries()) {
     if (!entry.horseSlug) {
-      console.warn(`    Entry with no horse link found (gate ${entry.gate}) — skipping this runner.`);
-      stats.errors.push({ context: raceUrl, message: `No horse link for gate ${entry.gate}` });
+      console.warn(`    Entry with no horse link found (no. ${entry.runnerNo}) — skipping this runner.`);
+      stats.errors.push({ context: raceUrl, message: `No horse link for no. ${entry.runnerNo}` });
       continue;
     }
 
@@ -190,7 +190,7 @@ async function scrapeRace(raceUrl) {
           raceId: race.id, horseId: horse.id, position: entry.position,
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           finishTime: entry.finishTime, margin: null, weightKg: entry.weight,
-          gate: entry.gate,
+          gate: entry.gate, runnerNo: entry.runnerNo,
           winOdds: entry.winOdds, placeOdds: entry.placeOdds, gear: entry.gear, isTipped: entry.isTipped,
         });
         track("jockeys", result.jockey);
@@ -198,21 +198,19 @@ async function scrapeRace(raceUrl) {
         stats.resultsImported++;
         console.log(`    ${entry.position}. ${entry.horseName} (${entry.jockey ?? "jockey unknown"})`);
       } else {
-        // Supertote lists runners in actual racecard-No. order, so the
-        // card's own listing position (1-based) *is* the No. — the site
-        // doesn't expose a separate number field to scrape for this, and
-        // this is reliable where that would otherwise sit blank/N/A.
+        // Horse No. = the page's .r-number, gate = the page's .r-lane. The listing
+        // position is only a fallback if the number is missing.
         const result = await upsertEntry({
           raceId: race.id, horseId: horse.id,
           jockeyName: entry.jockey, trainerName: resolvedTrainerName,
           gate: entry.gate, weightKg: entry.weight,
-          runnerNo: entryIndex + 1,
+          runnerNo: entry.runnerNo ?? entryIndex + 1,
           winOdds: entry.winOdds, placeOdds: entry.placeOdds, gear: entry.gear, isTipped: entry.isTipped,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
         stats.entriesImported++;
-        console.log(`    Gate ${entry.gate}: ${entry.horseName} (${entry.jockey ?? "jockey unknown"}) Win ${entry.winOdds ?? "-"} / Place ${entry.placeOdds ?? "-"}${entry.gear ? ` gear ${entry.gear}` : ""}${entry.isTipped ? " ★ tipped" : ""}`);
+        console.log(`    No. ${entry.runnerNo ?? entryIndex + 1} (gate ${entry.gate ?? "-"}): ${entry.horseName} (${entry.jockey ?? "jockey unknown"}) Win ${entry.winOdds ?? "-"} / Place ${entry.placeOdds ?? "-"}${entry.gear ? ` gear ${entry.gear}` : ""}${entry.isTipped ? " ★ tipped" : ""}`);
       }
     } catch (e) {
       stats.errors.push({ context: `${raceUrl} / ${entry.horseName ?? entry.horseSlug}`, message: e.message });

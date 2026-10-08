@@ -54,8 +54,13 @@ export function parseRacePage(html) {
     const posMatch = placingText.match(/(\d+)/);
     const position = posMatch ? Number(posMatch[1]) : null;
 
-    const gateText = $el.find(".r-number").first().text().trim();
-    const gate = gateText ? Number(gateText) : null;
+    // Supertote prints both numbers per runner:
+    //   <span class="r-number">1</span>  = the horse's racecard number
+    //   <span class="r-lane">2</span>    = the starting gate / lane
+    const numText = $el.find(".r-numbers-holder .r-number, .r-number").first().text().trim();
+    const runnerNo = /^\d+$/.test(numText) ? Number(numText) : null;
+    const laneText = $el.find(".r-lane").first().text().trim();
+    const gate = /^\d+$/.test(laneText) ? Number(laneText) : null;
 
     const horseLink = $el.find(".r-name a").first();
     const horseName = horseLink.text().trim() || null;
@@ -88,7 +93,7 @@ export function parseRacePage(html) {
     const gear = gearItems.length ? gearItems.join(",") : null;
     const isTipped = $el.hasClass("tipped");
 
-    entries.push({ position, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl, winOdds, placeOdds, gear, isTipped });
+    entries.push({ position, runnerNo, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl, winOdds, placeOdds, gear, isTipped });
   });
 
   // Racing notes block: an <h4>Racing Notes</h4>, one or more <p> of analysis

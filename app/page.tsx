@@ -13,7 +13,7 @@ import { getRaceDays } from "@/lib/meetings";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
 import { getCurrentMeetingDate, getLatestResults, getMeetingBoard, toSpotRace, type BoardRace, type ResultRace } from "@/lib/raceDay";
-import { mauritiusDate, refreshIntervalSec } from "@/lib/raceState";
+import { mauritiusDate, pickBoardState, refreshIntervalSec } from "@/lib/raceState";
 
 /** Secondary sections must never take the whole homepage down. */
 async function safe<T>(p: Promise<T>, fallback: T): Promise<T> {
@@ -37,6 +37,9 @@ export default async function HomePage() {
   const open = board.filter((b) => b.race.status !== "completed");
   const refreshSec = refreshIntervalSec(open.map((b) => b.race), nowMs);
   const today = mauritiusDate(nowMs);
+  // The race the visitor most wants: the one running now, else the next to go, else one awaiting its result.
+  const board_ = pickBoardState(open.map((b) => b.race), nowMs);
+  const focusRace = board_.live[0] ?? board_.next ?? board_.awaiting[0] ?? open[0]?.race ?? null;
   const strip = board.map((b) => ({ id: b.race.id, no: b.no, race_date: b.race.race_date, race_time: b.race.race_time, status: b.race.status }));
 
   const topHorses = [...horses].sort((a, b) => b.wins - a.wins).slice(0, 5);
@@ -63,7 +66,7 @@ export default async function HomePage() {
             </p>
             <div className="flex gap-3 mt-5 md:mt-7 flex-wrap">
               <Link href="/live" className="btn btn-gold"><Play size={15} /> {t("Watch live")}</Link>
-              <Link href={meetingDate ? `/race-days/${meetingDate}` : "/race-days"} className="btn btn-ghost">{meetingDate ? t("Today's race card") : t("Race calendar")}</Link>
+              <Link href={focusRace ? `/races/${focusRace.id}` : meetingDate ? `/race-days/${meetingDate}` : "/race-days"} className="btn btn-ghost">{focusRace ? t("Race card") : meetingDate ? t("Today's race card") : t("Race calendar")}</Link>
             </div>
           </div>
           <div className="order-1 md:order-2">

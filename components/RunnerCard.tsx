@@ -28,7 +28,7 @@ function PrizeWon({ position, racePrize, prizeSplit }: { position: number; raceP
 }
 
 type BaseProps = {
-  // The racecard "No" — not the gate/barrier number.
+  // The horse's racecard number — never the gate/barrier number (that is `gate`).
   number: number | null;
   horse: HorseSummary | null;
   jockeyName: string | null;
@@ -147,7 +147,7 @@ function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & 
   const now = Number(value), before = Number(prev);
   if (!Number.isFinite(now) || !Number.isFinite(before) || now === before) return null;
   const up = now > before; // bigger number = longer price = drifting
-  const diff = Math.abs(now - before) * 10; // shown x10, like the prices
+  const diff = Math.abs(now - before);
   const fresh = !!changedAt && Date.now() - new Date(changedAt).getTime() < 15 * 60 * 1000;
   const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: fmtOdds(prev) ?? prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: fmtOdds(open) ?? open })}` : ""}`;
   const Icon = up ? ArrowUp : ArrowDown;
@@ -259,7 +259,7 @@ export function EntryRow({
       </div>
 
       <div className="stats-grid">
-        <Stat label="Gate">{gate ?? t("N/A")}</Stat>
+        {gate != null && <Stat label="Gate">{gate}</Stat>}
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
         <Stat label="Rating">{rating ?? horse?.rating ?? t("N/A")}</Stat>
         {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
@@ -297,9 +297,9 @@ export function EntryRow({
 }
 
 export function ResultRow({
-  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, winOdds = null, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, performanceRating, racePrize, prizeSplit = null, index,
+  number, horse, jockeyName, jockeyId, weight, position, finishTime, margin, gate = null, winOdds = null, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, performanceRating, racePrize, prizeSplit = null, index,
 }: BaseProps & {
-  position: number; finishTime: string | null; margin: string | null;
+  position: number; finishTime: string | null; margin: string | null; gate?: number | null;
   winOdds?: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
   performanceRating: number | null; racePrize: number; prizeSplit?: number[] | null;
@@ -334,7 +334,8 @@ export function ResultRow({
       </div>
 
       <div className="stats-grid">
-        <Stat label="No.">{number ?? t("N/A")}</Stat>
+        <Stat label="Horse No.">{number ?? t("N/A")}</Stat>
+        {gate != null && <Stat label="Gate">{gate}</Stat>}
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
         {rating != null && <Stat label="Rating">{rating}</Stat>}
         {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}

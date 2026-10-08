@@ -13,14 +13,26 @@
         {
           "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/admin(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
           "originalSource": "/admin/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/account(.json)?[\\/#\\?]?$",
+          "originalSource": "/account"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/races(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/races/:path*"
+        },
+        {
+          "regexp": "^(?:\\/(_next\\/data\\/[^/]{1,}))?\\/horses(?:\\/((?:[^\\/#\\?]+?)(?:\\/(?:[^\\/#\\?]+?))*))?(.json)?[\\/#\\?]?$",
+          "originalSource": "/horses/:path*"
         }
       ],
       "wasm": [],
       "assets": [],
       "environments": {
-        "previewModeId": "19c16464862ffb8c84e9a3b625243dfc",
-        "previewModeSigningKey": "49235c217a16bba92907ed14c4c8035fc98adce7ea30014c0a79ba0b8ae7bfc3",
-        "previewModeEncryptionKey": "5bb942dcf5b9a9dcf8ba0ecd122779d935578b5586798dc4597cf3179f9e0246"
+        "previewModeId": "3e7193f1bac79f08a681323a6b0fa272",
+        "previewModeSigningKey": "491ec1f8ec71d2ca4ccb5b7314247740498edcd0fe3da2796bc2a89ce3151cdc",
+        "previewModeEncryptionKey": "8dd6f8855800526562001d91037e29a308e2e129af320eb1ad4044c3bea70c80"
       }
     }
   },

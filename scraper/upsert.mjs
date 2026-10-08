@@ -151,7 +151,7 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
   const { error } = await supabaseAdmin
     .from("race_entries")
     .upsert(
-      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, gate, weight_kg: weightKg, runner_no: runnerNo ?? null,
+      { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, ...(gate != null ? { gate } : {}), weight_kg: weightKg, runner_no: runnerNo ?? null,
         // Tote prices/gear/tip are re-written on every scrape so late price moves and gear changes are picked up.
         odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
         ...oddsMovement(existing, winOdds, placeOdds) },
@@ -169,7 +169,7 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
  *  stored directly on the result row (not just on race_entries) since a
  *  race scraped as already-completed never gets a race_entries row at
  *  all — see scrape.mjs's `isResult` branch. */
-export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg, gate, winOdds, placeOdds, gear, isTipped }) {
+export async function upsertResult({ raceId, horseId, position, jockeyName, trainerName, finishTime, margin, weightKg, gate, runnerNo, winOdds, placeOdds, gear, isTipped }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
@@ -181,7 +181,8 @@ export async function upsertResult({ raceId, horseId, position, jockeyName, trai
         jockey_id: jockey.id, trainer_id: trainer.id,
         jockey: jockeyName ?? "Unknown",
         finish_time: finishTime, margin: margin ?? null, weight_kg: weightKg,
-        gate: gate ?? null,
+        ...(gate != null ? { gate } : {}),
+        ...(runnerNo != null ? { runner_no: runnerNo } : {}),
         win_odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
       },
       { onConflict: "race_id,position" }

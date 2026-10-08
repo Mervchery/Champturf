@@ -105,11 +105,11 @@ export function refreshIntervalSec(races: Stated[], nowMs: number): number | nul
   return best;
 }
 
-/** Tote prices are stored as the raw feed value (e.g. "12"); the site shows them x10 (120).
- *  Display only — storage, comparisons and movement logic keep using the raw values. */
+/** Tote prices are shown exactly as the feed gives them (e.g. "12", "3.5") — no scaling.
+ *  Display only: tidies the number (drops trailing zeros) and leaves storage untouched. */
 export function fmtOdds(s: string | number | null | undefined): string | null {
   if (s == null || s === "") return null;
   const n = Number(String(s).replace(",", "."));
   if (!Number.isFinite(n)) return String(s);
-  return String(Math.round(n * 10 * 100) / 100);
+  return String(Math.round(n * 100) / 100);
 }

@@ -10,7 +10,6 @@ import { fmtMoney } from "@/lib/format";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { fmtTime, getRacePhase, raceStartMs, refreshIntervalSec } from "@/lib/raceState";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
-import { PodiumList } from "@/components/Podium";
 import MarketBoard from "@/components/MarketBoard";
 import RaceStrip from "@/components/RaceStrip";
 import RacePhaseBadge from "@/components/RacePhaseBadge";
@@ -184,17 +183,9 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 />
               ) : (
                 <>
-                  <div className="panel">
-                    <div className="flex items-center justify-between gap-2 flex-wrap mb-1">
-                      <h2 className="font-display text-xl">{t("Result")}</h2>
-                      {podium[0]?.time && <span className="text-xs opacity-70">{t("Winning time")} <span className="font-mono font-semibold">{podium[0].time}</span></span>}
-                    </div>
-                    <PodiumList rows={podium} showTime={false} />
-                  </div>
-
-                  <div className="flex items-center justify-between flex-wrap gap-2 mt-8 mb-4">
+                  <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                     <h2 className="font-display text-xl">{t("Official result")}</h2>
-                    <span className="text-xs opacity-70 hidden sm:block">{t("Jockey · Trainer · No. · Weight · Win/Place")}</span>
+                    {podium[0]?.time && <span className="text-xs opacity-70">{t("Winning time")} <span className="font-mono font-semibold">{podium[0].time}</span></span>}
                   </div>
                   <div className="space-y-3">
                     {results.map((row, i) => (
@@ -209,6 +200,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                         position={row.position}
                         finishTime={row.finish_time}
                         margin={row.margin}
+                        gate={row.gate}
                         winOdds={row.win_odds}
                         placeOdds={row.place_odds}
                         gear={row.gear}
@@ -268,8 +260,6 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 />
               ) : (
                 <>
-                  <MarketBoard entries={entries} />
-
                   {tipsPanel}
 
                   <div className="flex items-center justify-between flex-wrap gap-2 mt-8 mb-4">
@@ -311,6 +301,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       />
                     ))}
                   </div>
+
+                  <MarketBoard entries={entries} />
                 </>
               )}
 

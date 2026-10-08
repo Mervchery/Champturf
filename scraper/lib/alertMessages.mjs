@@ -33,8 +33,8 @@ export function dateLabel(isoDate, lang) {
 }
 
 const hhmm = (t) => (t ? String(t).slice(0, 5) : "");
-// Prices are shown x10 everywhere on the site (12 -> 120); alerts match. Move detection above stays on raw values.
-const fmt = (n) => String(Math.round(Number(String(n).replace(",", ".")) * 10 * 100) / 100);
+// Prices are shown as the raw feed value everywhere on the site; alerts match.
+const fmt = (n) => String(Math.round(Number(String(n).replace(",", ".")) * 100) / 100);
 
 /** Build the {en, fr} title/body pair for one alert. */
 export function buildMessage(kind, d) {
