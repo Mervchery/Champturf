@@ -101,7 +101,8 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
                 <div><div className="stat-label">{t("Off in")}</div><div className="font-semibold mt-0.5"><Countdown target={`${next.raceDate}T${next.raceTime}`} serverNow={nowMs} variant="compact" /></div></div>
-                <div><div className="stat-label">{t("No.")}</div><div className="font-semibold mt-0.5">{next.runnerNo ?? t("N/A")}</div></div>
+                <div><div className="stat-label">{t("Horse No.")}</div><div className="font-semibold mt-0.5">{next.runnerNo ?? t("N/A")}</div></div>
+                <div><div className="stat-label">{t("Gate")}</div><div className="font-semibold mt-0.5">{next.gate ?? t("N/A")}</div></div>
                 <div>
                   <div className="stat-label">{t("Jockey")}</div>
                   <div className="font-semibold mt-0.5 truncate">

@@ -106,5 +106,31 @@ export function parseRacePage(html) {
     if (m) dangerHorse = m[1].trim();
   });
 
-  return { raceNo, timeOfDay, name, distance, isResult, entries, racingNotes, dangerHorse };
+  const youtubeVideoId = parseRaceVideoId($);
+
+  return { raceNo, timeOfDay, name, distance, isResult, entries, racingNotes, dangerHorse, youtubeVideoId };
+}
+
+const YOUTUBE_ID = /(?:youtube(?:-nocookie)?\.com\/embed\/|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/i;
+
+/** The YouTube video ID from the "Race Video" iframe, or null when the page has no video
+ *  (earlier races, or a replay not uploaded yet — not an error). Takes the iframe sitting under
+ *  a "Race Video" heading; if the heading can't be matched, falls back to the first YouTube iframe. */
+export function parseRaceVideoId($) {
+  const found = [];
+  $("iframe").each((_, el) => {
+    const src = $(el).attr("src") || $(el).attr("data-src") || "";
+    const id = src.match(YOUTUBE_ID)?.[1];
+    if (id) found.push({ id, el });
+  });
+  if (found.length === 0) return null;
+  // Depth of the nearest ancestor (within 4 levels) whose text mentions "Race Video"; the iframe
+  // closest to that heading wins.
+  const depth = (el) => {
+    const up = $(el).parents().slice(0, 4).toArray();
+    const i = up.findIndex((a) => $(a).find("iframe").length === 1 && /race\s*video/i.test($(a).text()));
+    return i === -1 ? Infinity : i;
+  };
+  const underHeading = found.filter((f) => depth(f.el) !== Infinity).sort((a, b) => depth(a.el) - depth(b.el))[0];
+  return (underHeading ?? found[0]).id;
 }

@@ -5,7 +5,7 @@ import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
 import { resolveTrainerName } from "./lib/trainerOverrides.mjs";
-import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes, horseHasProfile, isRaceCompleteInDb } from "./upsert.mjs";
+import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes, horseHasProfile, isRaceCompleteInDb, setRaceVideo } from "./upsert.mjs";
 import { translateNotes } from "./lib/translateNotes.mjs";
 
 const rawArgs = process.argv.slice(2);
@@ -13,6 +13,9 @@ const rawArgs = process.argv.slice(2);
 // pages for horses we already know, and skips races already finished in the database.
 const FAST = rawArgs.includes("--fast");
 // --url=<race page> (repeatable) refreshes just those races — used by the per-race checkpoints.
+// --videos = video backfill mode: only reads each race page for its "Race Video" and saves the
+// YouTube ID (replacing a different one already saved). No horses, jockeys, entries or results are touched.
+const VIDEOS_ONLY = rawArgs.includes("--videos");
 const URLS = rawArgs.filter((a) => a.startsWith("--url=")).map((a) => a.slice(6));
 const args = rawArgs.filter((a) => !a.startsWith("--"));
 if (URLS.length === 0 && (args.length === 0 || args.length > 2)) {
@@ -20,6 +23,7 @@ if (URLS.length === 0 && (args.length === 0 || args.length > 2)) {
   console.error("  node scraper/scrape.mjs <date>              e.g. node scraper/scrape.mjs 06-sep-2026");
   console.error("  node scraper/scrape.mjs <start> <end>       e.g. node scraper/scrape.mjs 01-jan-2020 06-sep-2026");
   console.error("  add --fast for a quick odds-only refresh   e.g. node scraper/scrape.mjs --fast 06-sep-2026");
+  console.error("  add --videos to only fetch race videos      e.g. node scraper/scrape.mjs --videos 01-jan-2026 06-sep-2026");
   console.error("Date format must match the site's own URLs (DD-mon-YYYY).");
   process.exit(1);
 }
@@ -40,6 +44,7 @@ const stats = {
   ownersAdded: 0, ownersUpdated: 0,
   entriesImported: 0,
   resultsImported: 0,
+  videosSaved: 0,
   errors: [], // { context, message }
 };
 
@@ -63,6 +68,7 @@ function printStats() {
   console.log(`Owners added/updated:   ${s.ownersAdded} / ${s.ownersUpdated}`);
   console.log(`Entries imported:    ${s.entriesImported}`);
   console.log(`Results imported:    ${s.resultsImported}`);
+  console.log(`Race videos saved:   ${s.videosSaved}`);
   console.log(`Errors:              ${s.errors.length}`);
   if (s.errors.length > 0) {
     console.log("\nError details:");
@@ -127,9 +133,25 @@ async function scrapeRace(raceUrl) {
   const raceDate = toIsoDate(urlDate);
   const raceTime = to24Hour(parsed.timeOfDay);
 
+  // Video backfill mode: save the video and stop — nothing else is written.
+  if (VIDEOS_ONLY) {
+    if (parsed.youtubeVideoId && (await setRaceVideo(parsed.name, raceDate, parsed.youtubeVideoId))) {
+      stats.videosSaved++;
+      console.log(`  Video: ${parsed.youtubeVideoId} -> ${parsed.name}`);
+    } else {
+      console.log(`  ${parsed.youtubeVideoId ? "Video unchanged or race not in the database" : "No race video on the page"}: ${parsed.name}`);
+    }
+    return;
+  }
+
   // Fast mode: a race that is already completed WITH results in the database has nothing
   // new to give — skip it (avoids re-writing every result and re-running the stats trigger).
   if (FAST && parsed.isResult && (await isRaceCompleteInDb(parsed.name, raceDate))) {
+    // The replay is usually uploaded after the race, so still pick it up from this already-fetched page.
+    if (parsed.youtubeVideoId && (await setRaceVideo(parsed.name, raceDate, parsed.youtubeVideoId))) {
+      stats.videosSaved++;
+      console.log(`  Video: ${parsed.youtubeVideoId} -> ${parsed.name}`);
+    }
     console.log(`  Skipping ${parsed.name} — already completed in the database (fast mode).`);
     return;
   }
@@ -147,7 +169,8 @@ async function scrapeRace(raceUrl) {
     }
   }
 
-  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse, sourceUrl: raceUrl });
+  if (parsed.youtubeVideoId) console.log(`  Video: ${parsed.youtubeVideoId}`);
+  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse, sourceUrl: raceUrl, youtubeVideoId: parsed.youtubeVideoId });
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 

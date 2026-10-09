@@ -60,6 +60,8 @@ export async function upsertHorse({ name, age, origin, trainerName, ownerName, s
     for (const [key, value] of Object.entries(fields)) {
       if (value !== undefined && value !== null && value !== existing[key]) updates[key] = value;
     }
+    // Supertote's own "Race Video" is the source of truth: it replaces any different video already
+    // saved (e.g. a wrong one found by the admin "Auto-find on YouTube" search).
     if (Object.keys(updates).length > 0) {
       const { error } = await supabaseAdmin.from("horses").update(updates).eq("id", existing.id);
       if (error) throw new Error(`Failed to update horse "${name}": ${error.message}`);
@@ -80,7 +82,7 @@ export async function getRaceNotes(name, raceDate) {
   return data ?? null;
 }
 
-export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse, sourceUrl }) {
+export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse, sourceUrl, youtubeVideoId }) {
   const { data: existing, error: selectError } = await supabaseAdmin
     .from("races").select("*").eq("name", name).eq("race_date", raceDate).maybeSingle();
   if (selectError) throw new Error(`Failed to look up race "${name}": ${selectError.message}`);
@@ -89,6 +91,7 @@ export async function upsertRace({ name, raceDate, raceTime, distance, racingNot
     name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars",
     racing_notes: racingNotes, racing_notes_en: racingNotesEn, danger_horse: dangerHorse,
     source_url: sourceUrl, // lets the scheduler refresh just this race later
+    youtube_video_id: youtubeVideoId, // from the page's "Race Video" iframe; null/undefined = leave as is
   };
 
   if (existing) {
@@ -107,6 +110,19 @@ export async function upsertRace({ name, raceDate, raceTime, distance, racingNot
   const { data: created, error } = await supabaseAdmin.from("races").insert(fields).select("id").single();
   if (error) throw new Error(`Failed to create race "${name}": ${error.message}`);
   return { id: created.id, created: true, updated: false };
+}
+
+/** Saves the race's YouTube video ID from Supertote, replacing a different one already stored.
+ *  Returns true if the stored value changed. */
+export async function setRaceVideo(name, raceDate, videoId) {
+  if (!videoId) return false;
+  const { data: race, error } = await supabaseAdmin
+    .from("races").select("id, youtube_video_id").eq("name", name).eq("race_date", raceDate).maybeSingle();
+  if (error) throw new Error(`Failed to look up race "${name}": ${error.message}`);
+  if (!race || race.youtube_video_id === videoId) return false;
+  const { error: updateError } = await supabaseAdmin.from("races").update({ youtube_video_id: videoId }).eq("id", race.id);
+  if (updateError) throw new Error(`Failed to save video for "${name}": ${updateError.message}`);
+  return true;
 }
 
 export async function setRaceStatus(raceId, status) {
