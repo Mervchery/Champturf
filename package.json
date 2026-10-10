@@ -2,7 +2,7 @@
   "name": "champ-turf",
   "version": "9.0.0",
   "private": true,
-  "description": "Champ Turf — Mauritius horse racing platform",
+  "description": "Champ Turf \u2014 Mauritius horse racing platform",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -12,7 +12,10 @@
     "translate-notes": "node scraper/translate-notes.mjs",
     "scrape:fast": "node scraper/scrape.mjs --fast",
     "alerts": "node scraper/alerts.mjs",
-    "gen:vapid": "npx web-push generate-vapid-keys"
+    "gen:vapid": "npx web-push generate-vapid-keys",
+    "ml:train": "python ml/train.py",
+    "ml:predict": "python ml/predict.py",
+    "ml:test": "python ml/tests/smoke_test.py"
   },
   "dependencies": {
     "@supabase/ssr": "0.4.0",

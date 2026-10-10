@@ -140,11 +140,14 @@ export async function setRaceStatus(raceId, status) {
 function oddsMovement(existing, win, place) {
   const out = {};
   let changed = false;
+  // Supertote shows 9999 when a runner has no price yet. That is a placeholder, never a real price:
+  // it must not become the opening price or a "previous" price.
+  const real = (v) => (v == null || !Number.isFinite(Number(v)) || Number(v) >= 9999 ? null : v);
   const track = (current, key, prevKey, openKey) => {
-    const stored = existing?.[key] ?? null;
-    out[openKey] = existing?.[openKey] ?? stored ?? current ?? null;
-    out[prevKey] = existing?.[prevKey] ?? null;
-    if (current != null && stored != null && Number(current) !== Number(stored)) {
+    const stored = real(existing?.[key]);
+    out[openKey] = real(existing?.[openKey]) ?? stored ?? real(current) ?? null;
+    out[prevKey] = real(existing?.[prevKey]);
+    if (real(current) != null && stored != null && Number(current) !== Number(stored)) {
       out[prevKey] = stored;
       changed = true;
     }

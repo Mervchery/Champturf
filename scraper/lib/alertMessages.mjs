@@ -3,7 +3,7 @@
 export function parseOdds(value) {
   if (value == null) return null;
   const n = parseFloat(String(value).replace(",", "."));
-  return Number.isFinite(n) && n > 0 ? n : null;
+  return Number.isFinite(n) && n > 0 && n < 9999 ? n : null; // 9999 = Supertote "no price yet"
 }
 
 /** A price move worth a notification: at least `minPct` (default 15%) AND at least 0.3 in absolute terms. */

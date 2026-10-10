@@ -61,7 +61,8 @@ export function fmtTime(t: string | null | undefined): string {
 export function parseOdds(s: string | null | undefined): number | null {
   if (s == null) return null;
   const n = Number(s);
-  return Number.isFinite(n) && n > 0 ? n : null;
+  // 9999 is Supertote's placeholder for "no price yet" — never a real price.
+  return Number.isFinite(n) && n > 0 && n < 9999 ? n : null;
 }
 
 /** ▲ drifting / ▼ firming between two price strings. */

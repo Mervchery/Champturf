@@ -11,6 +11,8 @@ import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { fmtTime, getRacePhase, raceStartMs, refreshIntervalSec } from "@/lib/raceState";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
 import MarketBoard from "@/components/MarketBoard";
+import PredictionPanel from "@/components/PredictionPanel";
+import { getLatestModelRun, getPredictionsForRace } from "@/lib/predictions";
 import RaceStrip from "@/components/RaceStrip";
 import RacePhaseBadge from "@/components/RacePhaseBadge";
 import RaceStateBanner from "@/components/RaceStateBanner";
@@ -46,11 +48,13 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
   const follow = await getFollowState();
   // The card (for race numbers, the strip and prev/next) and meeting info are extras: if they
   // fail the race itself still renders.
-  const [entries, results, card, meeting] = await Promise.all([
+  const [entries, results, card, meeting, predictions, modelRun] = await Promise.all([
     race.status === "upcoming" ? getEntriesForRace(race.id) : Promise.resolve([]),
     race.status === "completed" ? getResultsForRace(race.id) : Promise.resolve([]),
     getRacesForDate(race.race_date).catch(() => [race]),
     getMeetingInfo(race.race_date).catch(() => null),
+    race.status === "upcoming" ? getPredictionsForRace(race.id) : Promise.resolve([]),
+    race.status === "upcoming" ? getLatestModelRun() : Promise.resolve(null),
   ]);
 
   const raceIndex = Math.max(0, card.findIndex((r) => r.id === race.id));
@@ -303,6 +307,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                   </div>
 
                   <MarketBoard entries={entries} />
+
+                  <PredictionPanel entries={entries} predictions={predictions} run={modelRun} />
                 </>
               )}
 

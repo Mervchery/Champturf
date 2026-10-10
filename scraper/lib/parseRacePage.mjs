@@ -26,6 +26,7 @@ function parseOdds($, $el) {
     const label = $n.children("span").first().text().trim().toLowerCase(); // "win:" / "place:"
     const value = $n.clone().children().remove().end().text().trim();      // text outside the label span
     if (!/^\d+(\.\d+)?$/.test(value)) return;
+    if (Number(value) >= 9999) return; // 9999 is Supertote's placeholder for "no price yet", not a real price
     if (label.startsWith("win")) win = value;
     else if (label.startsWith("place")) place = value;
   });
