@@ -1,0 +1,57 @@
+{
+ "version": "v202610101939",
+ "odds_unit": null,
+ "models": {
+  "A": {
+   "features": [
+    "h_runs",
+    "h_days_since",
+    "h_last_pos",
+    "h_avg3_pos",
+    "h_avg5_pos",
+    "h_best5_pos",
+    "h_worst5_pos",
+    "h_win5",
+    "h_top3_5",
+    "h_win_rate",
+    "h_top3_rate",
+    "h_last_margin",
+    "h_avg3_margin",
+    "h_consistency",
+    "h_improve",
+    "h_dist_runs",
+    "h_dist_top3",
+    "h_dist_change",
+    "h_class_change",
+    "h_last_rating",
+    "h_weight_change",
+    "h_best_pos_class",
+    "j_runs",
+    "j_win_rate",
+    "j_top3_rate",
+    "t_runs",
+    "t_win_rate",
+    "t_top3_rate",
+    "jh_runs",
+    "field_size",
+    "distance_m",
+    "class_num",
+    "prize_log",
+    "weight_kg",
+    "weight_rel",
+    "weight_rank",
+    "gate",
+    "gate_rel",
+    "avg5_rel",
+    "win_rate_rel",
+    "rating_rel"
+   ],
+   "calibration": {
+    "kind": "platt",
+    "a": 1.0977468490600586,
+    "b": 0.3899437189102173
+   },
+   "best_iteration": 62
+  }
+ }
+}
