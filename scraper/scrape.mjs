@@ -6,7 +6,7 @@ import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
 import { resolveTrainerName, TRAINER_OVERRIDES } from "./lib/trainerOverrides.mjs";
 import { ambiguousAliases, squash } from "./lib/personMatch.mjs";
-import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes, horseHasProfile, isRaceCompleteInDb, setRaceVideo } from "./upsert.mjs";
+import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, markScratchedEntries, getRaceNotes, horseHasProfile, isRaceCompleteInDb, setRaceVideo } from "./upsert.mjs";
 import { translateNotes } from "./lib/translateNotes.mjs";
 
 const rawArgs = process.argv.slice(2);
@@ -175,6 +175,8 @@ async function scrapeRace(raceUrl) {
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 
+  const seenHorseIds = new Set(); // every horse that is on the page this time
+  const errorsBefore = stats.errors.length;
   for (const [entryIndex, entry] of parsed.entries.entries()) {
     if (!entry.horseSlug) {
       console.warn(`    Entry with no horse link found (no. ${entry.runnerNo}) — skipping this runner.`);
@@ -205,6 +207,7 @@ async function scrapeRace(raceUrl) {
         silkImageUrl: entry.silkUrl,
       });
       track("horses", horse);
+      seenHorseIds.add(horse.id);
       track("trainers", horse.trainer);
       track("owners", horse.owner);
 
@@ -243,6 +246,16 @@ async function scrapeRace(raceUrl) {
       stats.errors.push({ context: `${raceUrl} / ${entry.horseName ?? entry.horseSlug}`, message: e.message });
       console.error(`    Error processing ${entry.horseName ?? entry.horseSlug}: ${e.message}`);
     }
+  }
+
+  // A horse that was entered before but is no longer on the page was probably scratched. Only decided
+  // when this race was read cleanly (no errors), so a failed fetch/parse can never flag runners.
+  if (stats.errors.length === errorsBefore) {
+    const { scratched, restored } = await markScratchedEntries(race.id, seenHorseIds);
+    for (const name of scratched) console.log(`    Scratched (no longer on the page): ${name}`);
+    if (restored) console.log(`    ${restored} previously scratched runner(s) are back on the page.`);
+  } else {
+    console.warn("    Errors while reading this race — scratch check skipped.");
   }
 
   stats.racesProcessed++;

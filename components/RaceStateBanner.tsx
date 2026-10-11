@@ -47,7 +47,7 @@ export default function RaceStateBanner({ raceDate, raceTime, status, serverNow 
     return (
       <div className="state-banner is-missing" role="status">
         <TriangleAlert size={16} aria-hidden="true" />
-        <div>{t("No official result has been recorded for this race.")}</div>
+        <div>{t("This race appears to have been cancelled — no result was recorded.")}</div>
       </div>
     );
   }

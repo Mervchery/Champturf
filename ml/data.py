@@ -134,6 +134,8 @@ def load_tables(db):
                                                       "margin", "rating", "win_odds", "is_tipped"])
     entries = _ensure(db.fetch("race_entries", "*"), ["race_id", "horse_id", "jockey_id", "trainer_id", "weight_kg", "gate", "rating",
                                                       "odds", "odds_open", "odds_prev", "is_tipped"])
+    if "scratched" in entries.columns:  # scratched runners are not in the field
+        entries = entries[entries["scratched"].fillna(False) != True].copy()
     if races.empty:
         return races, results, entries
     races["dt"] = pd.to_datetime(races["race_date"].astype(str) + " " + races["race_time"].astype(str).str.slice(0, 8), errors="coerce")

@@ -10,11 +10,11 @@ import type { Horse } from "@/lib/horses";
 export default function HorsesGrid({ horses }: { horses: Horse[] }) {
   const { t, lang } = useT();
   const [q, setQ] = useState("");
-  const [sort, setSort] = useState<"wins" | "earnings" | "name">("wins");
+  const [sort, setSort] = useState<"wins" | "earnings" | "name" | "rating">("wins");
 
   const list = useMemo(() => {
     let l = horses.filter((h) => (h.name + (h.owner?.name ?? "") + (h.stable?.name ?? "")).toLowerCase().includes(q.toLowerCase()));
-    l = [...l].sort((a, b) => (sort === "name" ? a.name.localeCompare(b.name) : (b as any)[sort] - (a as any)[sort]));
+    l = [...l].sort((a, b) => (sort === "name" ? a.name.localeCompare(b.name) : sort === "rating" ? (b.rating ?? -1) - (a.rating ?? -1) : (b as any)[sort] - (a as any)[sort]));
     return l;
   }, [horses, q, sort]);
 
@@ -29,6 +29,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
         />
         <select value={sort} onChange={(e) => setSort(e.target.value as any)} className="px-3.5 py-2 border border-line rounded-full bg-surface text-sm">
           <option value="wins">{t("Sort: most wins")}</option>
+          <option value="rating">{t("Sort: rating")}</option>
           <option value="earnings">{t("Sort: earnings")}</option>
           <option value="name">{t("Sort: name A–Z")}</option>
         </select>
@@ -52,6 +53,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
             </div>
             <div className="p-4">
               <h2 className="font-semibold">{h.name}</h2>
+              {h.rating != null && <span className="pill pill-gold mt-2 inline-block">{t("Rating")} {h.rating}</span>}
               <div className="text-xs opacity-70 mt-1">{h.age ? t("{n}yo", { n: h.age }) : t("N/A")} {h.sex ? t(h.sex) : t("N/A")} · {h.color ? t(h.color) : t("N/A")}</div>
               <div className="flex gap-3.5 mt-3 text-xs">
                 <div><b className="block font-mono text-sm">{h.wins}</b>{t("Wins")}</div>

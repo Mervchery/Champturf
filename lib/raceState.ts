@@ -47,6 +47,12 @@ export function getRacePhase(r: Stated, nowMs: number): RacePhase {
   return "unresulted";
 }
 
+/** A race that never got a result: not completed, and well past its start time (see RESULT_WAIT_MIN).
+ *  Shown as "Cancelled"; clears itself if a result arrives later. */
+export function isCancelled(r: Stated, nowMs: number): boolean {
+  return getRacePhase(r, nowMs) === "unresulted";
+}
+
 /** Whole minutes until the off, rounded up (never negative). */
 export function minutesToOff(r: Timed, nowMs: number): number {
   return Math.max(0, Math.ceil((raceStartMs(r) - nowMs) / 60000));

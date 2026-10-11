@@ -2,7 +2,8 @@ import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Video, Search, Star, AlertTriangle, NotebookPen, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Clock } from "lucide-react";
-import { getRaceById, getEntriesForRace, getResultsForRace, getRacesForDate } from "@/lib/races";
+import { getRaceById, getEntriesForRace, getResultsForRace, getRacesForDate, getScratchedForRace } from "@/lib/races";
+import ScratchedList from "@/components/ScratchedList";
 import { getRecentFormForHorses } from "@/lib/horses";
 import { getMeetingInfo } from "@/lib/meetings";
 import { toPodiumRow } from "@/lib/raceDay";
@@ -48,14 +49,18 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
   const follow = await getFollowState();
   // The card (for race numbers, the strip and prev/next) and meeting info are extras: if they
   // fail the race itself still renders.
-  const [entries, results, card, meeting, predictions, modelRun] = await Promise.all([
+  const [entriesAll, results, card, meeting, predictions, modelRun, scratchedDone] = await Promise.all([
     race.status === "upcoming" ? getEntriesForRace(race.id) : Promise.resolve([]),
     race.status === "completed" ? getResultsForRace(race.id) : Promise.resolve([]),
     getRacesForDate(race.race_date).catch(() => [race]),
     getMeetingInfo(race.race_date).catch(() => null),
     race.status === "upcoming" ? getPredictionsForRace(race.id) : Promise.resolve([]),
     race.status === "upcoming" ? getLatestModelRun() : Promise.resolve(null),
+    race.status === "completed" ? getScratchedForRace(race.id) : Promise.resolve([]),
   ]);
+  // Scratched horses stay visible (struck through) but are not runners: no odds, market, tips or predictions.
+  const entries = entriesAll.filter((e) => !e.scratched);
+  const scratchedList = race.status === "completed" ? scratchedDone : entriesAll.filter((e) => e.scratched);
 
   const raceIndex = Math.max(0, card.findIndex((r) => r.id === race.id));
   const raceNo = raceIndex + 1;
@@ -224,6 +229,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 </>
               )}
 
+              <ScratchedList entries={scratchedList} />
+
               {tipsPanel}
               {prizePanel}
 
@@ -305,6 +312,8 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       />
                     ))}
                   </div>
+
+                  <ScratchedList entries={scratchedList} />
 
                   <MarketBoard entries={entries} />
 

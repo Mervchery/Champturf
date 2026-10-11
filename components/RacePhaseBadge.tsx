@@ -25,7 +25,7 @@ export default function RacePhaseBadge({ raceDate, raceTime, status, serverNow, 
     : phase === "soon" ? t("Off in {n} min", { n: minutesToOff(race, now) })
     : phase === "awaiting" ? t("Result pending")
     : phase === "finished" ? t("Finished")
-    : phase === "unresulted" ? t("No result")
+    : phase === "unresulted" ? t("Cancelled")
     : t("Upcoming");
 
   return (

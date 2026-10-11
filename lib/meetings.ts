@@ -1,4 +1,5 @@
 import { createPublicClient as createClient } from "@/lib/supabase/public";
+import { isCancelled } from "@/lib/raceState";
 
 export type MeetingInfo = {
   race_date: string;
@@ -21,19 +22,22 @@ export type RaceDaySummary = MeetingInfo & {
 export async function getRaceDays(): Promise<RaceDaySummary[]> {
   const supabase = createClient();
   const [{ data: races, error }, { data: meetings, error: meetingsError }] = await Promise.all([
-    supabase.from("races").select("race_date, course, prize, status").order("race_date", { ascending: false }),
+    supabase.from("races").select("race_date, race_time, course, prize, status").order("race_date", { ascending: false }),
     supabase.from("meetings").select("*"),
   ]);
   if (error) throw error;
   if (meetingsError) throw meetingsError;
 
+  const nowMs = Date.now();
   const meetingByDate = new Map((meetings ?? []).map((m) => [m.race_date, m]));
   const grouped = new Map<string, { course: string; prize: number; statuses: Set<string>; count: number }>();
 
   for (const r of races ?? []) {
     const existing = grouped.get(r.race_date) ?? { course: r.course, prize: 0, statuses: new Set<string>(), count: 0 };
     existing.prize += r.prize ?? 0;
-    existing.statuses.add(r.status);
+    // A race that never got a result (cancelled) must not keep the whole meeting "in progress".
+    const effective = r.status !== "completed" && isCancelled(r as any, nowMs) ? "completed" : r.status;
+    existing.statuses.add(effective);
     existing.count += 1;
     grouped.set(r.race_date, existing);
   }

@@ -7,7 +7,7 @@ import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
 import { getMeetingBoard } from "@/lib/raceDay";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
-import { fmtOdds, fmtTime, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
+import { fmtOdds, fmtTime, isCancelled, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
 import { PodiumList } from "@/components/Podium";
 import RaceStrip from "@/components/RaceStrip";
 import RacePhaseBadge from "@/components/RacePhaseBadge";
@@ -44,8 +44,10 @@ export default async function RaceDayPage({ params }: { params: { date: string }
   const dateLabel = fmtDateLong(lang, params.date);
   // Race 6 of the day is the local "feature race" convention (see pickFeaturedRace).
   const featuredId = pickFeaturedRace(races)?.id ?? null;
-  const open = board.filter((b) => b.race.status !== "completed");
-  const finishedCount = board.length - open.length;
+  // Races that never got a result are cancelled: not "open", and not counted as races to be run.
+  const cancelledIds = new Set(board.filter((b) => b.race.status !== "completed" && isCancelled(b.race, nowMs)).map((b) => b.race.id));
+  const open = board.filter((b) => b.race.status !== "completed" && !cancelledIds.has(b.race.id));
+  const finishedCount = board.length - open.length - cancelledIds.size;
   const refreshSec = refreshIntervalSec(races, nowMs);
   const strip = board.map((b) => ({ id: b.race.id, no: b.no, race_date: b.race.race_date, race_time: b.race.race_time, status: b.race.status }));
 
@@ -56,7 +58,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
           <span className="text-xs font-semibold text-gold2">{t("RACE DAY")}</span>
           <h1 className="text-3xl font-display mt-1">{dateLabel}</h1>
           <div className="text-white/70 text-sm mt-2">
-            {meeting?.course ?? races[0].course} · {t("{done} of {total} races run", { done: finishedCount, total: board.length })}
+            {meeting?.course ?? races[0].course} · {t("{done} of {total} races run", { done: finishedCount, total: board.length - cancelledIds.size })}{cancelledIds.size > 0 ? ` · ${cancelledIds.size} ${t("Cancelled").toLowerCase()}` : ""}
           </div>
           {refreshSec && <div className="mt-4"><LiveRefresh intervalSec={refreshSec} className="on-dark" /></div>}
         </div>
@@ -109,7 +111,9 @@ export default async function RaceDayPage({ params }: { params: { date: string }
                   <ChevronRight size={18} className="opacity-50 shrink-0" aria-hidden="true" />
                 </Link>
 
-                {b.race.status === "completed" ? (
+                {cancelledIds.has(b.race.id) ? (
+                  <p className="meeting-race-note">{t("Cancelled")}</p>
+                ) : b.race.status === "completed" ? (
                   b.podium.length > 0 ? (
                     <PodiumList rows={b.podium} />
                   ) : (

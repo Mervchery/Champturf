@@ -72,6 +72,7 @@ export type RaceEntry = {
   // this runner as its favourite pick of the race.
   gear: string | null;
   is_tipped: boolean;
+  scratched: boolean; // flagged by the scraper when the horse disappeared from the source page
   // From the Jockey Club race card (supabase/mtc_data_migration.sql)
   rating: number | null;
   hwt: number | null;
@@ -179,6 +180,19 @@ export async function getEntriesForRace(raceId: string): Promise<RaceEntry[]> {
     .order("runner_no", { ascending: true, nullsFirst: false })
     .eq("race_id", raceId);
   if (error) throw error;
+  return (data as any) ?? [];
+}
+
+/** Entries flagged as scratched (non-partants) — shown on both the card and the result page. */
+export async function getScratchedForRace(raceId: string): Promise<RaceEntry[]> {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("race_entries")
+    .select(ENTRY_SELECT)
+    .eq("race_id", raceId)
+    .eq("scratched", true)
+    .order("runner_no", { ascending: true, nullsFirst: false });
+  if (error) return []; // optional extra: never break the page
   return (data as any) ?? [];
 }
 

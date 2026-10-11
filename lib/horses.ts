@@ -163,7 +163,8 @@ export async function getHorseProfileExtras(horseId: string, nowMs: number): Pro
       .from("race_entries")
       .select("runner_no, gate, weight_kg, odds, odds_prev, jockeys(id, name), races!inner(id, name, race_date, race_time, distance, status)")
       .eq("horse_id", horseId)
-      .eq("races.status", "upcoming"),
+      .eq("races.status", "upcoming")
+      .eq("scratched", false),
   ]);
 
   const rawRuns: any[] = runsRes.error ? [] : ((runsRes.data as any) ?? []);

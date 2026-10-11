@@ -109,7 +109,7 @@ export async function getMeetingBoard(date: string): Promise<BoardRace[]> {
   const ids = list.map((r) => r.id);
   // The cards are an enhancement: if either lookup fails the race list itself still renders.
   const [entriesRes, resultsRes] = await Promise.all([
-    supabase.from("race_entries").select(ENTRY_BOARD_SELECT).in("race_id", ids),
+    supabase.from("race_entries").select(ENTRY_BOARD_SELECT).in("race_id", ids).eq("scratched", false),
     supabase.from("race_results").select(RESULT_BOARD_SELECT).in("race_id", ids).order("position", { ascending: true }),
   ]);
   const entries: any[] = entriesRes.error ? [] : ((entriesRes.data as any) ?? []);

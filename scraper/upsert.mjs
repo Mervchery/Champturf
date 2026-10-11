@@ -205,6 +205,7 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
       { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, ...(gate != null ? { gate } : {}), weight_kg: weightKg, runner_no: runnerNo ?? null,
         // Tote prices/gear/tip are re-written on every scrape so late price moves and gear changes are picked up.
         odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
+        scratched: false, scratched_at: null, // seen on the page again -> back in the field
         ...oddsMovement(existing, winOdds, placeOdds) },
       { onConflict: "race_id,horse_id" }
     );
@@ -257,4 +258,26 @@ export async function isRaceCompleteInDb(name, raceDate) {
   const { count } = await supabaseAdmin
     .from("race_results").select("id", { count: "exact", head: true }).eq("race_id", race.id);
   return (count ?? 0) > 0;
+}
+
+/** After a race page has been fully and cleanly scraped: any entry of that race whose horse is no
+ *  longer on the page is flagged scratched (non-partant); any flagged entry whose horse is back is
+ *  cleared. Never deletes anything. `seenHorseIds` = every horse that WAS on the page. */
+export async function markScratchedEntries(raceId, seenHorseIds) {
+  if (!seenHorseIds || seenHorseIds.size === 0) return { scratched: [], restored: 0 };
+  const { data, error } = await supabaseAdmin.from("race_entries").select("id, horse_id, scratched, horses(name)").eq("race_id", raceId);
+  if (error) throw new Error(`Failed to read entries for scratch check: ${error.message}`);
+  const toScratch = (data ?? []).filter((e) => !seenHorseIds.has(e.horse_id) && !e.scratched);
+  const toRestore = (data ?? []).filter((e) => seenHorseIds.has(e.horse_id) && e.scratched);
+  if (toScratch.length) {
+    const { error: e1 } = await supabaseAdmin.from("race_entries")
+      .update({ scratched: true, scratched_at: new Date().toISOString() }).in("id", toScratch.map((e) => e.id));
+    if (e1) throw new Error(`Failed to flag scratched entries: ${e1.message}`);
+  }
+  if (toRestore.length) {
+    const { error: e2 } = await supabaseAdmin.from("race_entries")
+      .update({ scratched: false, scratched_at: null }).in("id", toRestore.map((e) => e.id));
+    if (e2) throw new Error(`Failed to restore entries: ${e2.message}`);
+  }
+  return { scratched: toScratch.map((e) => e.horses?.name ?? e.horse_id), restored: toRestore.length };
 }

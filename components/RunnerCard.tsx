@@ -337,10 +337,10 @@ export function ResultRow({
         <Stat label="Horse No.">{number ?? t("N/A")}</Stat>
         <Stat label="Gate">{gate ?? t("N/A")}</Stat>
         <Stat label="Weight">{weight ? `${weight}kg` : t("N/A")}</Stat>
-        {rating != null && <Stat label="Rating">{rating}</Stat>}
+        {(rating ?? horse?.rating) != null && <Stat label="Rating">{rating ?? horse?.rating}</Stat>}
         {hwt != null && <Stat label="HWT"><HwtValue hwt={hwt} last={hwtLast} /></Stat>}
         <Stat label="Gear"><GearValue gear={gear} equip={equip} changed={gearChanged} prev={gearPrev} /></Stat>
-        {performanceRating != null && rating == null && <Stat label="Perf">{performanceRating}</Stat>}
+        {performanceRating != null && (rating ?? horse?.rating) == null && <Stat label="Perf">{performanceRating}</Stat>}
       </div>
 
       <OddsRow win={winOdds} place={placeOdds} />
