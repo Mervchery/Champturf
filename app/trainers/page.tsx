@@ -1,5 +1,5 @@
 import { getT } from "@/lib/i18n/server";
-import { Target } from "lucide-react";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import { getTrainers } from "@/lib/trainers";
 import { getSeasonBoard, bySeason, lineOf } from "@/lib/season";
 import InactiveBadge from "@/components/InactiveBadge";
@@ -47,7 +47,7 @@ export default async function TrainersPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={tr.photo_url} alt={tr.name} className="w-full h-full object-cover" />
                     ) : (
-                      <Target size={26} />
+                      <DefaultPortrait kind="trainer" seed={tr.name} />
                     )}
                   </div>
                   {tr.stable?.silk_image_url && (

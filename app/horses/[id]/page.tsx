@@ -1,7 +1,7 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HorseIcon } from "@/components/RacingIcons";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import { getHorseById, getHorseProfileExtras, type HorseProfileExtras } from "@/lib/horses";
 import { fmtDateLong } from "@/lib/i18n";
 import { fmtOdds, fmtTime, mauritiusDate, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
@@ -66,7 +66,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               // eslint-disable-next-line @next/next/no-img-element
               <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
             ) : (
-              <HorseIcon size={40} />
+              <DefaultPortrait kind="horse" seed={h.name} />
             )}
             {h.silk_image_url && (
               <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5 shadow-md">

@@ -3,7 +3,7 @@
 import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { HorseIcon } from "@/components/RacingIcons";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import SilkImage from "@/components/SilkImage";
 import type { Horse } from "@/lib/horses";
 
@@ -38,12 +38,12 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
         {list.map((h) => (
           <Link key={h.id} href={`/horses/${h.id}`} className="card">
-            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 flex items-center justify-center text-white/75 relative">
+            <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 relative overflow-hidden">
               {h.photo_url ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
               ) : (
-                <HorseIcon size={36} />
+                <DefaultPortrait kind="horse" seed={h.name} />
               )}
               {h.silk_image_url && (
                 <div className="absolute top-2.5 right-2.5 bg-surface/90 rounded-full p-1 shadow-md">

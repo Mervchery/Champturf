@@ -42,7 +42,7 @@ export default function Footer() {
           <Link href="/cookies" className="tap hover:text-white transition-colors">{t("Cookie Policy")}</Link>
           <Link href="/community-guidelines" className="tap hover:text-white transition-colors">{t("Community guidelines")}</Link>
         </nav>
-        <span>© 2026 Champ Turf. {t("Independent coverage — not affiliated with the Mauritius Turf Club or any official body.")}</span>
+        <span>© 2026 Champ Turf. {t("Independent coverage — not affiliated with the Mauritius Turf Club or any official body.")}<span className="block text-[0.7rem] opacity-70 mt-1">Icons: <a href="https://game-icons.net" target="_blank" rel="noopener noreferrer" className="underline">game-icons.net</a> (Lorc, Delapouite &amp; contributors), <a href="https://creativecommons.org/licenses/by/3.0/" target="_blank" rel="noopener noreferrer" className="underline">CC BY 3.0</a></span></span>
         <div className="flex items-center gap-2 flex-wrap">
           <LanguageSwitch />
           <CurrencySwitch />

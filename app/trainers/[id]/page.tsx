@@ -1,7 +1,8 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Target, User } from "lucide-react";
+import { User } from "lucide-react";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import { getTrainerById } from "@/lib/trainers";
 import { getSeasonBoard, getSeasonHistory, seasonRank } from "@/lib/season";
 import SeasonHistory from "@/components/SeasonHistory";
@@ -46,7 +47,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
               // eslint-disable-next-line @next/next/no-img-element
               <img src={trainer.photo_url} alt={trainer.name} className="w-full h-full object-cover" />
             ) : (
-              <Target size={38} />
+              <DefaultPortrait kind="trainer" seed={trainer.name} />
             )}
           </div>
           <div className="min-w-0">
