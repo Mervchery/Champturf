@@ -15,7 +15,8 @@
     "gen:vapid": "npx web-push generate-vapid-keys",
     "ml:train": "python ml/train.py",
     "ml:predict": "python ml/predict.py",
-    "ml:test": "python ml/tests/smoke_test.py"
+    "ml:test": "python ml/tests/smoke_test.py",
+    "merge:people": "node scraper/merge-duplicates.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "0.4.0",

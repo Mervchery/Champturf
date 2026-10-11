@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Target, User } from "lucide-react";
 import { getTrainerById } from "@/lib/trainers";
-import { getSeasonBoard } from "@/lib/season";
+import { getSeasonBoard, getSeasonHistory, seasonRank } from "@/lib/season";
+import SeasonHistory from "@/components/SeasonHistory";
 import InactiveBadge from "@/components/InactiveBadge";
 import { getHorses } from "@/lib/horses";
 import { getCareerStatsForTrainer } from "@/lib/careerStats";
@@ -26,7 +27,8 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 export default async function TrainerDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const trainer = await getTrainerById(params.id);
-  const season = await getSeasonBoard();
+  const [season, history] = await Promise.all([getSeasonBoard(), getSeasonHistory("trainer", params.id)]);
+  const rank = season.available ? seasonRank(season.trainer, params.id) : trainer?.ranking ?? null;
   if (!trainer) return notFound();
 
   const [stats, allHorses] = await Promise.all([
@@ -58,7 +60,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
                   <Link href={`/stables/${trainer.stable.id}`} className="hover:underline">{trainer.stable.name}</Link>
                 </>
               ) : t("Unknown stable")}
-              {trainer.ranking && <span className="pill pill-gold ml-2">{t("Ranked")} #{trainer.ranking}</span>}
+              {rank && <span className="pill pill-gold ml-2">{t("Ranked")} #{rank}{season.available ? ` · ${season.ctx.year}` : ""}</span>}
             </div>
           </div>
         </div>
@@ -77,8 +79,10 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
             <div className="stat-tile"><div className="v">{stats.starts}</div><div className="l">{t("Total starts")}</div></div>
             <div className="stat-tile"><div className="v">{stats.avgFinish ?? t("N/A")}</div><div className="l">{t("Avg. finishing position")}</div></div>
             <div className="stat-tile"><div className="v">{trainer.horses}</div><div className="l">{t("Horses in stable")}</div></div>
-            <div className="stat-tile"><div className="v">{trainer.ranking ? `#${trainer.ranking}` : t("N/A")}</div><div className="l">{t("Current ranking")}</div></div>
+            <div className="stat-tile"><div className="v">{rank ? `#${rank}` : t("N/A")}</div><div className="l">{season.available ? `${season.ctx.year} ${t("ranking")}` : t("Current ranking")}</div></div>
           </div>
+
+          <SeasonHistory rows={history} kind="trainer" currentYear={season.ctx.year} />
 
           {stats.recentForm.length > 0 && (
             <div className="mb-10">

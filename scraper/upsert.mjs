@@ -1,5 +1,34 @@
 import { supabaseAdmin } from "./lib/supabaseAdmin.mjs";
 import { normalizeName } from "./lib/normalize.mjs";
+import { sameNameKeys, squash } from "./lib/personMatch.mjs";
+
+const PERSON_TYPE = { jockeys: "jockey", trainers: "trainer" };
+const nameCache = {}; // table -> [{ id, name }] — only used for the alias lookup of jockeys / trainers
+
+async function cachedNames(table) {
+  if (!nameCache[table]) {
+    const rows = [];
+    for (let from = 0; ; from += 1000) {
+      const { data, error } = await supabaseAdmin.from(table).select("id, name").order("id").range(from, from + 999);
+      if (error) throw new Error(`Failed to load ${table}: ${error.message}`);
+      rows.push(...(data ?? []));
+      if (!data || data.length < 1000) break;
+    }
+    nameCache[table] = rows;
+  }
+  return nameCache[table];
+}
+
+/** Same person under another spelling (from scraper/data/*.csv) -> that existing row, else null. */
+async function findByAlias(table, name) {
+  const type = PERSON_TYPE[table];
+  if (!type) return null;
+  const keys = sameNameKeys(type, name); // the person's other spellings, or just this spelling squashed ("B.Sooful" = "B. Sooful")
+  const hit = (await cachedNames(table)).find((r) => keys.has(squash(r.name)));
+  if (!hit) return null;
+  const { data } = await supabaseAdmin.from(table).select("*").eq("id", hit.id).maybeSingle();
+  return data ?? null;
+}
 
 /** Generic find-or-update-or-create for a name-keyed table (jockeys,
  *  trainers, owners, stables). Matches on normalized_name (see
@@ -18,8 +47,10 @@ async function findOrCreateNamed(table, name, extraFields = {}) {
     .eq("normalized_name", normalized)
     .maybeSingle();
   if (selectError) throw new Error(`Failed to look up ${table} "${name}": ${selectError.message}`);
+  const found = existing ?? (await findByAlias(table, name));
 
-  if (existing) {
+  if (found) {
+    const existing = found; // (shadows on purpose: the rest of the function works on whichever row matched)
     const updates = {};
     for (const [key, value] of Object.entries(extraFields)) {
       if (value !== undefined && value !== null && value !== existing[key]) {
@@ -36,6 +67,7 @@ async function findOrCreateNamed(table, name, extraFields = {}) {
 
   const { data: created, error } = await supabaseAdmin.from(table).insert({ name, ...extraFields }).select("id").single();
   if (error) throw new Error(`Failed to create ${table} "${name}": ${error.message}`);
+  if (nameCache[table]) nameCache[table].push({ id: created.id, name });
   return { id: created.id, created: true, updated: false };
 }
 

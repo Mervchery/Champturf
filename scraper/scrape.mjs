@@ -4,7 +4,8 @@ import { fetchHtml } from "./lib/fetchHtml.mjs";
 import { parseRacePage } from "./lib/parseRacePage.mjs";
 import { parseHorseProfile } from "./lib/parseHorseProfile.mjs";
 import { dateRange } from "./lib/dateRange.mjs";
-import { resolveTrainerName } from "./lib/trainerOverrides.mjs";
+import { resolveTrainerName, TRAINER_OVERRIDES } from "./lib/trainerOverrides.mjs";
+import { ambiguousAliases, squash } from "./lib/personMatch.mjs";
 import { upsertHorse, upsertRace, setRaceStatus, upsertEntry, upsertResult, getRaceNotes, horseHasProfile, isRaceCompleteInDb, setRaceVideo } from "./upsert.mjs";
 import { translateNotes } from "./lib/translateNotes.mjs";
 
@@ -188,6 +189,9 @@ async function scrapeRace(raceUrl) {
       // some real trainers are displayed identically on the source site
       // with no distinguishing detail at all (see trainerOverrides.mjs).
       const resolvedTrainerName = resolveTrainerName(entry.horseSlug, entry.trainer);
+      if (entry.trainer && !TRAINER_OVERRIDES[entry.horseSlug] && ambiguousAliases("trainer").includes(squash(entry.trainer))) {
+        console.warn(`    ⚠ "${entry.trainer}" could be two different trainers — add "${entry.horseSlug}" to scraper/lib/trainerOverrides.mjs`);
+      }
       // Fast mode: horses we already hold with owner + origin don't need their profile page again.
       const profile = FAST && entry.horseName && (await horseHasProfile(entry.horseName))
         ? { name: entry.horseName, age: null, origin: undefined, trainerName: null, ownerName: null }

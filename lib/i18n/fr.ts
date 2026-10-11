@@ -432,6 +432,11 @@ export const fr: Record<string, string> = {
   "Average finish": "Classement moyen",
   "Back to latest results": "Retour aux derniers résultats",
   "Betting market": "Marché des paris",
+  "Season by season": "Saison par saison",
+  "Season": "Saison",
+  "Current": "En cours",
+  "ranking": "classement",
+
   "Inactive": "Inactif",
   "No rides in {y}": "Aucune monte en {y}",
   "No runners in {y}": "Aucun partant en {y}",

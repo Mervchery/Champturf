@@ -3,7 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JockeyIcon } from "@/components/RacingIcons";
 import { getJockeyById } from "@/lib/jockeys";
-import { getSeasonBoard } from "@/lib/season";
+import { getSeasonBoard, getSeasonHistory } from "@/lib/season";
+import SeasonHistory from "@/components/SeasonHistory";
 import InactiveBadge from "@/components/InactiveBadge";
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
@@ -23,7 +24,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 export default async function JockeyDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const j = await getJockeyById(params.id);
-  const season = await getSeasonBoard();
+  const [season, history] = await Promise.all([getSeasonBoard(), getSeasonHistory("jockey", params.id)]);
   if (!j) return notFound();
 
   return (
@@ -46,11 +47,13 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
           <Link href="/jockeys" className="inline-block text-sm border-b border-ink pb-1">← {t("Back to jockeys")}</Link>
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
-            <div className="panel"><div className="text-xs opacity-70">{t("Wins")}</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
+            <div className="panel"><div className="text-xs opacity-70">{t("Career wins")}</div><div className="font-mono font-semibold text-xl">{j.wins}</div></div>
             <div className="panel"><div className="text-xs opacity-70">{t("Places")}</div><div className="font-mono font-semibold text-xl">{j.places}</div></div>
             <div className="panel"><div className="text-xs opacity-70">{t("Win %")}</div><div className="font-mono font-semibold text-xl">{j.win_pct}%</div></div>
             <div className="panel"><div className="text-xs opacity-70">{t("Suspensions")}</div><div className="font-mono font-semibold text-xl">{j.suspensions}</div></div>
           </div>
+
+          <div className="mt-8"><SeasonHistory rows={history} kind="jockey" currentYear={season.ctx.year} /></div>
 
           {j.apprentice ? (
             <div className="panel mt-6">

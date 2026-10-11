@@ -80,3 +80,32 @@ export function bySeason<T extends { id: string; name: string }>(items: T[], m: 
     return y.wins - x.wins || y.places - x.places || x.runs - y.runs || a.name.localeCompare(b.name);
   });
 }
+
+export type SeasonRow = { season: number; runs: number; wins: number; places: number };
+
+/** Every season a jockey or trainer has results in (newest first) — for the "season by season" table on their page.
+ *  Championships still count the current season only. Empty until supabase/season_stats_migration.sql has run. */
+export async function getSeasonHistory(kind: "jockey" | "trainer", id: string): Promise<SeasonRow[]> {
+  try {
+    const supabase = createClient();
+    const view = kind === "jockey" ? "jockey_season_stats" : "trainer_season_stats";
+    const col = kind === "jockey" ? "jockey_id" : "trainer_id";
+    const { data, error } = await supabase.from(view).select("*").eq(col, id).order("season", { ascending: false });
+    if (error) return [];
+    return (data ?? []).map((r: any) => ({ season: r.season, runs: r.rides ?? r.runners, wins: r.wins, places: r.places }));
+  } catch {
+    return [];
+  }
+}
+
+/** 1-based position in this season's championship (null if no runs this season). Ties share the better place. */
+export function seasonRank(m: Map<string, Line>, id: string): number | null {
+  const me = m.get(id);
+  if (!me || me.runs === 0) return null;
+  let better = 0;
+  for (const [k, l] of m) {
+    if (k === id) continue;
+    if (l.wins > me.wins || (l.wins === me.wins && (l.places > me.places || (l.places === me.places && l.runs < me.runs)))) better++;
+  }
+  return better + 1;
+}
