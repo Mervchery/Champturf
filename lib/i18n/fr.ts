@@ -591,4 +591,9 @@ export const fr: Record<string, string> = {
   "Currency": "Devise",
   "Show amounts in pounds (£)": "Afficher les montants en livres (£)",
   "Approximate rate: £1 = Rs {n}": "Taux approximatif : 1 £ = Rs {n}",
+  "Appearance": "Apparence",
+  "Auto": "Auto",
+  "Dark": "Sombre",
+  "Light": "Clair",
+  "Settings": "Réglages",
 };

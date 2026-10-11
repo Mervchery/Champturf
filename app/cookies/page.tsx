@@ -16,7 +16,8 @@ export default function CookiesPage() {
             [
               "Sign-in cookies: set by our authentication provider (Supabase) when you sign in, so you stay signed in. Essential for member features.",
               "Language cookie (ct-lang): remembers whether you chose English or French. Lasts up to one year.",
-              "Theme setting (ct-theme): remembers light or dark mode, saved in your browser's local storage.",
+              "Currency cookie (ct-currency): remembers whether you chose to see amounts in rupees (Rs) or pounds (£). Lasts up to one year.",
+              "Theme setting (ct-theme): remembers light, dark or automatic (follow your device), saved in your browser's local storage.",
             ],
           ],
         },

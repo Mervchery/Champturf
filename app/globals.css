@@ -1331,3 +1331,131 @@ textarea::placeholder {
 @media print {
   .tabbar, .tabbar-spacer, .race-strip, .live-chip { display: none !important; }
 }
+
+/* =====================================================================
+   More menu (bottom sheet on phones, popover card on larger screens)
+   ===================================================================== */
+.sheet-root { position: fixed; inset: 0; z-index: 120; }
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  background: rgba(5, 15, 11, 0.55);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  animation: fadeIn 0.2s var(--ease) both;
+  cursor: default;
+}
+.sheet-panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88dvh;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 22px 22px 0 0;
+  border: 1px solid var(--line);
+  border-bottom: 0;
+  padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
+  box-shadow: var(--shadow-lg);
+  animation: sheetUp 0.3s var(--ease) both;
+}
+@keyframes sheetUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+.sheet-grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 2px auto 6px; }
+@media (min-width: 768px) {
+  .sheet-backdrop { background: rgba(5, 15, 11, 0.25); -webkit-backdrop-filter: none; backdrop-filter: none; }
+  .sheet-panel {
+    left: auto;
+    bottom: auto;
+    top: 68px;
+    right: max(16px, calc((100vw - 1180px) / 2 + 16px));
+    width: 380px;
+    max-height: calc(100dvh - 90px);
+    border-radius: 18px;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 18px;
+  }
+}
+.sheet-close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: var(--parchment-2);
+  border: 1px solid var(--line);
+}
+.sheet-link {
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--parchment);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+.sheet-link.is-active { background: var(--turf); border-color: var(--turf); color: #fbf8f0; }
+.setting-row { display: grid; gap: 8px; padding: 14px 0 4px; border-top: 1px solid var(--line); margin-top: 10px; }
+.setting-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+.seg {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 13px;
+  background: var(--parchment-2);
+  border: 1px solid var(--line);
+  transition: opacity 0.2s var(--ease);
+}
+.seg.is-pending { opacity: 0.6; }
+.seg-btn {
+  min-height: 42px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--ink);
+  opacity: 0.72;
+  transition: background 0.2s var(--ease), opacity 0.2s var(--ease), transform 0.15s var(--ease);
+}
+.seg-btn:active { transform: scale(0.97); }
+.seg-btn.is-active { background: var(--gold-2); color: #1c1408; opacity: 1; box-shadow: var(--shadow-sm); }
+
+/* ---------- Proper dark mode: elements whose light-mode "turf green" fill would vanish ---------- */
+.dark .sheet-link.is-active,
+.dark .race-chip.is-current,
+.dark .meeting-race-no,
+.dark .spot-no:not(.is-hero) { background: var(--gold-2); border-color: var(--gold-2); color: #1c1408; }
+.dark .sheet-backdrop { background: rgba(0, 0, 0, 0.62); }
+.dark .state-banner { background: var(--parchment-2); }
+.dark .state-banner.is-live { background: var(--coral); border-color: var(--coral); color: #fff; }
+.dark .state-banner.is-soon { background: rgba(242, 166, 90, 0.16); }
+.dark .race-chip.is-next { border-color: var(--gold-2); box-shadow: 0 0 0 1px var(--gold-2) inset; }
+.dark .market-row.is-fav { background: linear-gradient(90deg, rgba(228, 200, 120, 0.14), transparent 70%); }
+.dark .phase-pill.phase-awaiting { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+.dark .live-chip { background: rgba(255, 255, 255, 0.08); color: var(--ink); }
+.dark .form-pill { background: rgba(255, 255, 255, 0.08); }
+.dark .empty-state-icon { background: rgba(255, 255, 255, 0.08); }
+.dark .tabbar-live { border-color: var(--surface); }

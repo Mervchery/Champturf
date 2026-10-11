@@ -28,6 +28,12 @@ Built on v8 with **no database changes and no scraper changes**: v9 only reads t
 - The £ rate is fetched live from open.er-api.com only when someone chooses £, cached for 6 h, and falls back to `FX_FALLBACK_GBP_MUR` in `lib/currency.ts` (62.5) if the lookup fails.
 - **Result dividends are shown ×10** (12 → 120, 43 → 430), or the same amount in £ when £ is chosen (`<Dividend>`: results cards, podiums, official result rows, a horse's previous runs). Pre-race tote prices are unchanged.
 
+### More menu, dark mode and a lighter top bar
+
+- The top bar now holds only the logo, search and account. **Appearance (Light / Dark / Auto), currency (Rs / £) and language** live in one **More** menu: a bottom sheet from the tab bar's *More* button on phones (it also lists every section), and a settings button opening the same menu as a card on desktop.
+- **Dark mode** now has an *Auto* option that follows the device and updates live; the saved choice is applied before first paint (no white flash). New visitors follow their device; saved Light/Dark choices are kept. Fills that disappeared in dark mode (current race chip, race numbers, active menu items) now use gold.
+- A dividend of 0 (e.g. an unplaced runner's SP) shows "—" instead of "0" / "£0.00".
+
 Notes: the "Photo finish gallery" placeholder on race pages was removed (it only showed the word "Image"). Signed-in members run the Supabase session check in middleware on each `/races` and `/horses` refresh; if that ever matters, raise the intervals in `refreshIntervalSec`. Not built or run here (no network): run `npm install && npm run build` before deploying.
 
 ## What's real vs. mocked

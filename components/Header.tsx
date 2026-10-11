@@ -4,42 +4,21 @@ import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Search, X } from "lucide-react";
-import ThemeToggle from "./ThemeToggle";
-import CurrencySwitch from "./CurrencySwitch";
+import { Search, SlidersHorizontal, X } from "lucide-react";
 import UserMenu from "./UserMenu";
+import { NAV_ITEMS } from "@/lib/nav";
 import { useRaceStatus } from "@/lib/useRaceStatus";
-
-const NAV_ITEMS = [
-  ["/", "Home"],
-  ["/race-days", "Race Days"],
-  ["/horses", "Horses"],
-  ["/jockeys", "Jockeys"],
-  ["/trainers", "Trainers"],
-  ["/stables", "Stables"],
-  ["/owners", "Owners"],
-  ["/news", "News"],
-  ["/stats", "Statistics"],
-  ["/results", "Results"],
-  ["/live", "Live"],
-];
 
 export default function Header() {
   const { t, lang } = useT();
-  const [open, setOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const [query, setQuery] = useState("");
   const router = useRouter();
   const pathname = usePathname() || "/";
   const status = useRaceStatus();
 
-  // Close the menu whenever the page changes, and let the bottom tab bar's "More" open it.
-  useEffect(() => { setOpen(false); setSearchOpen(false); }, [pathname]);
-  useEffect(() => {
-    const openMenu = () => { setOpen((v) => !v); setSearchOpen(false); }; // "More" in the tab bar toggles it
-    window.addEventListener("ct:open-menu", openMenu);
-    return () => window.removeEventListener("ct:open-menu", openMenu);
-  }, []);
+  // The search box closes whenever the page changes. (Sections + settings live in the More menu.)
+  useEffect(() => { setSearchOpen(false); }, [pathname]);
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -96,12 +75,21 @@ export default function Header() {
           <button
             className="lg:hidden flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
             aria-label={t("Search")}
-            onClick={() => { setSearchOpen((v) => !v); setOpen(false); }}
+            onClick={() => setSearchOpen((v) => !v)}
           >
             {searchOpen ? <X size={16} /> : <Search size={16} />}
           </button>
-          <CurrencySwitch className="hidden md:inline-flex" />
-          <ThemeToggle />
+          {/* Appearance, currency and language: one settings button on desktop; on phones the
+              bottom bar's "More" opens the same menu, so the top bar stays uncluttered. */}
+          <button
+            type="button"
+            className="hidden md:flex items-center justify-center w-9 h-9 rounded-full bg-white/10 border border-white/15"
+            aria-label={t("Settings")}
+            title={t("Settings")}
+            onClick={() => window.dispatchEvent(new Event("ct:open-menu"))}
+          >
+            <SlidersHorizontal size={16} />
+          </button>
           <UserMenu />
         </div>
       </div>
@@ -120,23 +108,6 @@ export default function Header() {
         </form>
       )}
 
-      {open && (
-        <nav aria-label={t("Main navigation")} className="md:hidden grid grid-cols-2 gap-2 px-4 pb-4 max-h-[calc(100dvh-8rem)] overflow-y-auto">
-          {NAV_ITEMS.map(([href, label]) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={() => setOpen(false)}
-              aria-current={isActive(href) ? "page" : undefined}
-              className={`px-3.5 min-h-[46px] flex items-center justify-between rounded-xl text-sm border ${isActive(href) ? "bg-white/15 border-white/25 font-semibold" : "bg-white/5 border-white/10"}`}
-            >
-              {t(label)}
-              {href === "/live" && status.live && <span className="live-dot" aria-label={t("LIVE")} />}
-            </Link>
-          ))}
-          <div className="col-span-2 flex justify-center pt-1"><CurrencySwitch /></div>
-        </nav>
-      )}
     </header>
   );
 }

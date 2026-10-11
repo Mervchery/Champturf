@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import NavProgress from "@/components/NavProgress";
 import Ticker from "@/components/Ticker";
 import MobileTabBar from "@/components/MobileTabBar";
+import MoreSheet from "@/components/MoreSheet";
+import { THEME_BOOT } from "@/lib/theme";
 import { CurrencyProvider } from "@/components/Money";
 import { getCurrency, getGbpRate } from "@/lib/currencyServer";
 import { FX_FALLBACK_GBP_MUR } from "@/lib/currency";
@@ -68,7 +70,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // The live rate is only looked up for visitors who chose £ (cached 6 h for everyone).
   const rate = currency === "GBP" ? await getGbpRate() : FX_FALLBACK_GBP_MUR;
   return (
-    <html lang={lang} className={`${display.variable} ${sans.variable} ${mono.variable}`}>
+    <html lang={lang} className={`${display.variable} ${sans.variable} ${mono.variable}`} suppressHydrationWarning>
+      <head>
+        {/* Applies the saved (or device) light/dark choice before first paint — no white flash. */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_BOOT }} />
+      </head>
       <body className="font-sans">
         <LanguageProvider lang={lang}>
           <CurrencyProvider currency={currency} rate={rate}>
@@ -79,6 +85,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <main>{children}</main>
           <Footer />
           <MobileTabBar />
+          <MoreSheet />
           </CurrencyProvider>
         </LanguageProvider>
       </body>

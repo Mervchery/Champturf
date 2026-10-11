@@ -27,6 +27,7 @@ export function formatDividend(raw: string | number | null | undefined, lang: La
   if (raw == null || raw === "") return null;
   const n = Number(String(raw).replace(",", "."));
   if (!Number.isFinite(n)) return String(raw);
+  if (n <= 0) return null; // a 0 from the feed means "no dividend", not Rs 0 / £0.00
   const mur = n * 10;
   if (currency === "GBP" && rate > 0) return "£" + (mur / rate).toLocaleString(locale(lang), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   return String(Math.round(mur * 100) / 100);
