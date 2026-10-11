@@ -7,6 +7,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import NavProgress from "@/components/NavProgress";
+import NavController from "@/components/NavController";
 import Ticker from "@/components/Ticker";
 import MobileTabBar from "@/components/MobileTabBar";
 import MoreSheet from "@/components/MoreSheet";
@@ -79,6 +80,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <LanguageProvider lang={lang}>
           <CurrencyProvider currency={currency} rate={rate}>
           <NavProgress />
+          <NavController />
           <ServiceWorkerRegister />
           <Header />
           <Ticker />

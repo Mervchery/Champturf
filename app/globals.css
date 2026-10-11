@@ -648,8 +648,13 @@ table.data-table {
   to { background-position: -100% 0; }
 }
 
-/* Page-to-page fade (see app/template.tsx). Opacity/transform only, and
-   "backwards" fill so nothing stays pinned after it finishes. */
+/* Page-to-page transitions (see app/template.tsx). NavController sets <html data-nav="…">
+   just before the route changes, so the new page knows how to arrive:
+   push  → slides in from the right over the old page (iOS navigation push)
+   pop   → slides in from the left with a little parallax (back)
+   tab   → quick cross-fade (switching tabs is a lateral move)
+   swipe → no animation (the edge-swipe gesture already moved the page)
+   Opacity/transform only, and "backwards" fill so nothing stays pinned afterwards. */
 .page-enter {
   animation: pageIn 0.42s var(--ease) backwards;
 }
@@ -657,6 +662,34 @@ table.data-table {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: none; }
 }
+@media (max-width: 767px) {
+  html[data-nav="push"] .page-enter {
+    animation: navPush 0.38s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+    background: var(--parchment);
+    box-shadow: -14px 0 30px rgba(0, 0, 0, 0.12);
+  }
+  html[data-nav="pop"] .page-enter {
+    animation: navPop 0.38s cubic-bezier(0.32, 0.72, 0, 1) backwards;
+  }
+  html[data-nav="tab"] .page-enter {
+    animation: navTab 0.26s ease-out backwards;
+  }
+  html[data-nav="swipe"] .page-enter { animation: none; }
+}
+@keyframes navPush {
+  from { transform: translate3d(100%, 0, 0); }
+  to { transform: none; }
+}
+@keyframes navPop {
+  from { transform: translate3d(-28%, 0, 0); opacity: 0.55; }
+  to { transform: none; opacity: 1; }
+}
+@keyframes navTab {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+/* The page container must not create horizontal scroll while it slides. */
+main { overflow-x: clip; }
 
 /* ---------- Loading states ---------- */
 
@@ -1292,17 +1325,33 @@ textarea::placeholder {
   transition: opacity 0.2s var(--ease);
 }
 .tabbar-item.is-active { opacity: 1; }
-.tabbar-item.is-active::before {
-  content: "";
+/* One gold bar glides between the five tabs (each tab is 20% wide). */
+.tabbar-indicator {
   position: absolute;
   top: 0;
-  left: 28%;
-  right: 28%;
+  left: 0;
+  width: 20%;
   height: 3px;
+  pointer-events: none;
+  transition: transform 0.45s cubic-bezier(0.34, 1.35, 0.5, 1), opacity 0.2s;
+}
+.tabbar-indicator::after {
+  content: "";
+  display: block;
+  margin: 0 28%;
+  height: 100%;
   border-radius: 0 0 3px 3px;
   background: var(--gold);
 }
-.tabbar-item:active { transform: scale(0.95); }
+.tabbar-item { -webkit-tap-highlight-color: transparent; transition: opacity 0.2s var(--ease), transform 0.18s var(--ease); }
+.tabbar-item:active { transform: scale(0.9); }
+/* The icon of the tab you just opened springs up. */
+.tabbar-item.is-active .tabbar-icon { animation: tabPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); }
+@keyframes tabPop {
+  0% { transform: scale(0.8) translateY(2px); }
+  55% { transform: scale(1.18) translateY(-3px); }
+  100% { transform: none; }
+}
 .tabbar-icon { position: relative; display: inline-flex; }
 .tabbar-live {
   position: absolute;
@@ -1361,11 +1410,20 @@ textarea::placeholder {
   border-bottom: 0;
   padding: 8px 16px calc(20px + env(safe-area-inset-bottom));
   box-shadow: var(--shadow-lg);
-  animation: sheetUp 0.3s var(--ease) both;
+  animation: sheetUp 0.45s cubic-bezier(0.32, 0.72, 0, 1) both;
+  will-change: transform;
 }
-@keyframes sheetUp { from { transform: translateY(24px); opacity: 0; } to { transform: none; opacity: 1; } }
+@keyframes sheetUp { from { transform: translateY(100%); } to { transform: none; } }
+@keyframes sheetDown { from { transform: none; } to { transform: translateY(100%); } }
+@keyframes backdropOut { from { opacity: 1; } to { opacity: 0; } }
+.sheet-root.is-closing .sheet-panel { animation: sheetDown 0.24s cubic-bezier(0.32, 0.72, 0, 1) both; }
+.sheet-root.is-closing .sheet-backdrop { animation: backdropOut 0.24s ease-out both; }
+.sheet-link { transition: transform 0.15s var(--ease), background 0.2s var(--ease); -webkit-tap-highlight-color: transparent; }
+.sheet-link:active { transform: scale(0.96); }
 .sheet-grab { width: 40px; height: 4px; border-radius: 4px; background: var(--line); margin: 2px auto 6px; }
 @media (min-width: 768px) {
+  .sheet-panel { animation: popoverIn 0.22s var(--ease) both; transform-origin: top right; }
+  .sheet-root.is-closing .sheet-panel { animation: popoverOut 0.16s ease-in both; }
   .sheet-backdrop { background: rgba(5, 15, 11, 0.25); -webkit-backdrop-filter: none; backdrop-filter: none; }
   .sheet-panel {
     left: auto;
@@ -1379,6 +1437,8 @@ textarea::placeholder {
     padding-bottom: 18px;
   }
 }
+@keyframes popoverIn { from { opacity: 0; transform: scale(0.96) translateY(-6px); } to { opacity: 1; transform: none; } }
+@keyframes popoverOut { from { opacity: 1; transform: none; } to { opacity: 0; transform: scale(0.97) translateY(-4px); } }
 .sheet-close {
   display: flex;
   align-items: center;
@@ -1459,3 +1519,38 @@ textarea::placeholder {
 .dark .form-pill { background: rgba(255, 255, 255, 0.08); }
 .dark .empty-state-icon { background: rgba(255, 255, 255, 0.08); }
 .dark .tabbar-live { border-color: var(--surface); }
+
+
+/* =====================================================================
+   iOS app feel
+   ===================================================================== */
+/* Header back chevron (phones, pushed screens). */
+.back-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin-left: -8px;
+  margin-right: -4px;
+  border-radius: 50%;
+  color: var(--gold-2);
+  -webkit-tap-highlight-color: transparent;
+  animation: backIn 0.3s var(--ease) both;
+  transition: transform 0.15s var(--ease), background 0.2s;
+}
+.back-btn:active { transform: scale(0.88); background: rgba(255, 255, 255, 0.1); }
+@keyframes backIn { from { opacity: 0; transform: translateX(-8px); } to { opacity: 1; transform: none; } }
+
+/* Touch: no grey tap flash, no 300ms/double-tap-zoom delay, instant-feeling presses. */
+a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
+@media (hover: none) {
+  a, button { -webkit-touch-callout: none; }
+  a:not(.tabbar-item):not(.sheet-link):active, button:not(.tabbar-item):not(.sheet-link):not(.seg-btn):active { transition: transform 0.12s var(--ease), opacity 0.12s; }
+  .runner-row, .race-chip, .pill, .btn { transition: transform 0.18s var(--ease); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-enter, html[data-nav] .page-enter { animation: none !important; box-shadow: none !important; }
+  .sheet-panel, .tabbar-indicator, .tabbar-item.is-active .tabbar-icon { animation: none !important; }
+}

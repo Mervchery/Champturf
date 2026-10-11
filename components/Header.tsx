@@ -4,7 +4,8 @@ import { useT } from "@/components/LanguageProvider";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { ChevronLeft, Search, SlidersHorizontal, X } from "lucide-react";
+import { isRootPath, setNavKind } from "@/components/NavController";
 import UserMenu from "./UserMenu";
 import { NAV_ITEMS } from "@/lib/nav";
 import { useRaceStatus } from "@/lib/useRaceStatus";
@@ -19,6 +20,21 @@ export default function Header() {
 
   // The search box closes whenever the page changes. (Sections + settings live in the More menu.)
   useEffect(() => { setSearchOpen(false); }, [pathname]);
+
+  // iOS-style back button on phones: shown on pushed detail screens when there is an in-app
+  // page to return to (history entries are indexed by NavController).
+  const [canBack, setCanBack] = useState(false);
+  useEffect(() => {
+    const sync = () => {
+      const idx = typeof window.history.state?.__ctIdx === "number" ? window.history.state.__ctIdx : 0;
+      setCanBack(idx > 0 && !isRootPath(window.location.pathname));
+    };
+    sync();
+    window.addEventListener("ct:nav-idx", sync);
+    window.addEventListener("popstate", sync);
+    return () => { window.removeEventListener("ct:nav-idx", sync); window.removeEventListener("popstate", sync); };
+  }, [pathname]);
+  const goBack = () => { setNavKind("pop"); router.back(); };
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
@@ -36,6 +52,11 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-[100] pt-[env(safe-area-inset-top)] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
       <div className="wrap flex items-center gap-3 md:gap-5 py-2 md:py-3.5">
+        {canBack && (
+          <button type="button" onClick={goBack} className="md:hidden back-btn" aria-label={t("Back")}>
+            <ChevronLeft size={22} strokeWidth={2.4} />
+          </button>
+        )}
         <Link href="/" className="flex items-center gap-2 md:gap-2.5 font-display text-lg md:text-xl font-bold shrink-0" aria-label="Champ Turf">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/logo.png" alt="" width={38} height={38} className="brand-logo w-8 h-8 md:w-[38px] md:h-[38px]" />

@@ -180,6 +180,7 @@ export const fr: Record<string, string> = {
   "DIRECTORY": "RÉPERTOIRE",
   "HORSE PROFILE": "PROFIL DU CHEVAL",
   "Born": "Né(e) en",
+  "Back": "Retour",
   "Back to horses": "Retour aux chevaux",
   "Career record": "Palmarès",
   "Wins": "Victoires",

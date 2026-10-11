@@ -24,19 +24,46 @@ export default function MoreSheet() {
   const router = useRouter();
   const status = useRaceStatus();
   const [open, setOpen] = useState(false);
+  const [closing, setClosing] = useState(false);
   const [theme, setTheme] = useState<Theme>("system");
   const [pending, startTransition] = useTransition();
   const closeBtn = useRef<HTMLButtonElement>(null);
+  const panel = useRef<HTMLDivElement>(null);
+  const backdrop = useRef<HTMLButtonElement>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const openRef = useRef(false);
+  const dismissRef = useRef<() => void>(() => {});
+  /** Animated close (slides down / fades) — then unmount. */
+  function dismiss() {
+    if (closeTimer.current || !open) return;
+    setClosing(true);
+    closeTimer.current = setTimeout(() => { closeTimer.current = null; setClosing(false); setOpen(false); }, 240);
+  }
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   // Open/close wiring.
   useEffect(() => {
-    const toggle = () => setOpen((v) => !v);
+    const toggle = () => {
+      if (closeTimer.current) return; // mid-close: ignore
+      if (openRef.current) dismissRef.current();
+      else setOpen(true);
+    };
     window.addEventListener("ct:open-menu", toggle);
     return () => window.removeEventListener("ct:open-menu", toggle);
   }, []);
-  useEffect(() => { setOpen(false); }, [pathname]);
+  useEffect(() => {
+    if (closeTimer.current) { clearTimeout(closeTimer.current); closeTimer.current = null; }
+    setClosing(false);
+    setOpen(false);
+  }, [pathname]);
+  openRef.current = open;
+  dismissRef.current = dismiss;
+  // Tell the tab bar so "More" lights up while the sheet is up.
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("ct:menu-state", { detail: open && !closing }));
+  }, [open, closing]);
 
   // Theme: read the saved choice, and follow the device live while set to Auto.
   useEffect(() => {
@@ -55,7 +82,7 @@ export default function MoreSheet() {
     if (!open) return;
     const before = document.activeElement as HTMLElement | null;
     closeBtn.current?.focus();
-    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") dismiss(); };
     document.addEventListener("keydown", onKey);
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -63,6 +90,58 @@ export default function MoreSheet() {
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prevOverflow;
       before?.focus?.();
+    };
+  }, [open]);
+
+  // Phones: drag the sheet down to dismiss (from the handle/title, or anywhere once scrolled to the top).
+  useEffect(() => {
+    const el = panel.current;
+    if (!open || !el) return;
+    let startY = 0, startT = 0, dy = 0, dragging = false, tracking = false;
+    const phone = () => window.matchMedia("(max-width: 767px)").matches;
+    const onStart = (e: TouchEvent) => {
+      if (!phone() || e.touches.length !== 1) return;
+      tracking = el.scrollTop <= 0;
+      startY = e.touches[0].clientY; startT = Date.now(); dy = 0; dragging = false;
+    };
+    const onMove = (e: TouchEvent) => {
+      if (!tracking) return;
+      const y = e.touches[0].clientY - startY;
+      if (!dragging) {
+        if (y > 6 && el.scrollTop <= 0) { dragging = true; el.style.animation = "none"; el.style.transition = "none"; }
+        else if (y < -6) { tracking = false; return; }
+        else return;
+      }
+      if (e.cancelable) e.preventDefault();
+      // Rubber-band: it follows the finger 1:1 downward.
+      dy = Math.max(0, y);
+      el.style.transform = `translate3d(0,${dy}px,0)`;
+      if (backdrop.current) backdrop.current.style.opacity = String(Math.max(0, 1 - dy / (el.offsetHeight * 1.1)));
+    };
+    const onEnd = () => {
+      if (!dragging) { tracking = false; return; }
+      tracking = false; dragging = false;
+      const velocity = dy / Math.max(1, Date.now() - startT);
+      if (dy > el.offsetHeight * 0.3 || velocity > 0.6) {
+        el.style.transition = "transform 0.24s cubic-bezier(0.32, 0.72, 0, 1)";
+        el.style.transform = `translate3d(0,${el.offsetHeight}px,0)`;
+        if (backdrop.current) { backdrop.current.style.transition = "opacity 0.24s"; backdrop.current.style.opacity = "0"; }
+        closeTimer.current = setTimeout(() => { closeTimer.current = null; setClosing(false); setOpen(false); }, 240);
+      } else {
+        el.style.transition = "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)";
+        el.style.transform = "translate3d(0,0,0)";
+        if (backdrop.current) { backdrop.current.style.transition = "opacity 0.25s"; backdrop.current.style.opacity = "1"; }
+      }
+    };
+    el.addEventListener("touchstart", onStart, { passive: true });
+    el.addEventListener("touchmove", onMove, { passive: false });
+    el.addEventListener("touchend", onEnd, { passive: true });
+    el.addEventListener("touchcancel", onEnd, { passive: true });
+    return () => {
+      el.removeEventListener("touchstart", onStart);
+      el.removeEventListener("touchmove", onMove);
+      el.removeEventListener("touchend", onEnd);
+      el.removeEventListener("touchcancel", onEnd);
     };
   }, [open]);
 
@@ -85,13 +164,13 @@ export default function MoreSheet() {
   if (!open) return null;
 
   return (
-    <div className="sheet-root">
-      <button type="button" className="sheet-backdrop" aria-label={t("Close")} onClick={() => setOpen(false)} tabIndex={-1} />
-      <div role="dialog" aria-modal="true" aria-label={t("Menu")} className="sheet-panel">
+    <div className={`sheet-root ${closing ? "is-closing" : ""}`}>
+      <button ref={backdrop} type="button" className="sheet-backdrop" aria-label={t("Close")} onClick={dismiss} tabIndex={-1} />
+      <div ref={panel} role="dialog" aria-modal="true" aria-label={t("Menu")} className="sheet-panel">
         <div className="sheet-grab md:hidden" aria-hidden="true" />
         <div className="flex items-center justify-between pt-1 pb-2">
           <h2 className="font-display text-xl">{t("Menu")}</h2>
-          <button ref={closeBtn} type="button" onClick={() => setOpen(false)} className="sheet-close" aria-label={t("Close")}>
+          <button ref={closeBtn} type="button" onClick={dismiss} className="sheet-close" aria-label={t("Close")}>
             <X size={18} />
           </button>
         </div>
