@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { JockeyIcon } from "@/components/RacingIcons";
 import { getJockeyById } from "@/lib/jockeys";
+import { getSeasonBoard } from "@/lib/season";
+import InactiveBadge from "@/components/InactiveBadge";
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 
@@ -21,6 +23,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 export default async function JockeyDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const j = await getJockeyById(params.id);
+  const season = await getSeasonBoard();
   if (!j) return notFound();
 
   return (
@@ -33,6 +36,7 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
           <div>
             <span className="text-xs font-semibold text-gold2">{j.apprentice ? t("APPRENTICE JOCKEY") : t("JOCKEY PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{j.name}</h1>
+            {season.available && !season.activeJockeys.has(j.id) && <div className="mt-2"><InactiveBadge year={season.ctx.year} kind="jockey" /></div>}
             <div className="text-white/70 text-sm mt-1.5">{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</div>
           </div>
         </div>

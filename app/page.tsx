@@ -9,6 +9,7 @@ import { ResultCard } from "@/components/Podium";
 import { getHorses } from "@/lib/horses";
 import { getJockeys } from "@/lib/jockeys";
 import { getNews } from "@/lib/news";
+import { getSeasonBoard, bySeason, lineOf } from "@/lib/season";
 import { getRaceDays } from "@/lib/meetings";
 import { fmtMoney } from "@/lib/format";
 import { fmtDateLong } from "@/lib/i18n";
@@ -25,13 +26,14 @@ export default async function HomePage() {
   const nowMs = Date.now();
 
   const meetingDate = await safe(getCurrentMeetingDate(nowMs), null);
-  const [board, latest, horses, jockeys, news, raceDays] = await Promise.all([
+  const [board, latest, horses, jockeys, news, raceDays, season] = await Promise.all([
     meetingDate ? safe(getMeetingBoard(meetingDate), [] as BoardRace[]) : Promise.resolve([] as BoardRace[]),
     safe(getLatestResults(6), [] as ResultRace[]),
     safe(getHorses(), []),
     safe(getJockeys(), []),
     safe(getNews(), []),
     safe(getRaceDays(), []),
+    getSeasonBoard(),
   ]);
 
   const open = board.filter((b) => b.race.status !== "completed");
@@ -42,8 +44,16 @@ export default async function HomePage() {
   const focusRace = board_.live[0] ?? board_.next ?? board_.awaiting[0] ?? open[0]?.race ?? null;
   const strip = board.map((b) => ({ id: b.race.id, no: b.no, race_date: b.race.race_date, race_time: b.race.race_time, status: b.race.status }));
 
-  const topHorses = [...horses].sort((a, b) => b.wins - a.wins).slice(0, 5);
-  const topJockeys = [...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins).slice(0, 5);
+  // Championships count the current season only (old seasons never accumulate); falls back to all-time until
+  // supabase/season_stats_migration.sql has been run.
+  const topHorses = (season.available
+    ? bySeason(horses, season.horse).filter((x) => lineOf(season.horse, x.id).wins > 0)
+    : [...horses].sort((a, b) => b.wins - a.wins)
+  ).slice(0, 5).map((x) => ({ h: x, wins: season.available ? lineOf(season.horse, x.id).wins : x.wins }));
+  const topJockeys = (season.available
+    ? bySeason(jockeys.filter((j) => !j.apprentice && season.activeJockeys.has(j.id)), season.jockey).filter((x) => lineOf(season.jockey, x.id).wins > 0)
+    : [...jockeys].filter((j) => !j.apprentice).sort((a, b) => b.wins - a.wins)
+  ).slice(0, 5).map((x) => ({ j: x, wins: season.available ? lineOf(season.jockey, x.id).wins : x.wins }));
   const upcomingDays = raceDays
     .filter((d) => d.status !== "completed" && d.race_date !== meetingDate)
     .sort((a, b) => a.race_date.localeCompare(b.race_date))
@@ -117,38 +127,38 @@ export default async function HomePage() {
         <div className="wrap grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
           <div>
             <div className="flex justify-between items-end mb-4">
-              <h2 className="font-display text-xl">{t("Leading horses")}</h2>
+              <h2 className="font-display text-xl">{t("Leading horses")}{season.available && <span className="ml-2 text-xs font-sans opacity-60">{season.ctx.year}</span>}</h2>
               <Link href="/stats" className="inline-block text-sm border-b border-ink pb-1">{t("Statistics centre")} →</Link>
             </div>
             <div className="panel">
-              {topHorses.length === 0 && <p className="text-sm opacity-70">{t("No horses yet.")}</p>}
-              {topHorses.map((h, i) => (
+              {topHorses.length === 0 && <p className="text-sm opacity-70">{season.available ? t("No winners yet this season.") : t("No horses yet.")}</p>}
+              {topHorses.map(({ h, wins }, i) => (
                 <Link key={h.id} href={`/horses/${h.id}`} className="grid grid-cols-[32px_1fr_auto] gap-3.5 items-center py-3 border-b border-line last:border-0">
                   <div className="font-mono text-sm text-coral-ink font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{h.name}</div>
                     <div className="text-xs opacity-70">{h.trainer?.name ?? t("Unknown")}</div>
                   </div>
-                  <div className="font-mono font-semibold text-right">{h.wins}{t("W")}</div>
+                  <div className="font-mono font-semibold text-right">{wins}{t("W")}</div>
                 </Link>
               ))}
             </div>
           </div>
           <div>
             <div className="flex justify-between items-end mb-4">
-              <h2 className="font-display text-xl">{t("Leading jockeys")}</h2>
+              <h2 className="font-display text-xl">{t("Leading jockeys")}{season.available && <span className="ml-2 text-xs font-sans opacity-60">{season.ctx.year}</span>}</h2>
               <Link href="/stats" className="inline-block text-sm border-b border-ink pb-1">{t("Statistics centre")} →</Link>
             </div>
             <div className="panel">
-              {topJockeys.length === 0 && <p className="text-sm opacity-70">{t("No jockeys yet.")}</p>}
-              {topJockeys.map((j, i) => (
+              {topJockeys.length === 0 && <p className="text-sm opacity-70">{season.available ? t("No winners yet this season.") : t("No jockeys yet.")}</p>}
+              {topJockeys.map(({ j, wins }, i) => (
                 <Link key={j.id} href={`/jockeys/${j.id}`} className="grid grid-cols-[32px_1fr_auto] gap-3.5 items-center py-3 border-b border-line last:border-0">
                   <div className="font-mono text-sm text-coral-ink font-semibold">{i + 1}</div>
                   <div>
                     <div className="font-semibold text-sm">{j.name}</div>
                     <div className="text-xs opacity-70">{j.nationality ? t("nat:" + j.nationality) : t("N/A")}</div>
                   </div>
-                  <div className="font-mono font-semibold text-right">{j.wins}{t("W")}</div>
+                  <div className="font-mono font-semibold text-right">{wins}{t("W")}</div>
                 </Link>
               ))}
             </div>

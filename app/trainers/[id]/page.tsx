@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Target, User } from "lucide-react";
 import { getTrainerById } from "@/lib/trainers";
+import { getSeasonBoard } from "@/lib/season";
+import InactiveBadge from "@/components/InactiveBadge";
 import { getHorses } from "@/lib/horses";
 import { getCareerStatsForTrainer } from "@/lib/careerStats";
 import SilkImage from "@/components/SilkImage";
@@ -24,6 +26,7 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
 export default async function TrainerDetailPage({ params }: { params: { id: string } }) {
   const { t, lang } = getT();
   const trainer = await getTrainerById(params.id);
+  const season = await getSeasonBoard();
   if (!trainer) return notFound();
 
   const [stats, allHorses] = await Promise.all([
@@ -47,6 +50,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
           <div className="min-w-0">
             <span className="text-xs font-semibold text-gold2">{t("TRAINER PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{trainer.name}</h1>
+            {season.available && !season.activeTrainers.has(trainer.id) && <div className="mt-2"><InactiveBadge year={season.ctx.year} kind="trainer" /></div>}
             <div className="text-white/70 text-sm mt-1.5 flex items-center gap-2 flex-wrap">
               {trainer.stable ? (
                 <>

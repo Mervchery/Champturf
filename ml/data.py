@@ -33,7 +33,8 @@ class Supabase:
             # ordered by id so paging is stable; Range pages through PostgREST's row limit
             r = requests.get(f"{self.url}/rest/v1/{table}?select={columns}&order=id.asc",
                              headers={**self.h, "Range-Unit": "items", "Range": f"{start}-{start + page - 1}"}, timeout=60)
-            r.raise_for_status()
+            if not r.ok:
+                raise SystemExit(f"Supabase said no for table '{table}': {r.status_code} {r.text[:400]}")
             chunk = r.json()
             rows += chunk
             if len(chunk) < page:
@@ -119,14 +120,24 @@ def detect_odds_unit(win_prices_by_race):
     return None, diag
 
 
+def _ensure(df, cols):
+    """Older databases may not have every optional column yet; a missing one becomes empty (never invented)."""
+    for c in cols:
+        if c not in df.columns:
+            df[c] = np.nan
+    return df
+
+
 def load_tables(db):
-    races = db.fetch("races", "id,name,race_date,race_time,distance,race_class,prize,status")
-    results = db.fetch("race_results", "race_id,horse_id,position,jockey_id,trainer_id,weight_kg,gate,margin,rating,win_odds,is_tipped")
-    entries = db.fetch("race_entries", "race_id,horse_id,jockey_id,trainer_id,weight_kg,gate,rating,odds,odds_open,odds_prev,is_tipped")
+    races = _ensure(db.fetch("races", "*"), ["id", "name", "race_date", "race_time", "distance", "race_class", "prize", "status"])
+    results = _ensure(db.fetch("race_results", "*"), ["race_id", "horse_id", "position", "jockey_id", "trainer_id", "weight_kg", "gate",
+                                                      "margin", "rating", "win_odds", "is_tipped"])
+    entries = _ensure(db.fetch("race_entries", "*"), ["race_id", "horse_id", "jockey_id", "trainer_id", "weight_kg", "gate", "rating",
+                                                      "odds", "odds_open", "odds_prev", "is_tipped"])
     if races.empty:
         return races, results, entries
     races["dt"] = pd.to_datetime(races["race_date"].astype(str) + " " + races["race_time"].astype(str).str.slice(0, 8), errors="coerce")
     races["distance_m"] = races["distance"].map(parse_distance_m)
-    races["class_num"] = races["race_class"].map(parse_class_num) if "race_class" in races else np.nan
+    races["class_num"] = races["race_class"].map(parse_class_num)
     races["prize"] = pd.to_numeric(races["prize"], errors="coerce")
     return races.dropna(subset=["dt"]), results, entries
