@@ -33,8 +33,10 @@ export function recallTabPath(tab: string): string | null {
 
 /** How the next page should animate. Read by CSS through <html data-nav="…">. */
 export type NavKind = "push" | "pop" | "tab" | "swipe";
+let kindAt = 0;
 export function setNavKind(kind: NavKind) {
   document.documentElement.dataset.nav = kind;
+  kindAt = Date.now();
 }
 
 function isStandalone() {
@@ -63,6 +65,8 @@ export default function NavController() {
     const replace = h.replaceState.bind(h);
     h.pushState = (state: unknown, title: string, url?: string | URL | null) => {
       last = readIdx() + 1;
+      // A navigation nobody classified (e.g. router.push after a search) is a plain push.
+      if (Date.now() - kindAt > 800) setNavKind("push");
       push({ ...((state as object) || {}), [IDX_KEY]: last }, title, url);
       window.dispatchEvent(new Event("ct:nav-idx"));
     };
@@ -107,10 +111,6 @@ export default function NavController() {
     if (tab) rememberTabPath(tab, pathname + location.search);
     const main = document.querySelector("main") as HTMLElement | null;
     if (main) { main.style.transition = ""; main.style.transform = ""; main.style.boxShadow = ""; }
-    // Clear the marker once the page has animated in, so a later programmatic navigation
-    // (e.g. a search submit) doesn't replay a stale push/pop animation.
-    const t = setTimeout(() => { delete document.documentElement.dataset.nav; }, 500);
-    return () => clearTimeout(t);
   }, [pathname]);
 
   // 4) Edge-swipe back (installed app only).

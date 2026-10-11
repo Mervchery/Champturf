@@ -665,10 +665,10 @@ table.data-table {
 @media (max-width: 767px) {
   /* Short, opacity-led slides: the old page has no exit animation, so a full-width slide would
      reveal an empty screen and look like a glitch. */
-  html[data-nav="push"] .page-enter { animation: navPush 0.3s var(--ease) backwards; }
-  html[data-nav="pop"] .page-enter { animation: navPop 0.3s var(--ease) backwards; }
-  html[data-nav="tab"] .page-enter { animation: navTab 0.2s ease-out backwards; }
-  html[data-nav="swipe"] .page-enter { animation: none; }
+  .page-enter.nav-push { animation: navPush 0.3s var(--ease) backwards; }
+  .page-enter.nav-pop { animation: navPop 0.3s var(--ease) backwards; }
+  .page-enter.nav-tab { animation: navTab 0.2s ease-out backwards; }
+  .page-enter.nav-swipe { animation: none; }
 }
 @keyframes navPush {
   from { transform: translate3d(28px, 0, 0); opacity: 0; }
@@ -1528,7 +1528,6 @@ textarea::placeholder {
   border-radius: 50%;
   color: var(--gold-2);
   -webkit-tap-highlight-color: transparent;
-  animation: backIn 0.3s var(--ease) both;
   transition: transform 0.15s var(--ease), background 0.2s;
 }
 .back-btn:active { transform: scale(0.88); background: rgba(255, 255, 255, 0.1); }
@@ -1543,6 +1542,6 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .page-enter, html[data-nav] .page-enter { animation: none !important; box-shadow: none !important; }
+  .page-enter, .page-enter[class*="nav-"] { animation: none !important; box-shadow: none !important; }
   .sheet-panel, .tabbar-indicator, .tabbar-item.is-active .tabbar-icon { animation: none !important; }
 }

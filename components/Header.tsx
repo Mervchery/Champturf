@@ -21,20 +21,14 @@ export default function Header() {
   // The search box closes whenever the page changes. (Sections + settings live in the More menu.)
   useEffect(() => { setSearchOpen(false); }, [pathname]);
 
-  // iOS-style back button on phones: shown on pushed detail screens when there is an in-app
-  // page to return to (history entries are indexed by NavController).
-  const [canBack, setCanBack] = useState(false);
-  useEffect(() => {
-    const sync = () => {
-      const idx = typeof window.history.state?.__ctIdx === "number" ? window.history.state.__ctIdx : 0;
-      setCanBack(idx > 0 && !isRootPath(window.location.pathname));
-    };
-    sync();
-    window.addEventListener("ct:nav-idx", sync);
-    window.addEventListener("popstate", sync);
-    return () => { window.removeEventListener("ct:nav-idx", sync); window.removeEventListener("popstate", sync); };
-  }, [pathname]);
-  const goBack = () => { setNavKind("pop"); router.back(); };
+  // iOS-style back button on phones, shown on every pushed (non-root) screen. Decided from the
+  // path during render, so it appears in the same frame as the new page (no late layout shift).
+  const canBack = !isRootPath(pathname);
+  const goBack = () => {
+    setNavKind("pop");
+    const idx = typeof window.history.state?.__ctIdx === "number" ? window.history.state.__ctIdx : 0;
+    if (idx > 0) router.back(); else router.push("/"); // opened directly: no earlier page, go Home
+  };
 
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
