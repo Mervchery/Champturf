@@ -129,6 +129,9 @@ export default function NavController() {
 
     function start(e: TouchEvent) {
       if (e.touches.length !== 1 || e.touches[0].clientX > 24 || !canGoBack()) return;
+      // Only listen for moves during an edge touch: a document-wide non-passive touchmove
+      // listener would make every normal scroll wait on JS (janky, esp. with sticky bars).
+      document.addEventListener("touchmove", move, { passive: false });
       startX = e.touches[0].clientX; startY = e.touches[0].clientY; startT = Date.now(); dx = 0;
       mode = "pending";
     }
@@ -148,6 +151,7 @@ export default function NavController() {
       main!.style.boxShadow = "-12px 0 32px rgba(0,0,0,0.18)";
     }
     function end() {
+      document.removeEventListener("touchmove", move);
       if (mode !== "drag") { mode = "idle"; return; }
       mode = "idle";
       const w = window.innerWidth;
@@ -165,7 +169,6 @@ export default function NavController() {
     }
 
     document.addEventListener("touchstart", start, { passive: true });
-    document.addEventListener("touchmove", move, { passive: false });
     document.addEventListener("touchend", end, { passive: true });
     document.addEventListener("touchcancel", end, { passive: true });
     return () => {
