@@ -5,7 +5,7 @@ import { ArrowDown, ArrowUp, ChevronRight, Play, Radio } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import Countdown from "@/components/Countdown";
 import { useNow } from "@/lib/useNow";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/Money";
 import { fmtDateLong } from "@/lib/i18n";
 import { fmtOdds, fmtTime, getRacePhase, mauritiusDate, oddsDirection, pickBoardState } from "@/lib/raceState";
 
@@ -98,7 +98,7 @@ export default function RaceSpotlight({ races, serverNow, variant = "panel" }: P
 
       <h2 className={`font-display text-2xl mt-2 ${title}`}>{focus.name}</h2>
       <div className={`text-sm mt-1.5 ${muted}`}>
-        {focus.course} · {focus.distance} · {fmtMoney(focus.prize, lang)}
+        {focus.course} · {focus.distance} · <Money amount={focus.prize} />
         {focus.runnerCount > 0 ? ` · ${t("{n} runners", { n: focus.runnerCount })}` : ""}
       </div>
 

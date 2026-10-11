@@ -588,4 +588,7 @@ export const fr: Record<string, string> = {
   "Loading results…": "Chargement des résultats…",
   "Loading the form…": "Chargement de la forme…",
   "Loading the broadcast…": "Chargement de la diffusion…",
+  "Currency": "Devise",
+  "Show amounts in pounds (£)": "Afficher les montants en livres (£)",
+  "Approximate rate: £1 = Rs {n}": "Taux approximatif : 1 £ = Rs {n}",
 };

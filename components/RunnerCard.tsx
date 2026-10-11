@@ -2,7 +2,7 @@ import Link from "next/link";
 import { fmtOdds } from "@/lib/raceState";
 import SilkImage from "@/components/SilkImage";
 import FollowButton from "@/components/FollowButton";
-import { fmtMoney } from "@/lib/format";
+import { Money, Dividend } from "@/components/Money";
 import { ordinal } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
 import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
@@ -20,11 +20,11 @@ function PrizeWon({ position, racePrize, prizeSplit }: { position: number; raceP
   const { lang } = getT();
   // The race's real purse split (from the Jockey Club card) when we have it…
   const real = prizeSplit?.[position - 1];
-  if (real != null) return <>{fmtMoney(real, lang)}</>;
+  if (real != null) return <Money amount={real} />;
   // …otherwise the 60/20/10 estimate used for horse earnings — display only.
   const pct = position === 1 ? 0.6 : position === 2 ? 0.2 : position === 3 ? 0.1 : 0;
   if (pct === 0) return <span className="opacity-70">—</span>;
-  return <>{fmtMoney(Math.round(racePrize * pct), lang)}</>;
+  return <Money amount={Math.round(racePrize * pct)} />;
 }
 
 type BaseProps = {
@@ -159,25 +159,25 @@ function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & 
   );
 }
 
-function OddsPill({ kind, value, prev, open, changedAt }: { kind: "win" | "place"; value: string | null } & Movement) {
+function OddsPill({ kind, value, prev, open, changedAt, dividend = false }: { kind: "win" | "place"; value: string | null; dividend?: boolean } & Movement) {
   const { t } = getT();
   return (
     <div className={`odds-pill odds-${kind} ${value ? "" : "is-empty"}`}>
       <span className="odds-label">{kind === "win" ? t("Win") : t("Place")}</span>
       <span className="odds-right">
         <MoveBadge value={value} prev={prev} open={open} changedAt={changedAt} />
-        <span className="odds-value">{fmtOdds(value) ?? "—"}</span>
+        <span className="odds-value">{dividend ? <Dividend value={value} /> : (fmtOdds(value) ?? "—")}</span>
       </span>
     </div>
   );
 }
 
-function OddsRow({ win, place, winMove, placeMove }: { win: string | null; place: string | null; winMove?: Movement; placeMove?: Movement }) {
+function OddsRow({ win, place, winMove, placeMove, dividend = false }: { win: string | null; place: string | null; winMove?: Movement; placeMove?: Movement; dividend?: boolean }) {
   if (!win && !place) return null;
   return (
     <div className="odds-row">
-      <OddsPill kind="win" value={win} {...winMove} />
-      <OddsPill kind="place" value={place} {...placeMove} />
+      <OddsPill kind="win" value={win} dividend={dividend} {...winMove} />
+      <OddsPill kind="place" value={place} dividend={dividend} {...placeMove} />
     </div>
   );
 }
@@ -278,7 +278,7 @@ export function EntryRow({
           <div className="text-xs opacity-70 leading-snug">
             <span className="font-semibold">{horse.wins}</span>{t("W")}-<span className="font-semibold">{places}</span>{t("P")}
             <span className="opacity-70"> {t("from {n}", { n: horse.starts })} · </span>
-            <span className="whitespace-nowrap">{fmtMoney(horse.earnings, lang)}</span>
+            <span className="whitespace-nowrap"><Money amount={horse.earnings} /></span>
           </div>
           {form && form.length > 0 && (
             <div className="ml-auto"><FormPills form={form} daysSince={daysSince} /></div>
@@ -343,7 +343,7 @@ export function ResultRow({
         {performanceRating != null && (rating ?? horse?.rating) == null && <Stat label="Perf">{performanceRating}</Stat>}
       </div>
 
-      <OddsRow win={winOdds} place={placeOdds} />
+      <OddsRow win={winOdds} place={placeOdds} dividend />
     </div>
   );
 }

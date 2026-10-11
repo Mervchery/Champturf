@@ -5,7 +5,7 @@ import { ArrowDown, ArrowUp, ChevronRight, Trophy } from "lucide-react";
 import { getMeetingInfo } from "@/lib/meetings";
 import { getRacesForDate, pickFeaturedRace } from "@/lib/races";
 import { getMeetingBoard } from "@/lib/raceDay";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/Money";
 import { fmtDateLong } from "@/lib/i18n";
 import { fmtOdds, fmtTime, isCancelled, oddsDirection, refreshIntervalSec } from "@/lib/raceState";
 import { PodiumList } from "@/components/Podium";
@@ -84,7 +84,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6 mb-8">
             <div className="stat-tile"><div className="v">{races.length}</div><div className="l">{t("Races")}</div></div>
-            <div className="stat-tile"><div className="v !text-xl">{fmtMoney(totalPrize, lang)}</div><div className="l">{t("Total prize money")}</div></div>
+            <div className="stat-tile"><div className="v !text-xl"><Money amount={totalPrize} /></div><div className="l">{t("Total prize money")}</div></div>
             <div className="stat-tile"><div className="v !text-xl">{meeting?.weather ?? t("N/A")}</div><div className="l">{t("Weather")}</div></div>
             <div className="stat-tile"><div className="v !text-xl">{meeting?.track_condition ?? t("N/A")}</div><div className="l">{t("Track condition")}</div></div>
           </div>
@@ -104,7 +104,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
                     <h3 className="font-display text-lg leading-snug mt-1">{b.race.name}</h3>
                     <div className="text-xs opacity-70 mt-0.5">
                       {b.race.distance}
-                      {b.race.race_class ? ` · ${t("Class")} ${b.race.race_class}` : ""} · {fmtMoney(b.race.prize, lang)}
+                      {b.race.race_class ? ` · ${t("Class")} ${b.race.race_class}` : ""} · <Money amount={b.race.prize} />
                       {b.runnerCount > 0 ? ` · ${t("{n} runners", { n: b.runnerCount })}` : ""}
                     </div>
                   </div>

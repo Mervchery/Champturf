@@ -2,8 +2,8 @@ import Link from "next/link";
 import SilkImage from "@/components/SilkImage";
 import { getT } from "@/lib/i18n/server";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
-import { fmtMoney } from "@/lib/format";
-import { fmtOdds, fmtTime } from "@/lib/raceState";
+import { Money, Dividend } from "@/components/Money";
+import { fmtTime } from "@/lib/raceState";
 import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
 import { ChevronRight } from "lucide-react";
 import type { PodiumRow, ResultRace } from "@/lib/raceDay";
@@ -51,7 +51,7 @@ export function PodiumList({ rows, showTime = true }: { rows: PodiumRow[]; showT
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-mono font-semibold tabular-nums leading-tight">{fmtOdds(p.odds) ?? "—"}</div>
+            <div className="font-mono font-semibold tabular-nums leading-tight"><Dividend value={p.odds} /></div>
             <div className="text-[0.68rem] opacity-60 leading-tight mt-0.5">
               {showTime && p.time ? <span className="font-mono">{p.time}</span> : p.odds ? t("SP") : ""}
             </div>
@@ -77,7 +77,7 @@ export function ResultCard({ race, showDate = false }: { race: ResultRace; showD
           <div className="text-xs opacity-70 mt-0.5">
             {race.distance}
             {race.race_class ? ` · ${t("Class")} ${race.race_class}` : ""}
-            {race.prize ? ` · ${fmtMoney(race.prize, lang)}` : ""}
+            {race.prize ? <> · <Money amount={race.prize} /></> : null}
             {race.runnerCount > 0 ? ` · ${t("{n} runners", { n: race.runnerCount })}` : ""}
           </div>
         </div>

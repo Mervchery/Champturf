@@ -9,7 +9,7 @@ import Countdown from "@/components/Countdown";
 import LiveRefresh from "@/components/LiveRefresh";
 import EmptyState from "@/components/EmptyState";
 import { ArrowDown, ArrowUp, CalendarClock, History } from "lucide-react";
-import { fmtMoney } from "@/lib/format";
+import { Money, Dividend } from "@/components/Money";
 import SilkImage from "@/components/SilkImage";
 import FollowButton from "@/components/FollowButton";
 import { getFollowState } from "@/lib/follows";
@@ -127,7 +127,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
             <div className="stat-tile"><div className="v">{h.wins}</div><div className="l">{t("Wins")}</div></div>
             <div className="stat-tile"><div className="v">{h.seconds + h.thirds}</div><div className="l">{t("Places")}</div></div>
             <div className="stat-tile"><div className="v">{h.starts}</div><div className="l">{t("Starts")}</div></div>
-            <div className="stat-tile"><div className="v">{fmtMoney(h.earnings, lang)}</div><div className="l">{t("Career earnings")}</div></div>
+            <div className="stat-tile"><div className="v"><Money amount={h.earnings} /></div><div className="l">{t("Career earnings")}</div></div>
           </div>
           {recorded.starts > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
@@ -217,7 +217,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                       <td data-label={t("Distance")} className="text-xs">{r.distance ?? "—"}</td>
                       <td data-label={t("Jockey")} className="text-xs">{r.jockeyId ? <Link href={`/jockeys/${r.jockeyId}`} className="hover:underline">{r.jockeyName}</Link> : (r.jockeyName ?? "—")}</td>
                       <td data-label={t("Trainer")} className="text-xs">{r.trainerName ?? "—"}</td>
-                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums">{fmtOdds(r.odds) ?? "—"}</td>
+                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums"><Dividend value={r.odds} /></td>
                       <td data-label={t("Time")} className="text-xs font-mono">{r.time ?? "—"}</td>
                     </tr>
                   ))}

@@ -6,6 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Search, X } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
+import CurrencySwitch from "./CurrencySwitch";
 import UserMenu from "./UserMenu";
 import { useRaceStatus } from "@/lib/useRaceStatus";
 
@@ -99,6 +100,7 @@ export default function Header() {
           >
             {searchOpen ? <X size={16} /> : <Search size={16} />}
           </button>
+          <CurrencySwitch className="hidden md:inline-flex" />
           <ThemeToggle />
           <UserMenu />
         </div>
@@ -132,6 +134,7 @@ export default function Header() {
               {href === "/live" && status.live && <span className="live-dot" aria-label={t("LIVE")} />}
             </Link>
           ))}
+          <div className="col-span-2 flex justify-center pt-1"><CurrencySwitch /></div>
         </nav>
       )}
     </header>

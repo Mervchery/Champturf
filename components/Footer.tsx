@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { getT } from "@/lib/i18n/server";
 import LanguageSwitch from "@/components/LanguageSwitch";
+import CurrencySwitch from "@/components/CurrencySwitch";
 import InstallApp from "@/components/InstallApp";
 
 export default function Footer() {
@@ -42,7 +43,10 @@ export default function Footer() {
           <Link href="/community-guidelines" className="tap hover:text-white transition-colors">{t("Community guidelines")}</Link>
         </nav>
         <span>© 2026 Champ Turf. {t("Independent coverage — not affiliated with the Mauritius Turf Club or any official body.")}</span>
-        <LanguageSwitch />
+        <div className="flex items-center gap-2 flex-wrap">
+          <LanguageSwitch />
+          <CurrencySwitch />
+        </div>
       </div>
     </footer>
   );

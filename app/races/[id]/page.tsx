@@ -7,7 +7,7 @@ import ScratchedList from "@/components/ScratchedList";
 import { getRecentFormForHorses } from "@/lib/horses";
 import { getMeetingInfo } from "@/lib/meetings";
 import { toPodiumRow } from "@/lib/raceDay";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/Money";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
 import { fmtTime, getRacePhase, raceStartMs, refreshIntervalSec } from "@/lib/raceState";
 import { EntryRow, ResultRow } from "@/components/RunnerCard";
@@ -98,7 +98,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
         {race.prize_split.map((amount, i) => (
           <div key={i} className="stat-cell !text-left border border-line rounded-xl">
             <div className="stat-label !text-left">{ordinal(lang, i + 1)}</div>
-            <div className="font-semibold tabular-nums mt-0.5">{fmtMoney(amount, lang)}</div>
+            <div className="font-semibold tabular-nums mt-0.5"><Money amount={amount} /></div>
           </div>
         ))}
       </div>
@@ -151,7 +151,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
           </div>
           <h1 className="text-3xl font-display mt-1.5">{race.name}</h1>
           <div className="text-white/70 text-sm mt-2">
-            {fmtDateLong(lang, race.race_date)} · <span className="font-semibold text-white/90">{fmtTime(race.race_time)}</span> · {race.distance} · {fmtMoney(race.prize, lang)}
+            {fmtDateLong(lang, race.race_date)} · <span className="font-semibold text-white/90">{fmtTime(race.race_time)}</span> · {race.distance} · <Money amount={race.prize} />
             {race.conditions ? ` · ${race.conditions}` : ""}
           </div>
           {(race.race_class || race.rails || meeting?.track_condition || meeting?.weather) && (

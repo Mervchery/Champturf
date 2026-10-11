@@ -6,7 +6,7 @@ import { getTrainers } from "@/lib/trainers";
 import { getStables } from "@/lib/stables";
 import { getSeasonBoard, bySeason, lineOf } from "@/lib/season";
 import InactiveBadge from "@/components/InactiveBadge";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/Money";
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 
@@ -79,7 +79,7 @@ export default async function StatsPage({ searchParams }: { searchParams: { tab?
                 <thead><tr><th>#</th><th>{t("Horse")}</th><th>{t("Trainer")}</th><th>{t("Starts")}</th><th>{t("Wins")}</th><th>{t("Placed")}</th><th>{t("Earnings")}</th></tr></thead>
                 <tbody>
                   {horseRows.map((h, i) => (
-                    <tr key={h.id}><td>{i + 1}</td><td data-title>{h.name}</td><td data-label={t("Trainer")}>{h.trainer?.name ?? t("Unknown")}</td><td data-label={t("Starts")}>{h.starts}</td><td data-label={t("Wins")}>{h.wins}</td><td data-label={t("Placed")}>{h.seconds + h.thirds}</td><td data-label={t("Earnings")}>{fmtMoney(h.earnings, lang)}</td></tr>
+                    <tr key={h.id}><td>{i + 1}</td><td data-title>{h.name}</td><td data-label={t("Trainer")}>{h.trainer?.name ?? t("Unknown")}</td><td data-label={t("Starts")}>{h.starts}</td><td data-label={t("Wins")}>{h.wins}</td><td data-label={t("Placed")}>{h.seconds + h.thirds}</td><td data-label={t("Earnings")}><Money amount={h.earnings} /></td></tr>
                   ))}
                 </tbody>
               </table>

@@ -11,7 +11,7 @@ import { getJockeys } from "@/lib/jockeys";
 import { getNews } from "@/lib/news";
 import { getSeasonBoard, bySeason, lineOf } from "@/lib/season";
 import { getRaceDays } from "@/lib/meetings";
-import { fmtMoney } from "@/lib/format";
+import { Money } from "@/components/Money";
 import { fmtDateLong } from "@/lib/i18n";
 import { getCurrentMeetingDate, getLatestResults, getMeetingBoard, toSpotRace, type BoardRace, type ResultRace } from "@/lib/raceDay";
 import { mauritiusDate, pickBoardState, refreshIntervalSec } from "@/lib/raceState";
@@ -181,7 +181,7 @@ export default async function HomePage() {
                 <Link key={d.race_date} href={`/race-days/${d.race_date}`} className="card p-4">
                   <span className="pill pill-gold inline-flex items-center gap-1"><CalendarDays size={12} /> {t("Upcoming")}</span>
                   <h3 className="mt-2 text-sm font-semibold">{fmtDateLong(lang, d.race_date)}</h3>
-                  <div className="text-xs opacity-70 mt-1">{t(d.raceCount === 1 ? "{n} race" : "{n} races", { n: d.raceCount })} · {fmtMoney(d.totalPrize, lang)}</div>
+                  <div className="text-xs opacity-70 mt-1">{t(d.raceCount === 1 ? "{n} race" : "{n} races", { n: d.raceCount })} · <Money amount={d.totalPrize} /></div>
                 </Link>
               ))}
             </div>

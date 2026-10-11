@@ -9,6 +9,9 @@ import Footer from "@/components/Footer";
 import NavProgress from "@/components/NavProgress";
 import Ticker from "@/components/Ticker";
 import MobileTabBar from "@/components/MobileTabBar";
+import { CurrencyProvider } from "@/components/Money";
+import { getCurrency, getGbpRate } from "@/lib/currencyServer";
+import { FX_FALLBACK_GBP_MUR } from "@/lib/currency";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { siteUrl } from "@/lib/site";
 
@@ -59,12 +62,16 @@ export const viewport: Viewport = {
 // `export const revalidate = 0` or `dynamic = "force-dynamic"` to a page: either
 // one switches that data cache off again.
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getLang();
+  const currency = getCurrency();
+  // The live rate is only looked up for visitors who chose £ (cached 6 h for everyone).
+  const rate = currency === "GBP" ? await getGbpRate() : FX_FALLBACK_GBP_MUR;
   return (
     <html lang={lang} className={`${display.variable} ${sans.variable} ${mono.variable}`}>
       <body className="font-sans">
         <LanguageProvider lang={lang}>
+          <CurrencyProvider currency={currency} rate={rate}>
           <NavProgress />
           <ServiceWorkerRegister />
           <Header />
@@ -72,6 +79,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main>{children}</main>
           <Footer />
           <MobileTabBar />
+          </CurrencyProvider>
         </LanguageProvider>
       </body>
     </html>

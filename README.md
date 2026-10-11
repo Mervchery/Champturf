@@ -22,6 +22,12 @@ Built on v8 with **no database changes and no scraper changes**: v9 only reads t
 - **Mobile**: bottom tab bar (Home / Race day / Results / Live / More), 44 px targets, header menu closes on navigation.
 - **Polish**: `EmptyState`, route skeletons for race day, results, horse and live pages, retry + home on errors, French strings for everything new.
 
+### Currency option and result dividends
+
+- Visitors can switch **Rs | £** (header on desktop, menu on phones, footer). The choice is a cookie (`ct-currency`); nothing stored or scraped is converted. Prize money and earnings show as `Rs 25,000` or `£400`.
+- The £ rate is fetched live from open.er-api.com only when someone chooses £, cached for 6 h, and falls back to `FX_FALLBACK_GBP_MUR` in `lib/currency.ts` (62.5) if the lookup fails.
+- **Result dividends are shown ×10** (12 → 120, 43 → 430), or the same amount in £ when £ is chosen (`<Dividend>`: results cards, podiums, official result rows, a horse's previous runs). Pre-race tote prices are unchanged.
+
 Notes: the "Photo finish gallery" placeholder on race pages was removed (it only showed the word "Image"). Signed-in members run the Supabase session check in middleware on each `/races` and `/horses` refresh; if that ever matters, raise the intervals in `refreshIntervalSec`. Not built or run here (no network): run `npm install && npm run build` before deploying.
 
 ## What's real vs. mocked
