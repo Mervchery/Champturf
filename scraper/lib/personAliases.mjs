@@ -1,5 +1,8 @@
 // Generated from scraper/data/mauritius_jockeys_trainers_2023_2026.csv — every spelling Supertote / the racecards
 // use for the same jockey or trainer. Matching rules live in personMatch.mjs. To change it, edit the CSV and
+// regenerate (or edit here directly): one entry per real person,
+// Generated from scraper/data/mauritius_jockeys_trainers_2023_2026.csv — every spelling Supertote / the racecards
+// use for the same jockey or trainer. Matching rules live in personMatch.mjs. To change it, edit the CSV and
 // regenerate (or edit here directly): one entry per real person, listing ALL the ways their name appears.
 export const PEOPLE = {
  "jockey": [
@@ -569,8 +572,29 @@ export const PEOPLE = {
     "P DABY",
     "PDABY",
     "Preetam Daby",
-    "P.Daby",
-    "C DABY"
+    "P.Daby"
+   ]
+  },
+  {
+   "key": "chandradutt daby",
+   "name": "Chandradutt Daby",
+   "aliases": [
+    "C DABY",
+    "CDABY",
+    "Chandradutt Daby",
+    "C.Daby",
+    "C. Daby"
+   ]
+  },
+  {
+   "key": "vicky ruhee",
+   "name": "Vicky Ruhee",
+   "aliases": [
+    "V RUHEE",
+    "VRUHEE",
+    "Vicky Ruhee",
+    "V.Ruhee",
+    "V. Ruhee"
    ]
   },
   {
@@ -624,11 +648,12 @@ export const PEOPLE = {
    ]
   },
   {
-   "key": "selvom mootien",
-   "name": "Selvom Mootien",
+   "key": "selvon mootien",
+   "name": "Selvon Mootien",
    "aliases": [
     "M MOOTIEN",
     "MMOOTIEN",
+    "Selvon Mootien",
     "Selvom Mootien",
     "S Mootien",
     "S.Mootien"
