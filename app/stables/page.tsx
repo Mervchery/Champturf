@@ -1,6 +1,6 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
-import { Shirt } from "lucide-react";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import { getStables } from "@/lib/stables";
 import SilkImage from "@/components/SilkImage";
 import type { Metadata } from "next";
@@ -33,8 +33,8 @@ export default async function StablesPage() {
                     <SilkImage url={s.silk_image_url} size={48} title={s.name} />
                   </div>
                 ) : (
-                  <div className="w-16 h-16 rounded-2xl bg-white/10 border-2 border-white/25 flex items-center justify-center text-white/75 shrink-0">
-                    <Shirt size={26} />
+                  <div className="w-16 h-16 rounded-2xl border-2 border-white/25 overflow-hidden shrink-0">
+                    <DefaultPortrait kind="stable" />
                   </div>
                 )}
               </div>

@@ -6,6 +6,7 @@ import { getHorses } from "@/lib/horses";
 import { getTrainers } from "@/lib/trainers";
 import { getCareerStatsForStable } from "@/lib/careerStats";
 import SilkImage from "@/components/SilkImage";
+import DefaultPortrait from "@/components/DefaultPortrait";
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 
@@ -38,9 +39,15 @@ export default async function StableDetailPage({ params }: { params: { id: strin
     <div>
       <div className="detail-hero">
         <div className="wrap flex gap-6 items-center flex-wrap">
-          <div className="p-2 bg-white/10 rounded-2xl border border-white/15">
-            <SilkImage url={stable.silk_image_url} size={72} title={stable.name} />
-          </div>
+          {stable.silk_image_url ? (
+            <div className="p-2 bg-white/10 rounded-2xl border border-white/15">
+              <SilkImage url={stable.silk_image_url} size={72} title={stable.name} />
+            </div>
+          ) : (
+            <div className="w-[88px] h-[88px] rounded-2xl border border-white/15 overflow-hidden shrink-0">
+              <DefaultPortrait kind="stable" />
+            </div>
+          )}
           <div className="min-w-0">
             <span className="text-xs font-semibold text-gold2">{t("STABLE PROFILE")}</span>
             <h1 className="text-3xl font-display mt-1">{stable.name}</h1>

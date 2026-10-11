@@ -53,7 +53,7 @@ export default async function JockeysPage({ searchParams }: { searchParams: { ta
               return (
               <Link key={j.id} href={`/jockeys/${j.id}`} className={`card ${active ? "" : "grayscale opacity-60"}`}>
                 <div className="h-[150px] bg-gradient-to-br from-turf to-turf2 relative overflow-hidden">
-                  <DefaultPortrait kind="jockey" seed={j.name} />
+                  <DefaultPortrait kind="jockey" />
                 </div>
                 <div className="p-4">
                   <h2 className="font-semibold">{j.name}</h2>

@@ -43,7 +43,7 @@ export default function HorsesGrid({ horses }: { horses: Horse[] }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
               ) : (
-                <DefaultPortrait kind="horse" seed={h.name} />
+                <DefaultPortrait kind="horse" />
               )}
               {h.silk_image_url && (
                 <div className="absolute top-2.5 right-2.5 bg-surface/90 rounded-full p-1 shadow-md">

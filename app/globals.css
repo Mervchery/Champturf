@@ -1545,3 +1545,21 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
   .page-enter, .page-enter[class*="nav-"] { animation: none !important; box-shadow: none !important; }
   .sheet-panel, .tabbar-indicator, .tabbar-item.is-active .tabbar-icon { animation: none !important; }
 }
+
+
+/* ---------- Default portraits (horse / jockey / trainer / stable without a photo) ---------- */
+:root {
+  /* light mode: warm sand tile, deep green icon */
+  --dp-bottom: #ddd0b0;
+  --dp-glyph: #1f4a3b;
+  --dp-ring: #b99339;
+}
+.dark {
+  /* dark mode: turf-green tile, ivory icon */
+  --dp-bottom: #123c2e;
+  --dp-glyph: #f3e9c9;
+  --dp-ring: #e4c878;
+}
+.dp-bg { fill: var(--dp-bottom); }
+.dp-ring { stroke: var(--dp-ring); stroke-opacity: 0.35; }
+.dp-glyph { fill: var(--dp-glyph); }

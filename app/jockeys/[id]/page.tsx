@@ -32,7 +32,7 @@ export default async function JockeyDetailPage({ params }: { params: { id: strin
       <div className="detail-hero">
         <div className="wrap flex gap-6 items-center flex-wrap">
           <div className="w-24 h-24 rounded-full bg-white/10 border-2 border-gold2 flex items-center justify-center text-gold2 shrink-0 overflow-hidden">
-            <DefaultPortrait kind="jockey" seed={j.name} />
+            <DefaultPortrait kind="jockey" />
           </div>
           <div>
             <span className="text-xs font-semibold text-gold2">{j.apprentice ? t("APPRENTICE JOCKEY") : t("JOCKEY PROFILE")}</span>

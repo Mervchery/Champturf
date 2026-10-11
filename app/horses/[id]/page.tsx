@@ -66,7 +66,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
               // eslint-disable-next-line @next/next/no-img-element
               <img src={h.photo_url} alt={h.name} className="w-full h-full object-cover" />
             ) : (
-              <DefaultPortrait kind="horse" seed={h.name} />
+              <DefaultPortrait kind="horse" />
             )}
             {h.silk_image_url && (
               <div className="absolute -bottom-1 -right-1 bg-surface rounded-full p-0.5 shadow-md">

@@ -47,7 +47,7 @@ export default async function TrainersPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img src={tr.photo_url} alt={tr.name} className="w-full h-full object-cover" />
                     ) : (
-                      <DefaultPortrait kind="trainer" seed={tr.name} />
+                      <DefaultPortrait kind="trainer" />
                     )}
                   </div>
                   {tr.stable?.silk_image_url && (

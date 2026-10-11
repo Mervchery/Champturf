@@ -47,7 +47,7 @@ export default async function TrainerDetailPage({ params }: { params: { id: stri
               // eslint-disable-next-line @next/next/no-img-element
               <img src={trainer.photo_url} alt={trainer.name} className="w-full h-full object-cover" />
             ) : (
-              <DefaultPortrait kind="trainer" seed={trainer.name} />
+              <DefaultPortrait kind="trainer" />
             )}
           </div>
           <div className="min-w-0">
