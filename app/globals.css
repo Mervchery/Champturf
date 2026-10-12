@@ -1493,7 +1493,21 @@ textarea::placeholder {
   transition: background 0.2s var(--ease), opacity 0.2s var(--ease), transform 0.15s var(--ease);
 }
 .seg-btn:active { transform: scale(0.97); }
-.seg-btn.is-active { background: var(--gold-2); color: #1c1408; opacity: 1; box-shadow: var(--shadow-sm); }
+.seg-btn.is-active { color: #1c1408; opacity: 1; }
+.seg { position: relative; }
+.seg-btn { position: relative; z-index: 1; }
+.seg-thumb {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px - 3px * (var(--n) - 1)) / var(--n));
+  border-radius: 10px;
+  background: var(--gold-2);
+  box-shadow: var(--shadow-sm);
+  transform: translateX(calc(var(--i) * (100% + 3px)));
+  transition: transform 0.4s cubic-bezier(0.32, 1.25, 0.5, 1);
+}
 
 /* ---------- Proper dark mode: elements whose light-mode "turf green" fill would vanish ---------- */
 .dark .sheet-link.is-active,
@@ -1563,3 +1577,132 @@ a, button, [role="button"], summary, label { -webkit-tap-highlight-color: transp
 .dp-bg { fill: var(--dp-bottom); }
 .dp-ring { stroke: var(--dp-ring); stroke-opacity: 0.35; }
 .dp-glyph { fill: var(--dp-glyph); }
+
+
+/* =====================================================================
+   Galloping horse loader (components/GallopHorse.tsx)
+   One 0.82s stride; each leg joint animates through the same angle table, offset per leg.
+   ===================================================================== */
+.gh { --gh-t: 0.82s; display: block; overflow: visible; color: #a8812c; }
+.dark .gh, .detail-hero .gh { color: var(--gold-2); }
+.gh * { transform-box: view-box; transform-origin: 0 0; }
+.gh-body { animation: ghBob var(--gh-t) cubic-bezier(0.45, 0, 0.55, 1) infinite; transform-origin: 100px 60px; }
+.gh-shadow { animation: ghShadow var(--gh-t) cubic-bezier(0.45, 0, 0.55, 1) infinite; transform-origin: 100px 106px; }
+.gh-fu { animation: ghForeU var(--gh-t) cubic-bezier(0.4, 0, 0.4, 1) infinite; }
+.gh-fl { animation: ghForeL var(--gh-t) cubic-bezier(0.4, 0, 0.4, 1) infinite; }
+.gh-hu { animation: ghHindU var(--gh-t) cubic-bezier(0.4, 0, 0.4, 1) infinite; }
+.gh-hl { animation: ghHindL var(--gh-t) cubic-bezier(0.4, 0, 0.4, 1) infinite; }
+/* stride offsets: near hind, far hind, near fore, far fore */
+.gh-p1 { animation-delay: calc(var(--gh-t) * -0.00); }
+.gh-p2 { animation-delay: calc(var(--gh-t) * -0.12); }
+.gh-p3 { animation-delay: calc(var(--gh-t) * -0.50); }
+.gh-p4 { animation-delay: calc(var(--gh-t) * -0.62); }
+.gh-neck { animation: ghNeck var(--gh-t) ease-in-out infinite; }
+.gh-mane { animation: ghMane calc(var(--gh-t) / 2) ease-in-out infinite alternate; }
+.gh-tail { animation: ghTail calc(var(--gh-t) / 2) ease-in-out infinite alternate; }
+.gh-jockey { animation: ghJockey var(--gh-t) cubic-bezier(0.45, 0, 0.55, 1) infinite; transform-origin: 100px 40px; }
+.gh-ground { animation: ghGround 0.5s linear infinite; }
+
+@keyframes ghBob {
+  0%   { transform: translateY(1.5px) rotate(-0.8deg); }
+  30%  { transform: translateY(2.5px) rotate(0.6deg); }
+  65%  { transform: translateY(-4px) rotate(1.4deg); }
+  100% { transform: translateY(1.5px) rotate(-0.8deg); }
+}
+@keyframes ghShadow {
+  0%, 100% { transform: scaleX(1); opacity: 0.2; }
+  65% { transform: scaleX(0.82); opacity: 0.1; }
+}
+@keyframes ghForeU {
+  0%   { transform: rotate(-38deg); }
+  20%  { transform: rotate(-6deg); }
+  40%  { transform: rotate(30deg); }
+  55%  { transform: rotate(14deg); }
+  80%  { transform: rotate(-26deg); }
+  92%  { transform: rotate(-40deg); }
+  100% { transform: rotate(-38deg); }
+}
+@keyframes ghForeL {
+  0%   { transform: rotate(0deg); }
+  20%  { transform: rotate(0deg); }
+  40%  { transform: rotate(10deg); }
+  55%  { transform: rotate(98deg); }
+  80%  { transform: rotate(84deg); }
+  92%  { transform: rotate(28deg); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes ghHindU {
+  0%   { transform: rotate(-32deg); }
+  20%  { transform: rotate(0deg); }
+  40%  { transform: rotate(38deg); }
+  55%  { transform: rotate(30deg); }
+  80%  { transform: rotate(-6deg); }
+  92%  { transform: rotate(-30deg); }
+  100% { transform: rotate(-32deg); }
+}
+@keyframes ghHindL {
+  0%   { transform: rotate(-6deg); }
+  20%  { transform: rotate(2deg); }
+  40%  { transform: rotate(0deg); }
+  55%  { transform: rotate(72deg); }
+  80%  { transform: rotate(84deg); }
+  92%  { transform: rotate(22deg); }
+  100% { transform: rotate(-6deg); }
+}
+@keyframes ghNeck {
+  0%, 100% { transform: rotate(2deg); }
+  50% { transform: rotate(-5deg); }
+}
+@keyframes ghMane { from { transform: rotate(-4deg) skewX(4deg); } to { transform: rotate(5deg) skewX(-5deg); } }
+@keyframes ghTail { from { transform: rotate(-7deg); } to { transform: rotate(7deg); } }
+@keyframes ghJockey {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-1px) rotate(-1.5deg); }
+}
+@keyframes ghGround { from { transform: translateX(0); } to { transform: translateX(-20px); } }
+.gh-streaks { animation: ghStreaks 0.5s linear infinite; }
+@keyframes ghStreaks {
+  0% { transform: translateX(10px); opacity: 0; }
+  30% { opacity: 0.35; }
+  100% { transform: translateX(-16px); opacity: 0; }
+}
+/* Stage: clips the scrolling track and softly fades its ends. */
+.gh-stage {
+  width: 250px;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 18%, #000 82%, transparent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gh *, .gh-body, .gh-shadow { animation: none !important; }
+}
+
+
+/* =====================================================================
+   Motion polish
+   ===================================================================== */
+:root { --spring: cubic-bezier(0.34, 1.56, 0.64, 1); --ease-out: cubic-bezier(0.22, 1, 0.36, 1); }
+
+/* Header: soft shadow appears once you scroll. */
+.site-header { transition: box-shadow 0.35s var(--ease), background-color 0.35s var(--ease), border-color 0.35s; }
+html[data-scrolled] .site-header { box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22); background-color: rgba(18, 60, 46, 0.94); }
+
+/* Below-the-fold cards rise in as they arrive (NavController). */
+.rv { opacity: 0; transform: translate3d(0, 22px, 0) scale(0.985); }
+.rv.rv-in {
+  opacity: 1;
+  transform: none;
+  transition: opacity 0.7s var(--ease-out) var(--rv-d, 0ms), transform 0.7s var(--ease-out) var(--rv-d, 0ms);
+}
+
+/* Cards: tactile press on touch screens. */
+@media (hover: none) {
+  a.card:active { transform: scale(0.985); transition-duration: 0.12s; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .rv { opacity: 1 !important; transform: none !important; }
+  .seg-thumb, .site-header { transition: none !important; }
+}

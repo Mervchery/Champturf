@@ -15,7 +15,14 @@ export default function Segmented<V extends string>({
   pending?: boolean;
 }) {
   return (
-    <div className={`seg ${pending ? "is-pending" : ""}`} role="radiogroup" aria-label={label}>
+    <div
+      className={`seg ${pending ? "is-pending" : ""}`}
+      role="radiogroup"
+      aria-label={label}
+      style={{ "--n": options.length, "--i": Math.max(0, options.findIndex((o) => o.value === value)) } as React.CSSProperties}
+    >
+      {/* the gold thumb glides to the chosen option, like an iOS segmented control */}
+      <span className="seg-thumb" aria-hidden="true" />
       {options.map((o) => (
         <button
           key={o.value}

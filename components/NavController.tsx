@@ -113,6 +113,50 @@ export default function NavController() {
     if (main) { main.style.transition = ""; main.style.transform = ""; main.style.boxShadow = ""; }
   }, [pathname]);
 
+  // 3b) Header gains a soft shadow once the page has scrolled (data-scrolled on <html>).
+  useEffect(() => {
+    const root = document.documentElement;
+    let on = false;
+    const onScroll = () => {
+      const now = window.scrollY > 6;
+      if (now !== on) { on = now; if (now) root.dataset.scrolled = ""; else delete root.dataset.scrolled; }
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // 3c) Cards / panels below the fold rise into place as they scroll into view.
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined" || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        const el = e.target as HTMLElement;
+        io.unobserve(el);
+        el.classList.add("rv-in");
+        // Hand the element back to its normal styles (hover lift etc.) once settled.
+        timers.push(setTimeout(() => { el.classList.remove("rv", "rv-in"); el.style.removeProperty("--rv-d"); }, 900));
+      }
+    }, { rootMargin: "0px 0px -6% 0px", threshold: 0.04 });
+    const start = requestAnimationFrame(() => {
+      const vh = window.innerHeight;
+      let n = 0;
+      document.querySelectorAll<HTMLElement>("main .card, main .panel, main .stat-tile").forEach((el) => {
+        if (el.closest("[data-route-loading]") || el.closest("[data-no-reveal]")) return;
+        const r = el.getBoundingClientRect();
+        if (r.top < vh + 24) return; // already on screen: leave it alone
+        el.classList.add("rv");
+        el.style.setProperty("--rv-d", `${(n++ % 3) * 70}ms`); // small stagger across a row
+        io.observe(el);
+      });
+    });
+    // Safety net: never leave anything hidden.
+    const safety = setTimeout(() => document.querySelectorAll(".rv").forEach((el) => el.classList.add("rv-in")), 4000);
+    return () => { cancelAnimationFrame(start); clearTimeout(safety); timers.forEach(clearTimeout); io.disconnect(); };
+  }, [pathname]);
+
   // 4) Edge-swipe back (installed app only).
   useEffect(() => {
     if (!isStandalone()) return;

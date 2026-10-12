@@ -1,14 +1,13 @@
-import { HorseIcon } from "@/components/RacingIcons";
+import GallopHorse from "@/components/GallopHorse";
 import { getT } from "@/lib/i18n/server";
 
 /** Galloping-horse indicator used by the route loading screens. */
 export function GallopLoader({ label = "Loading the field…" }: { label?: string }) {
   const { t } = getT();
   return (
-    <div className="flex flex-col items-center gap-1 py-8" role="status" aria-live="polite">
-      <div className="loader-track">
-        <HorseIcon size={32} className="loader-horse" />
-        <div className="loader-ground" />
+    <div className="flex flex-col items-center gap-2 py-8" role="status" aria-live="polite">
+      <div className="gh-stage">
+        <GallopHorse size={190} />
       </div>
       <span className="text-xs opacity-70">{t(label)}</span>
     </div>

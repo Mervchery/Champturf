@@ -44,7 +44,7 @@ export default function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-[100] pt-[env(safe-area-inset-top)] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
+    <header className="site-header sticky top-0 z-[100] pt-[env(safe-area-inset-top)] bg-[rgba(18,60,46,0.82)] backdrop-blur-xl text-surface border-b border-white/10 transition-colors">
       <div className="wrap flex items-center gap-3 md:gap-5 py-2 md:py-3.5">
         {canBack && (
           <button type="button" onClick={goBack} className="md:hidden back-btn" aria-label={t("Back")}>
