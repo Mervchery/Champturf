@@ -28,6 +28,7 @@ export default function Footer() {
           <Link href="/jockeys" className={link}>{t("Jockeys")}</Link>
           <Link href="/championships" className={link}>{t("Championships")}</Link>
           <Link href="/stats" className={link}>{t("Statistics")}</Link>
+          <Link href="/guide" className={link}>{t("Racing guide")}</Link>
         </div>
         <div>
           <h2 className="text-white text-sm mb-2.5">{t("Coverage")}</h2>

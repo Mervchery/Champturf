@@ -1,7 +1,7 @@
 import { getT } from "@/lib/i18n/server";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Video, Search, Star, AlertTriangle, NotebookPen, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Clock } from "lucide-react";
+import { Video, Search, Star, AlertTriangle, NotebookPen, ArrowUp, ArrowDown, ChevronLeft, ChevronRight, Clock, Info } from "lucide-react";
 import { getRaceById, getEntriesForRace, getResultsForRace, getRacesForDate, getScratchedForRace } from "@/lib/races";
 import ScratchedList from "@/components/ScratchedList";
 import { getRecentFormForHorses } from "@/lib/horses";
@@ -194,6 +194,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                 <>
                   <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
                     <h2 className="font-display text-xl">{t("Official result")}</h2>
+                    <Link href="/guide#results" className="guide-link"><Info size={12} aria-hidden="true" /> {t("What do these mean?")}</Link>
                     {podium[0]?.time && <span className="text-xs opacity-70">{t("Winning time")} <span className="font-mono font-semibold">{podium[0].time}</span></span>}
                   </div>
                   <div className="space-y-3">
@@ -275,6 +276,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
 
                   <div className="flex items-center justify-between flex-wrap gap-2 mt-8 mb-4">
                     <h2 className="font-display text-xl">{t("Runners")}</h2>
+                    <Link href="/guide#runner-card" className="guide-link"><Info size={12} aria-hidden="true" /> {t("What do these mean?")}</Link>
                     <span className="odds-legend" aria-label={t("Odds movement")}>
                       <span className="odds-move is-up"><ArrowUp size={10} strokeWidth={3} /></span> {t("Drifting")}
                       <span className="odds-move is-down ml-2"><ArrowDown size={10} strokeWidth={3} /></span> {t("Firming")}

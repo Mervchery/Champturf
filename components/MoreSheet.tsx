@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { Globe, Coins, Monitor, Moon, Sun, X } from "lucide-react";
+import { BookOpen, Globe, Coins, Monitor, Moon, Sun, X } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import { useCurrency } from "@/components/Money";
 import Segmented from "@/components/Segmented";
@@ -184,6 +184,12 @@ export default function MoreSheet() {
             </Link>
           ))}
         </nav>
+
+        <div className="setting-row">
+          <Link href="/guide" aria-current={isActive("/guide") ? "page" : undefined} className={`sheet-link ${isActive("/guide") ? "is-active" : ""}`}>
+            <span className="inline-flex items-center gap-2"><BookOpen size={16} aria-hidden="true" /> {t("Racing guide")}</span>
+          </Link>
+        </div>
 
         <div className="setting-row">
           <div className="setting-label"><Sun size={13} aria-hidden="true" /> {t("Appearance")}</div>

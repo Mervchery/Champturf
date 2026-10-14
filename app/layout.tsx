@@ -11,6 +11,7 @@ import NavController from "@/components/NavController";
 import Ticker from "@/components/Ticker";
 import MobileTabBar from "@/components/MobileTabBar";
 import MoreSheet from "@/components/MoreSheet";
+import InstallHint from "@/components/InstallHint";
 import { THEME_BOOT } from "@/lib/theme";
 import { CurrencyProvider } from "@/components/Money";
 import { getCurrency, getGbpRate } from "@/lib/currencyServer";
@@ -88,6 +89,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <Footer />
           <MobileTabBar />
           <MoreSheet />
+          <InstallHint />
           </CurrencyProvider>
         </LanguageProvider>
       </body>
