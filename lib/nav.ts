@@ -8,6 +8,7 @@ export const NAV_ITEMS: [string, string][] = [
   ["/stables", "Stables"],
   ["/owners", "Owners"],
   ["/news", "News"],
+  ["/championships", "Championships"],
   ["/stats", "Statistics"],
   ["/results", "Results"],
   ["/live", "Live"],

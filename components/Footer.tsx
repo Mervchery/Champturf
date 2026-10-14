@@ -26,6 +26,7 @@ export default function Footer() {
           <Link href="/race-days" className={link}>{t("Race calendar")}</Link>
           <Link href="/horses" className={link}>{t("Horses")}</Link>
           <Link href="/jockeys" className={link}>{t("Jockeys")}</Link>
+          <Link href="/championships" className={link}>{t("Championships")}</Link>
           <Link href="/stats" className={link}>{t("Statistics")}</Link>
         </div>
         <div>

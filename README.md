@@ -8,6 +8,15 @@ role-gated admin dashboard backed by **Supabase Auth**.
 Icons are from [lucide-react](https://lucide.dev) plus a few bespoke SVGs in
 `components/RacingIcons.tsx` — no emoji anywhere in the UI.
 
+## v9.3 — MTCJC 2026 championships
+
+New page `/championships` (also in the menu, footer and sitemap, with French strings). Standings are computed live from `race_results` + `races` — no database changes, no scraper changes.
+
+- **Season rankings:** Overall Horse and Overall Stable (stakes money; uses each race's scraped `prize_split`, else the 60/20/10 estimate), Overall Jockey (wins, then 2nd, 3rd, 4th… places).
+- **Special championships:** RED STAR Mauritian Jockeys (with Rs 175,000 / 50,000 / 25,000 prizes), Sprinters, Milers, Stayers, Four-Year-Old Triple Crown (with bonus tracker and rollover to 2027/2028), Three-Year-Old. Points 7 / 3 / 2 / 1.
+- Qualifying races are matched by **date + name** in `lib/championships.ts`, which holds every rule, date and prize in one place. Add `aliases` there if a race is named differently on the source site.
+- Open items from the rules: the two Three-Year-Old race names, and the RED STAR designated races, are not listed — see `lib/championships.ts` (`SPECIAL_RACES.threeyo`, `RED_STAR_RACES`).
+
 ## v9 — live race days (October 2026)
 
 Built on v8 with **no database changes and no scraper changes**: v9 only reads the tables the scraper already fills.
