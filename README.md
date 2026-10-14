@@ -16,7 +16,7 @@ New page `/championships` (also in the menu, footer and sitemap, with French str
 - **Special championships:** RED STAR Mauritian Jockeys (with Rs 175,000 / 50,000 / 25,000 prizes), Sprinters, Milers, Stayers, Four-Year-Old Triple Crown (with bonus tracker and rollover to 2027/2028), Three-Year-Old. Points 7 / 3 / 2 / 1.
 - Qualifying races are matched by **date + name** in `lib/championships.ts`, which holds every rule, date and prize in one place. Add `aliases` there if a race is named differently on the source site.
 - **Race tracker** (`/championships?c=tracker`): every designated race in date order with a live state — counted, run/awaiting result, racing today, upcoming. Races are linked to results by exact name + date first, then fuzzily (approximate name, up to 14 days off for postponements); a race with a published finishing order is counted whatever its status flag says. Each championship also shows a title outlook (points still available, clinched or number of contenders). Moved races are followed automatically (a clearly named race is found up to 90 days from its listed date) and tagged "Date moved"; if a move is not in the data yet, set it in `DATE_CHANGES`. Unlinked run races show a "Data check" list of races found that day, and can be fixed in `RACE_OVERRIDES`.
-- Open items from the rules: the two Three-Year-Old race names, and the RED STAR designated races, are not listed — see `lib/championships.ts` (`SPECIAL_RACES.threeyo`, `RED_STAR_RACES`).
+- Open items from the rules: the RED STAR designated races are not listed in the rules — see `lib/championships.ts` (`RED_STAR_RACES`). The Three-Year-Old races are matched on "MTC Sophomore" in the race name.
 
 ## v9 — live race days (October 2026)
 
@@ -305,7 +305,7 @@ This site does not publish everything the app's schema has a field for:
 | Jockey per race | Yes, read directly from the race page |
 | Horse's sex, color, breed | **Not available anywhere on this site** — left blank |
 | Horse's stable | **Not available anywhere on this site** — the site tracks trainer and owner only, no separate "stable" concept. `horses.stable_id` stays unset for scraped horses (shows as "Unknown" in the app, same as any horse with no stable assigned) |
-| Race prize money / purse | **Not available anywhere on this site** — left as 0 |
+| Race prize money | **Not available anywhere on this site** — left as 0 |
 | Margin / distance behind | **Not available anywhere on this site** — the `race_results.margin` column exists (for a future source that does publish it) but is always null from this scraper |
 | Multiple owners | The site lists co-ownership as one syndicate string (e.g. "Messrs X, Y & Z") — this is stored as a single owner record with that full name, since the schema doesn't model multiple owners per horse |
 | Scratched / did-not-finish runners | Detected (placing shown as "-" on the page) — the horse's own record is still created/updated, but no result row is written for that race, since there's no finishing position to store |

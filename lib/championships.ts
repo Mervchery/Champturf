@@ -13,6 +13,8 @@ export type QualRace = {
   name: string; date: string; aliases?: string[]; leg?: number; distance?: string; grade?: string;
   /** Words that must NOT appear in the database race name (e.g. "trial" so Derby never matches Derby Trial). */
   exclude?: string[];
+  /** Max days a clearly named race may be moved from its listed date and still be linked (default 90). */
+  drift?: number;
   /** Official name not known yet — never auto-matched, only date candidates are suggested. */
   unnamed?: boolean;
 };
@@ -44,11 +46,10 @@ export const SPECIAL_RACES: Record<SpecialKey, QualRace[]> = {
     { name: "Guineas", date: "2026-06-13", leg: 2, distance: "1,600 m", grade: "G2" },
     { name: "Derby", date: "2026-07-26", leg: 3, distance: "1,850 m", grade: "G1", exclude: ["trial"] },
   ],
-  // Race names are not in the published rules ("to be confirmed against the MTCJC regulations").
-  // Add `aliases` here once known; until then these two are shown as "name to be confirmed" and score nothing.
+  // Both races carry "MTC Sophomore" in their name, so the date tells them apart (drift 10 keeps the two from being swapped).
   threeyo: [
-    { name: "First designated race", date: "2026-06-20", unnamed: true },
-    { name: "Second designated race", date: "2026-07-18", unnamed: true },
+    { name: "MTC Sophomore 1", date: "2026-06-20", aliases: ["mtc sophomore", "sophomore"], drift: 10 },
+    { name: "MTC Sophomore 2", date: "2026-07-18", aliases: ["mtc sophomore", "sophomore"], drift: 10 },
   ],
 };
 
@@ -228,7 +229,7 @@ function linkRaces(races: DbRace[], results: Map<string, number>): Map<string, L
         const ref = DATE_CHANGES[keyOf(k, i)] ?? q.date;
         const gap = Math.abs(daysBetween(ref, r.race_date));
         // A clearly named race is followed anywhere within 90 days of its listed date (postponements); an approximate name only within 14.
-        if (!ns || gap > (ns === 1 ? 90 : 14)) continue;
+        if (!ns || gap > (ns === 1 ? q.drift ?? 90 : 14)) continue;
         const dateScore = gap === 0 ? 0.5 : Math.max(0, 0.4 - gap * 0.025);
         const exact = gap === 0 && ns === 1;
         const note = gap > 0 ? `run ${gap} day${gap > 1 ? "s" : ""} ${r.race_date > ref ? "after" : "before"} the ${ref === q.date ? "listed" : "updated"} date` : ns < 1 ? "name only approximately matches" : undefined;

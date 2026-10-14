@@ -92,7 +92,7 @@ function RaceDayCard({ day, today }: { day: Awaited<ReturnType<typeof getRaceDay
         <span className="flex items-center gap-1.5 opacity-70"><Flag size={13} /> {t(day.raceCount === 1 ? "{n} race" : "{n} races", { n: day.raceCount })}</span>
         {day.weather && <span className="flex items-center gap-1.5 opacity-70"><CloudSun size={13} /> {day.weather}</span>}
       </div>
-      <div className="mt-3 font-mono text-sm font-semibold"><Money amount={day.totalPrize} /> <span className="font-sans font-normal opacity-70 text-xs">{t("total purse")}</span></div>
+      <div className="mt-3 font-mono text-sm font-semibold"><Money amount={day.totalPrize} /> <span className="font-sans font-normal opacity-70 text-xs">{t("Stakes money")}</span></div>
     </Link>
   );
 }

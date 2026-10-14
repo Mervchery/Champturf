@@ -84,7 +84,7 @@ export default async function RaceDayPage({ params }: { params: { date: string }
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6 mb-8">
             <div className="stat-tile"><div className="v">{races.length}</div><div className="l">{t("Races")}</div></div>
-            <div className="stat-tile"><div className="v !text-xl"><Money amount={totalPrize} /></div><div className="l">{t("Total prize money")}</div></div>
+            <div className="stat-tile"><div className="v !text-xl"><Money amount={totalPrize} /></div><div className="l">{t("Stakes money")}</div></div>
             <div className="stat-tile"><div className="v !text-xl">{meeting?.weather ?? t("N/A")}</div><div className="l">{t("Weather")}</div></div>
             <div className="stat-tile"><div className="v !text-xl">{meeting?.track_condition ?? t("N/A")}</div><div className="l">{t("Track condition")}</div></div>
           </div>

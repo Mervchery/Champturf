@@ -108,8 +108,9 @@ export const fr: Record<string, string> = {
   "Track condition": "État de la piste",
   "FEATURED RACE": "COURSE VEDETTE",
   "Races on this card": "Courses au programme",
-  "total purse": "dotation totale",
-  "Total prize money": "Dotation totale",
+  "Stakes money": "Allocations totales",
+  "Career earnings": "Gains en carrière",
+  "Earnings": "Gains",
   "Result in": "Résultat disponible",
 
   // Race page
@@ -187,7 +188,6 @@ export const fr: Record<string, string> = {
   "Places": "Places",
   "Starts": "Départs",
   "Placed": "Placés",
-  "Career earnings": "Gains en carrière",
   "Connections": "Intervenants",
   "Owner": "Propriétaire",
   "Stable": "Écurie",
@@ -255,7 +255,6 @@ export const fr: Record<string, string> = {
   "Career wins": "Victoires en carrière",
   "No results recorded yet.": "Aucun résultat enregistré pour le moment.",
   "Location": "Lieu",
-  "Earnings": "Gains",
 
   // News / stats / results / search / live
   "EDITORIAL": "ÉDITORIAL",
