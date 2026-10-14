@@ -116,7 +116,7 @@ const SECTIONS: Section[] = [
 ];
 
 /** A static example of a runner card's number strip, built from the real card styles. */
-function SampleCard({ t }: { t: (k: string) => string }) {
+function SampleCard({ t }: { t: (k: string, v?: Record<string, string | number>) => string }) {
   const cells: [string, React.ReactNode, string][] = [
     ["Gate", "4", "#gate"],
     ["Weight", "57.5kg", "#weight"],
