@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Sparkles, Star, Info } from "lucide-react";
 import { getT } from "@/lib/i18n/server";
-import { fmtOdds } from "@/lib/raceState";
+import { fmtOddsS } from "@/lib/oddsServer";
 import type { RaceEntry } from "@/lib/races";
 import type { ModelRun, Prediction } from "@/lib/predictions";
 
@@ -103,7 +103,7 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
             <div className="text-right shrink-0 w-[4.6rem]">
               <div className="text-[0.66rem] font-semibold uppercase tracking-wide opacity-70">{confLabel[p.confidence].split(" ")[0]}</div>
               {p.is_value && p.fair_odds != null ? (
-                <div className="text-[0.62rem] leading-tight opacity-70 mt-0.5">{t("Fair price")} {fmtOdds(String(p.fair_odds))}</div>
+                <div className="text-[0.62rem] leading-tight opacity-70 mt-0.5">{t("Fair price")} {fmtOddsS(String(p.fair_odds))}</div>
               ) : null}
             </div>
           </li>

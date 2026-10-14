@@ -2,7 +2,8 @@ import Link from "next/link";
 import { ArrowDown, ArrowUp, Star } from "lucide-react";
 import { getT } from "@/lib/i18n/server";
 import { ordinal } from "@/lib/i18n";
-import { fmtOdds, oddsDirection, parseOdds } from "@/lib/raceState";
+import { oddsDirection, parseOdds } from "@/lib/raceState";
+import { fmtOddsS } from "@/lib/oddsServer";
 import type { RaceEntry } from "@/lib/races";
 
 type Row = {
@@ -107,12 +108,12 @@ export default function MarketBoard({ entries }: { entries: RaceEntry[] }) {
         <div className="flex flex-wrap gap-2 mt-3">
           {firmest && firmest.change! < 0 && (
             <span className="mover mover-down">
-              <ArrowDown size={12} strokeWidth={3} /> {t("Firming")}: <strong>{name(firmest)}</strong> {fmtOdds(firmest.entry.odds_open)} → {fmtOdds(firmest.entry.odds)} ({pct(Math.abs(firmest.change!))})
+              <ArrowDown size={12} strokeWidth={3} /> {t("Firming")}: <strong>{name(firmest)}</strong> {fmtOddsS(firmest.entry.odds_open)} → {fmtOddsS(firmest.entry.odds)} ({pct(Math.abs(firmest.change!))})
             </span>
           )}
           {drifter && drifter.change! > 0 && (
             <span className="mover mover-up">
-              <ArrowUp size={12} strokeWidth={3} /> {t("Drifting")}: <strong>{name(drifter)}</strong> {fmtOdds(drifter.entry.odds_open)} → {fmtOdds(drifter.entry.odds)} (+{pct(drifter.change!)})
+              <ArrowUp size={12} strokeWidth={3} /> {t("Drifting")}: <strong>{name(drifter)}</strong> {fmtOddsS(drifter.entry.odds_open)} → {fmtOddsS(drifter.entry.odds)} (+{pct(drifter.change!)})
             </span>
           )}
         </div>
@@ -152,7 +153,7 @@ export default function MarketBoard({ entries }: { entries: RaceEntry[] }) {
                   <span className="text-xs opacity-50">{t("Steady")}</span>
                 )}
                 {dir && <span className="sr-only">{dir === "down" ? t("Firming") : t("Drifting")}</span>}
-                <div className="text-[0.62rem] opacity-60 leading-tight">{r.open != null && r.change != null ? t("Opened {n}", { n: fmtOdds(e.odds_open) ?? "" }) : t("since opening")}</div>
+                <div className="text-[0.62rem] opacity-60 leading-tight">{r.open != null && r.change != null ? t("Opened {n}", { n: fmtOddsS(e.odds_open) ?? "" }) : t("since opening")}</div>
               </div>
             </li>
           );

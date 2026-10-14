@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { fmtOdds } from "@/lib/raceState";
+import { fmtOddsS } from "@/lib/oddsServer";
 import SilkImage from "@/components/SilkImage";
 import FollowButton from "@/components/FollowButton";
-import { Money, Dividend } from "@/components/Money";
+import { Money } from "@/components/Money";
+import { Odds } from "@/components/OddsFormat";
 import { ordinal } from "@/lib/i18n";
 import { getT } from "@/lib/i18n/server";
 import { JockeyCapIcon, BinocularsIcon } from "@/components/RacingIcons";
@@ -149,7 +150,7 @@ function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & 
   const up = now > before; // bigger number = longer price = drifting
   const diff = Math.abs(now - before);
   const fresh = !!changedAt && Date.now() - new Date(changedAt).getTime() < 15 * 60 * 1000;
-  const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: fmtOdds(prev) ?? prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: fmtOdds(open) ?? open })}` : ""}`;
+  const label = `${up ? t("Drifting") : t("Firming")} — ${t("was {n}", { n: fmtOddsS(prev) ?? prev })}${open && open !== prev ? ` · ${t("Opened {n}", { n: fmtOddsS(open) ?? open })}` : ""}`;
   const Icon = up ? ArrowUp : ArrowDown;
   return (
     <span className={`odds-move ${up ? "is-up" : "is-down"} ${fresh ? "is-fresh" : ""}`} title={label} aria-label={label}>
@@ -166,7 +167,7 @@ function OddsPill({ kind, value, prev, open, changedAt, dividend = false }: { ki
       <span className="odds-label">{kind === "win" ? t("Win") : t("Place")}</span>
       <span className="odds-right">
         <MoveBadge value={value} prev={prev} open={open} changedAt={changedAt} />
-        <span className="odds-value">{dividend ? <Dividend value={value} /> : (fmtOdds(value) ?? "—")}</span>
+        <span className="odds-value">{dividend ? <Odds value={value} /> : (fmtOddsS(value) ?? "—")}</span>
       </span>
     </div>
   );

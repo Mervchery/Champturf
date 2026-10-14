@@ -3,13 +3,15 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
-import { BookOpen, Globe, Coins, Monitor, Moon, Sun, X } from "lucide-react";
+import { BookOpen, Globe, Coins, Percent, Monitor, Moon, Sun, X } from "lucide-react";
 import { useT } from "@/components/LanguageProvider";
 import { useCurrency } from "@/components/Money";
 import Segmented from "@/components/Segmented";
 import { useRaceStatus } from "@/lib/useRaceStatus";
 import { NAV_ITEMS } from "@/lib/nav";
 import { CURRENCY_COOKIE, type Currency } from "@/lib/currency";
+import { ODDS_COOKIE, type OddsFormat } from "@/lib/oddsFormat";
+import { useOddsFormat } from "@/components/OddsFormat";
 import { LANG_COOKIE, type Lang } from "@/lib/i18n";
 import { THEME_KEY, applyTheme, readTheme, type Theme } from "@/lib/theme";
 
@@ -20,6 +22,7 @@ import { THEME_KEY, applyTheme, readTheme, type Theme } from "@/lib/theme";
 export default function MoreSheet() {
   const { t, lang } = useT();
   const { currency, rate } = useCurrency();
+  const oddsFormat = useOddsFormat();
   const pathname = usePathname() || "/";
   const router = useRouter();
   const status = useRaceStatus();
@@ -155,6 +158,11 @@ export default function MoreSheet() {
     document.cookie = `${CURRENCY_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`;
     startTransition(() => router.refresh());
   }
+  function chooseOdds(next: OddsFormat) {
+    if (next === oddsFormat) return;
+    document.cookie = `${ODDS_COOKIE}=${next}; path=/; max-age=31536000; samesite=lax`;
+    startTransition(() => router.refresh());
+  }
   function chooseLang(code: Lang) {
     if (code === lang) return;
     document.cookie = `${LANG_COOKIE}=${code}; path=/; max-age=31536000; samesite=lax`;
@@ -206,6 +214,23 @@ export default function MoreSheet() {
         </div>
 
         <div className="setting-row">
+          <div className="setting-label"><Percent size={13} aria-hidden="true" /> {t("Odds")}</div>
+          <Segmented<OddsFormat>
+            label={t("Odds")}
+            value={oddsFormat}
+            pending={pending}
+            onChange={chooseOdds}
+            options={[
+              { value: "decimal", label: t("Decimal") },
+              { value: "fractional", label: t("Fractional") },
+            ]}
+          />
+          <p className="text-[0.72rem] opacity-65">
+            {oddsFormat === "fractional" ? t("Prices as fractions, e.g. 7/2") : t("Prices as decimals, e.g. 4.5")}
+          </p>
+        </div>
+
+        <div className="setting-row">
           <div className="setting-label"><Coins size={13} aria-hidden="true" /> {t("Currency")}</div>
           <Segmented<Currency>
             label={t("Currency")}
@@ -218,7 +243,7 @@ export default function MoreSheet() {
             ]}
           />
           <p className="text-[0.72rem] opacity-65">
-            {currency === "GBP" ? t("Approximate rate: £1 = Rs {n}", { n: rate.toFixed(2) }) : t("Show amounts in pounds (£)")}
+            {currency === "GBP" ? t("Approximate rate: £1 = Rs {n}", { n: rate.toFixed(2) }) : t("Show prize money and earnings in pounds (£)")}
           </p>
         </div>
 

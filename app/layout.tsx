@@ -18,6 +18,8 @@ import { getCurrency, getGbpRate } from "@/lib/currencyServer";
 import { FX_FALLBACK_GBP_MUR } from "@/lib/currency";
 import ServiceWorkerRegister from "@/components/ServiceWorkerRegister";
 import { siteUrl } from "@/lib/site";
+import { OddsFormatProvider } from "@/components/OddsFormat";
+import { getOddsFormat } from "@/lib/oddsServer";
 
 // Fonts are self-hosted at build time by next/font instead of being pulled in with
 // a CSS @import from fonts.googleapis.com. That removes the render-blocking
@@ -69,6 +71,7 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const lang = getLang();
   const currency = getCurrency();
+  const oddsFormat = getOddsFormat();
   // The live rate is only looked up for visitors who chose £ (cached 6 h for everyone).
   const rate = currency === "GBP" ? await getGbpRate() : FX_FALLBACK_GBP_MUR;
   return (
@@ -80,6 +83,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body className="font-sans">
         <LanguageProvider lang={lang}>
           <CurrencyProvider currency={currency} rate={rate}>
+          <OddsFormatProvider format={oddsFormat}>
           <NavProgress />
           <NavController />
           <ServiceWorkerRegister />
@@ -90,6 +94,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           <MobileTabBar />
           <MoreSheet />
           <InstallHint />
+          </OddsFormatProvider>
           </CurrencyProvider>
         </LanguageProvider>
       </body>

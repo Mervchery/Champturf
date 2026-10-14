@@ -21,14 +21,3 @@ export function formatMoney(n: number, lang: Lang, currency: Currency, rate: num
   return "Rs " + n.toLocaleString(locale(lang));
 }
 
-/** Result dividends. The feed gives the per-unit figure (12, 43); the site shows it x10
- *  (120, 430) — in rupees, or converted to pounds when the visitor picks £. */
-export function formatDividend(raw: string | number | null | undefined, lang: Lang, currency: Currency, rate: number): string | null {
-  if (raw == null || raw === "") return null;
-  const n = Number(String(raw).replace(",", "."));
-  if (!Number.isFinite(n)) return String(raw);
-  if (n <= 0) return null; // a 0 from the feed means "no dividend", not Rs 0 / £0.00
-  const mur = n * 10;
-  if (currency === "GBP" && rate > 0) return "£" + (mur / rate).toLocaleString(locale(lang), { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  return String(Math.round(mur * 100) / 100);
-}
