@@ -60,7 +60,10 @@ export const RACE_OVERRIDES: Record<string, string> = {};
 /** Use when a designated race has been moved to a new date that the results data does not show yet, e.g.
  *  { "sprinters:2": "2026-10-24" }. The tracker then counts down to the new date instead of calling the race "missing".
  *  Once the race is in the data under its new date it is linked automatically — this is only needed until then. */
-export const DATE_CHANGES: Record<string, string> = {};
+export const DATE_CHANGES: Record<string, string> = {
+  // MTC 175th Anniversary Cup: race day 19 moved from Sat 17 to Sun 18 October 2026 (MTCJC communiqué, 15 Oct).
+  "stayers:2": "2026-10-18",
+};
 
 /** Triple Crown bonus by season (Rs), if no horse has won all three legs in the years before. */
 export const TRIPLE_CROWN_BONUS: Record<number, number> = { 2026: 1_000_000, 2027: 2_000_000, 2028: 3_000_000 };

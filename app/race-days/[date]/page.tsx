@@ -13,6 +13,8 @@ import { PodiumList } from "@/components/Podium";
 import RaceStrip from "@/components/RaceStrip";
 import RacePhaseBadge from "@/components/RacePhaseBadge";
 import LiveRefresh from "@/components/LiveRefresh";
+import WeatherCard, { WeatherIcon } from "@/components/WeatherCard";
+import { getRaceDayForecast } from "@/lib/weather";
 import type { Metadata } from "next";
 import { pageMeta } from "@/lib/seo";
 
@@ -33,9 +35,10 @@ export async function generateMetadata({ params }: { params: { date: string } })
 export default async function RaceDayPage({ params }: { params: { date: string } }) {
   const { t, lang } = getT();
   const nowMs = Date.now();
-  const [board, meeting] = await Promise.all([
+  const [board, meeting, forecast] = await Promise.all([
     getMeetingBoard(params.date),
     getMeetingInfo(params.date).catch(() => null),
+    getRaceDayForecast(params.date),
   ]);
 
   if (board.length === 0) return notFound();
@@ -86,9 +89,15 @@ export default async function RaceDayPage({ params }: { params: { date: string }
           <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4 mt-6 mb-8">
             <div className="stat-tile"><div className="v">{races.length}</div><div className="l">{t("Races")}</div></div>
             <div className="stat-tile"><div className="v !text-xl"><Money amount={totalPrize} /></div><div className="l">{t("Stakes money")}</div></div>
-            <div className="stat-tile"><div className="v !text-xl">{meeting?.weather ?? t("N/A")}</div><div className="l">{t("Weather")}</div></div>
+            <div className="stat-tile"><div className="v !text-xl">{meeting?.weather ?? (forecast ? <span className="inline-flex items-center gap-1.5"><WeatherIcon kind={forecast.kind} size={20} />{forecast.high}°</span> : t("N/A"))}</div><div className="l">{meeting?.weather || !forecast ? t("Weather") : t("Forecast")}</div></div>
             <div className="stat-tile"><div className="v !text-xl">{meeting?.track_condition ?? t("N/A")}</div><div className="l">{t("Track condition")}</div></div>
           </div>
+
+          {forecast && (
+            <div className="mb-8">
+              <WeatherCard forecast={forecast} raceHours={races.map((r) => Number(String(r.race_time).slice(0, 2)))} />
+            </div>
+          )}
 
           <h2 className="font-display text-2xl mb-4">{t("Races on this card")}</h2>
           <div className="space-y-4">

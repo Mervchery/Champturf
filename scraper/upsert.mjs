@@ -1,6 +1,7 @@
 import { supabaseAdmin } from "./lib/supabaseAdmin.mjs";
 import { normalizeName } from "./lib/normalize.mjs";
 import { sameNameKeys, squash } from "./lib/personMatch.mjs";
+import { PLACEHOLDER_RACES } from "./lib/placeholderRaces.mjs";
 
 const PERSON_TYPE = { jockeys: "jockey", trainers: "trainer" };
 const nameCache = {}; // table -> [{ id, name }] — only used for the alias lookup of jockeys / trainers
@@ -114,10 +115,24 @@ export async function getRaceNotes(name, raceDate) {
   return data ?? null;
 }
 
-export async function upsertRace({ name, raceDate, raceTime, distance, racingNotes, racingNotesEn, dangerHorse, sourceUrl, youtubeVideoId }) {
-  const { data: existing, error: selectError } = await supabaseAdmin
+export async function upsertRace({ name, raceDate, raceNo, raceTime, distance, racingNotes, racingNotesEn, dangerHorse, sourceUrl, youtubeVideoId }) {
+  let { data: existing, error: selectError } = await supabaseAdmin
     .from("races").select("*").eq("name", name).eq("race_date", raceDate).maybeSingle();
   if (selectError) throw new Error(`Failed to look up race "${name}": ${selectError.message}`);
+
+  // No race under Supertote's name: is there a nomination-sheet placeholder for this race number? If so it
+  // is taken over (renamed below) rather than duplicated — but never once it has results.
+  if (!existing && raceNo) {
+    const placeholder = PLACEHOLDER_RACES[raceDate]?.[raceNo - 1];
+    if (placeholder && placeholder !== name) {
+      const { data: ph } = await supabaseAdmin
+        .from("races").select("*").eq("name", placeholder).eq("race_date", raceDate).maybeSingle();
+      if (ph) {
+        const { count } = await supabaseAdmin.from("race_results").select("id", { count: "exact", head: true }).eq("race_id", ph.id);
+        if (!count) { existing = ph; console.log(`  Placeholder "${placeholder}" -> "${name}"`); }
+      }
+    }
+  }
 
   const fields = {
     name, race_date: raceDate, race_time: raceTime, distance, course: "Champ de Mars",

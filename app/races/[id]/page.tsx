@@ -6,6 +6,8 @@ import { getRaceById, getEntriesForRace, getResultsForRace, getRacesForDate, get
 import ScratchedList from "@/components/ScratchedList";
 import { getRecentFormForHorses } from "@/lib/horses";
 import { getMeetingInfo } from "@/lib/meetings";
+import { getRaceDayForecast, hourFor } from "@/lib/weather";
+import { WeatherIcon } from "@/components/WeatherCard";
 import { toPodiumRow } from "@/lib/raceDay";
 import { Money } from "@/components/Money";
 import { fmtDateLong, ordinal } from "@/lib/i18n";
@@ -49,7 +51,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
   const follow = await getFollowState();
   // The card (for race numbers, the strip and prev/next) and meeting info are extras: if they
   // fail the race itself still renders.
-  const [entriesAll, results, card, meeting, predictions, modelRun, scratchedDone] = await Promise.all([
+  const [entriesAll, results, card, meeting, predictions, modelRun, scratchedDone, forecast] = await Promise.all([
     race.status === "upcoming" ? getEntriesForRace(race.id) : Promise.resolve([]),
     race.status === "completed" ? getResultsForRace(race.id) : Promise.resolve([]),
     getRacesForDate(race.race_date).catch(() => [race]),
@@ -57,7 +59,9 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
     race.status === "upcoming" ? getPredictionsForRace(race.id) : Promise.resolve([]),
     race.status === "upcoming" ? getLatestModelRun() : Promise.resolve(null),
     race.status === "completed" ? getScratchedForRace(race.id) : Promise.resolve([]),
+    race.status === "upcoming" ? getRaceDayForecast(race.race_date) : Promise.resolve(null),
   ]);
+  const raceWeather = hourFor(forecast, race.race_time);
   // Scratched horses stay visible (struck through) but are not runners: no odds, market, tips or predictions.
   const entries = entriesAll.filter((e) => !e.scratched);
   const scratchedList = race.status === "completed" ? scratchedDone : entriesAll.filter((e) => e.scratched);
@@ -154,12 +158,17 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             {fmtDateLong(lang, race.race_date)} · <span className="font-semibold text-white/90">{fmtTime(race.race_time)}</span> · {race.distance} · <Money amount={race.prize} />
             {race.conditions ? ` · ${race.conditions}` : ""}
           </div>
-          {(race.race_class || race.rails || meeting?.track_condition || meeting?.weather) && (
+          {(race.race_class || race.rails || meeting?.track_condition || meeting?.weather || raceWeather) && (
             <div className="flex flex-wrap gap-2 mt-3 text-xs">
               {race.race_class && <span className="rounded-full bg-white/10 px-3 py-1">{t("Class")} {race.race_class}</span>}
               {race.rails && <span className="rounded-full bg-white/10 px-3 py-1">{t("Rails")}: {race.rails}</span>}
               {meeting?.track_condition && <span className="rounded-full bg-white/10 px-3 py-1">{t("Track condition")}: {meeting.track_condition}</span>}
               {meeting?.weather && <span className="rounded-full bg-white/10 px-3 py-1">{meeting.weather}</span>}
+              {!meeting?.weather && raceWeather && (
+                <Link href={`/race-days/${race.race_date}`} className="rounded-full bg-white/10 px-3 py-1 inline-flex items-center gap-1.5">
+                  <WeatherIcon kind={raceWeather.kind} size={13} /> {raceWeather.temp}° · {t("{n}% rain", { n: raceWeather.rain })}
+                </Link>
+              )}
             </div>
           )}
           {(phase === "upcoming" || phase === "soon") && (

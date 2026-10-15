@@ -171,7 +171,7 @@ async function scrapeRace(raceUrl) {
   }
 
   if (parsed.youtubeVideoId) console.log(`  Video: ${parsed.youtubeVideoId}`);
-  const race = await upsertRace({ name: parsed.name, raceDate, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse, sourceUrl: raceUrl, youtubeVideoId: parsed.youtubeVideoId });
+  const race = await upsertRace({ name: parsed.name, raceDate, raceNo: parsed.raceNo, raceTime, distance: parsed.distance, racingNotes: parsed.racingNotes, racingNotesEn, dangerHorse: parsed.dangerHorse, sourceUrl: raceUrl, youtubeVideoId: parsed.youtubeVideoId });
   await setRaceStatus(race.id, parsed.isResult ? "completed" : "upcoming");
   console.log(`  Race: ${parsed.name} (${parsed.isResult ? "completed" : "upcoming"})`);
 
