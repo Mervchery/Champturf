@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { fmtOddsS } from "@/lib/oddsServer";
+import { decimalText } from "@/lib/oddsFormat";
 import SilkImage from "@/components/SilkImage";
 import FollowButton from "@/components/FollowButton";
 import { Money } from "@/components/Money";
@@ -155,7 +156,7 @@ function MoveBadge({ value, prev, open, changedAt }: { value: string | null } & 
   return (
     <span className={`odds-move ${up ? "is-up" : "is-down"} ${fresh ? "is-fresh" : ""}`} title={label} aria-label={label}>
       <Icon size={11} strokeWidth={3} />
-      {Math.round(diff * 100) / 100}
+      {decimalText(diff / 100)}
     </span>
   );
 }
@@ -167,7 +168,7 @@ function OddsPill({ kind, value, prev, open, changedAt, dividend = false }: { ki
       <span className="odds-label">{kind === "win" ? t("Win") : t("Place")}</span>
       <span className="odds-right">
         <MoveBadge value={value} prev={prev} open={open} changedAt={changedAt} />
-        <span className="odds-value">{dividend ? <Odds value={value} /> : (fmtOddsS(value) ?? "—")}</span>
+        <span className="odds-value">{dividend ? <Odds value={value} source="result" /> : (fmtOddsS(value) ?? "—")}</span>
       </span>
     </div>
   );

@@ -219,7 +219,7 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                       <td data-label={t("Distance")} className="text-xs">{r.distance ?? "—"}</td>
                       <td data-label={t("Jockey")} className="text-xs">{r.jockeyId ? <Link href={`/jockeys/${r.jockeyId}`} className="hover:underline">{r.jockeyName}</Link> : (r.jockeyName ?? "—")}</td>
                       <td data-label={t("Trainer")} className="text-xs">{r.trainerName ?? "—"}</td>
-                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums"><Odds value={r.odds} /></td>
+                      <td data-label={t("SP")} className="text-xs font-mono tabular-nums"><Odds value={r.odds} source="result" /></td>
                       <td data-label={t("Time")} className="text-xs font-mono">{r.time ?? "—"}</td>
                     </tr>
                   ))}

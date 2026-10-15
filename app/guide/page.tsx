@@ -59,7 +59,7 @@ const SECTIONS: Section[] = [
     chip: "Odds",
     intro: "Prices come from the tote and move as money comes in. They are shown as decimals by default, and you can switch to fractions in the menu.",
     terms: [
-      { id: "win", icon: Coins, term: "Win", short: "The tote price for the horse to win.", more: "A price of 4.5 returns 4.5 times your stake if the horse wins, stake included (7/2 in fractions). The lower the price, the more the horse is fancied." },
+      { id: "win", icon: Coins, term: "Win", short: "The tote price for the horse to win, in decimal.", more: "A price of 3.7 returns 3.7 times your stake if the horse wins, stake included — Rs 3.70 for every Rs 1, or Rs 370 for Rs 100 (7/2-style fractions are available in the menu). The lower the price, the more the horse is fancied." },
       { id: "place", icon: Medal, term: "Place", short: "The tote price for the horse to finish in the places.", more: "Shorter than the win price, because finishing in the places is easier than winning." },
       { id: "drift-firm", icon: ArrowDown, term: "Drifting ▲ / Firming ▼", short: "Whether the price has got longer or shorter.", more: "▲ red means the price has lengthened (the horse is less fancied than before). ▼ green means it has shortened (more money coming in). The number is the size of the move, and a pulse means it moved in the last 15 minutes." },
       { id: "opened", icon: Timer, term: "Opened", short: "The first price we recorded for the horse.", more: "Comparing it with the current price shows the overall move since the market opened." },
@@ -88,8 +88,8 @@ const SECTIONS: Section[] = [
     terms: [
       { id: "margin", icon: Ruler, term: "Margin", short: "How far a horse was beaten.", more: "In lengths, as published — a length is roughly the body of a horse. Short head, head and neck are the closest finishes." },
       { id: "time", icon: Timer, term: "Winning time", short: "How long the winner took.", more: "Times are only comparable between races of the same distance on similar ground." },
-      { id: "dividend", icon: Receipt, term: "Final Win & Place prices", short: "What the tote paid on a finished race.", more: "On finished races the Win and Place pills show the final tote prices, in the same style as the odds before the race." },
-      { id: "odds-format", icon: Percent, term: "Decimal or fractional", short: "Two ways of writing the same price.", more: "Decimal 4.5 and fractional 7/2 mean exactly the same thing. Decimal includes your stake in the return; fractional shows the profit only. Pick your style under Menu → Odds. Rs / £ only changes money, such as prize money and earnings." },
+      { id: "dividend", icon: Receipt, term: "Final Win & Place prices", short: "What the tote paid on a finished race.", more: "On finished races the Win and Place pills show the final tote prices as decimals too. The tote pays out on a Rs 10 unit, so a payout of Rs 20 for Rs 10 is shown as 2.0." },
+      { id: "odds-format", icon: Percent, term: "Decimal or fractional", short: "Two ways of writing the same price.", more: "Decimal 4.5 and fractional 7/2 are the same price. Decimal includes your stake in the return; fractional shows the profit only. Pick your style under Menu → Odds. Rs / £ only changes money, such as prize money and earnings." },
       { id: "perf", icon: Gauge, term: "Perf", short: "A performance score for that run.", more: "Shown on a result when there is no official rating for the horse." },
     ],
   },

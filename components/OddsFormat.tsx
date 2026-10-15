@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext } from "react";
-import { formatOdds, type OddsFormat } from "@/lib/oddsFormat";
+import { formatOdds, type OddsFormat, type OddsSource } from "@/lib/oddsFormat";
 
 const OddsFormatContext = createContext<OddsFormat>("decimal");
 
@@ -12,7 +12,7 @@ export function OddsFormatProvider({ format, children }: { format: OddsFormat; c
 export const useOddsFormat = () => useContext(OddsFormatContext);
 
 /** A price in the visitor's chosen style (decimal or fractional). Never currency-converted. */
-export function Odds({ value }: { value: string | number | null | undefined }) {
+export function Odds({ value, source = "entry" }: { value: string | number | null | undefined; source?: OddsSource }) {
   const fmt = useOddsFormat();
-  return <>{formatOdds(value, fmt) ?? "—"}</>;
+  return <>{formatOdds(value, fmt, source) ?? "—"}</>;
 }

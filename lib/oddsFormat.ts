@@ -16,10 +16,12 @@ export function toFraction(decimal: number): string {
   const x = decimal - 1; // profit per unit staked
   if (!(x > 0)) return String(Math.round(decimal * 100) / 100);
   if (Math.abs(x - 1) < 0.005) return "Evens";
-  const tol = Math.max(0.02, x * 0.015);
-  for (const d of DENOMS) {
-    const n = Math.round(x * d);
-    if (n >= 1 && Math.abs(n / d - x) <= tol) return `${n}/${d}`;
+  // Exact-ish match first (2.7 → 27/10), then a looser one (so odd prices still get a tidy fraction).
+  for (const tol of [0.006, 0.02]) {
+    for (const d of DENOMS) {
+      const n = Math.round(x * d);
+      if (n >= 1 && Math.abs(n / d - x) <= tol) return `${n}/${d}`;
+    }
   }
   const g = (a: number, b: number): number => (b ? g(b, a % b) : a);
   const n = Math.round(x * 100);
@@ -27,11 +29,27 @@ export function toFraction(decimal: number): string {
   return `${n / k}/${100 / k}`;
 }
 
-/** Format a stored decimal price in the visitor's chosen style. Null for empty / zero. */
-export function formatOdds(raw: string | number | null | undefined, fmt: OddsFormat = "decimal"): string | null {
+// What the stored number means. Supertote prints the money returned for a bet:
+//   • before the race ("entry"): Rs 370 back for a Rs 100 bet  → stored 370  → decimal 3.70
+//   • on results ("result"):     Rs  20 back for a Rs  10 bet  → stored 20   → decimal 2.00
+//   • "decimal": already a decimal (e.g. the model's fair price, 1 / probability)
+export type OddsSource = "entry" | "result" | "decimal";
+const DIVISOR: Record<OddsSource, number> = { entry: 100, result: 10, decimal: 1 };
+
+/** Stored feed value → decimal odds (stake included, like PMU). Null for empty / placeholder (9999) / zero. */
+export function toDecimal(raw: string | number | null | undefined, source: OddsSource = "entry"): number | null {
   if (raw == null || raw === "") return null;
   const n = Number(String(raw).replace(",", "."));
-  if (!Number.isFinite(n)) return String(raw);
-  if (n <= 0) return null;
-  return fmt === "fractional" ? toFraction(n) : String(Math.round(n * 100) / 100);
+  if (!Number.isFinite(n) || n <= 0 || n >= 9999) return null;
+  return n / DIVISOR[source];
+}
+
+/** 3.7 → "3.7", 2 → "2.0", 3.75 → "3.75": one decimal at least, two at most. */
+export const decimalText = (d: number) => (Math.round(d * 100) / 100).toFixed(2).replace(/0$/, "");
+
+/** Format a stored price in the visitor's chosen style. Null when there is no price. */
+export function formatOdds(raw: string | number | null | undefined, fmt: OddsFormat = "decimal", source: OddsSource = "entry"): string | null {
+  const d = toDecimal(raw, source);
+  if (d == null) return null;
+  return fmt === "fractional" ? toFraction(d) : decimalText(d);
 }

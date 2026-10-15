@@ -52,7 +52,7 @@ export function PodiumList({ rows, showTime = true }: { rows: PodiumRow[]; showT
             </div>
           </div>
           <div className="text-right shrink-0">
-            <div className="font-mono font-semibold tabular-nums leading-tight"><Odds value={p.odds} /></div>
+            <div className="font-mono font-semibold tabular-nums leading-tight"><Odds value={p.odds} source="result" /></div>
             <div className="text-[0.68rem] opacity-60 leading-tight mt-0.5">
               {showTime && p.time ? <span className="font-mono">{p.time}</span> : p.odds ? t("SP") : ""}
             </div>

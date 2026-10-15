@@ -103,7 +103,7 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
             <div className="text-right shrink-0 w-[4.6rem]">
               <div className="text-[0.66rem] font-semibold uppercase tracking-wide opacity-70">{confLabel[p.confidence].split(" ")[0]}</div>
               {p.is_value && p.fair_odds != null ? (
-                <div className="text-[0.62rem] leading-tight opacity-70 mt-0.5">{t("Fair price")} {fmtOddsS(String(p.fair_odds))}</div>
+                <div className="text-[0.62rem] leading-tight opacity-70 mt-0.5">{t("Fair price")} {fmtOddsS(1 / p.win_prob, "decimal")}</div>
               ) : null}
             </div>
           </li>

@@ -33,8 +33,9 @@ export function dateLabel(isoDate, lang) {
 }
 
 const hhmm = (t) => (t ? String(t).slice(0, 5) : "");
-// Prices are shown as the raw feed value everywhere on the site; alerts match.
-const fmt = (n) => String(Math.round(Number(String(n).replace(",", ".")) * 100) / 100);
+// Supertote's feed value is the money returned for a Rs 100 bet (370 = Rs 370), so 370 -> decimal 3.7.
+// The site shows decimal odds everywhere (like PMU); alerts match.
+const fmt = (n) => (Math.round(Number(String(n).replace(",", ".")))/100).toFixed(2).replace(/0$/, "");
 
 /** Build the {en, fr} title/body pair for one alert. */
 export function buildMessage(kind, d) {
