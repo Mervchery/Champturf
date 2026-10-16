@@ -524,6 +524,7 @@ export const fr: Record<string, string> = {
   "No result": "Pas de résultat",
   "Cancelled": "Annulée",
   "Scratched": "Non-partant",
+  "Status": "Statut",
   "Scratched runners": "Non-partants",
   "This race appears to have been cancelled — no result was recorded.": "Cette course semble avoir été annulée — aucun résultat n'a été enregistré.",
   "No result available": "Résultat indisponible",

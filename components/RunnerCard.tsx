@@ -193,10 +193,10 @@ function TipPill() {
   );
 }
 
-function HorseName({ horse }: { horse: HorseSummary | null }) {
+function HorseName({ horse, struck = false }: { horse: HorseSummary | null; struck?: boolean }) {
   const { t } = getT();
   return horse
-    ? <Link href={`/horses/${horse.id}`} className="font-semibold text-[1.02rem] leading-tight hover:underline">{horse.name}</Link>
+    ? <Link href={`/horses/${horse.id}`} className={`font-semibold text-[1.02rem] leading-tight hover:underline ${struck ? "line-through" : ""}`}>{horse.name}</Link>
     : <span className="font-semibold opacity-70">{t("Unknown")}</span>;
 }
 
@@ -221,8 +221,10 @@ function ageSex(horse: HorseSummary | null, t: (k: string, v?: Record<string, st
 }
 
 export function EntryRow({
-  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, daysSince = null, index, follow,
+  number, horse, jockeyName, jockeyId, weight, gate, odds, placeOdds = null, gear = null, isTipped = false, rating = null, hwt = null, hwtLast = null, equip = null, gearChanged = false, gearPrev = null, oddsPrev = null, placeOddsPrev = null, oddsOpen = null, placeOddsOpen = null, oddsChangedAt = null, form, daysSince = null, index, follow, scratched = false,
 }: BaseProps & {
+  // Declared runner that has been withdrawn (non-partant): kept on the card, struck through, no odds.
+  scratched?: boolean;
   gate: number | null; odds: string | null; placeOdds?: string | null; gear?: string | null; isTipped?: boolean;
   rating?: number | null; hwt?: number | null; hwtLast?: number | null; equip?: string | null; gearChanged?: boolean; gearPrev?: string | null;
   oddsPrev?: string | null; placeOddsPrev?: string | null; oddsOpen?: string | null; placeOddsOpen?: string | null; oddsChangedAt?: string | null;
@@ -235,7 +237,7 @@ export function EntryRow({
   const { t, lang } = getT();
   const places = horse ? horse.seconds + horse.thirds : 0;
   return (
-    <div className="runner-row" style={delayFor(index)}>
+    <div className={`runner-row ${scratched ? "opacity-60" : ""}`} style={delayFor(index)}>
       <div className="runner-head">
         <div className="runner-rail">
           <div className="runner-number">{number ?? t("N/A")}</div>
@@ -243,8 +245,9 @@ export function EntryRow({
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
-            <HorseName horse={horse} />
-            {isTipped && <TipPill />}
+            <HorseName horse={horse} struck={scratched} />
+            {scratched && <span className="pill pill-outline font-bold tracking-wide" title={t("Scratched")}>SCR</span>}
+            {isTipped && !scratched && <TipPill />}
           </div>
           <div className="text-xs opacity-70 mt-0.5">{ageSex(horse, t)}</div>
         </div>
@@ -268,13 +271,17 @@ export function EntryRow({
         <Stat label="Gear"><GearValue gear={gear} equip={equip} changed={gearChanged} prev={gearPrev} /></Stat>
       </div>
 
-      <OddsRow
-        win={odds} place={placeOdds}
-        winMove={{ prev: oddsPrev, open: oddsOpen, changedAt: oddsChangedAt }}
-        placeMove={{ prev: placeOddsPrev, open: placeOddsOpen, changedAt: oddsChangedAt }}
-      />
+      {scratched ? (
+        <div className="mt-3 text-xs font-semibold">{t("Scratched")}</div>
+      ) : (
+        <OddsRow
+          win={odds} place={placeOdds}
+          winMove={{ prev: oddsPrev, open: oddsOpen, changedAt: oddsChangedAt }}
+          placeMove={{ prev: placeOddsPrev, open: placeOddsOpen, changedAt: oddsChangedAt }}
+        />
+      )}
 
-      {horse && horse.starts > 0 && (
+      {!scratched && horse && horse.starts > 0 && (
         <div className="form-panel flex items-center gap-2.5 mt-3">
           <FormRing wins={horse.wins} places={places} starts={horse.starts} />
           <div className="text-xs opacity-70 leading-snug">
@@ -287,7 +294,7 @@ export function EntryRow({
           )}
         </div>
       )}
-      {!(horse && horse.starts > 0) && (
+      {!scratched && !(horse && horse.starts > 0) && (
         form && form.length > 0 ? (
           <div className="mt-3"><FormPills form={form} daysSince={daysSince} /></div>
         ) : (

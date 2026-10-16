@@ -5,4 +5,5 @@ Run these in the Supabase SQL editor, in this order (each is safe to re-run):
 4. add_missing_horses.sql               (adds the horses missing from the DB with rating + trainer)
 5. load_horse_ratings.sql               (ratings for existing horses)
 6. scratched_migration.sql              (needed BEFORE deploying the new site/scraper code)
+7. scratched_manual_migration.sql          (admin "Scratch" button; needed BEFORE deploying the admin panel change)
 Optional diagnostic: check_gujadhur_attribution.sql

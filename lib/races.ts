@@ -72,7 +72,8 @@ export type RaceEntry = {
   // this runner as its favourite pick of the race.
   gear: string | null;
   is_tipped: boolean;
-  scratched: boolean; // flagged by the scraper when the horse disappeared from the source page
+  scratched: boolean; // flagged by the scraper (horse gone from / marked on the source page) or by an admin
+  scratched_manual?: boolean; // set by an admin: locked, the scraper leaves it alone
   // From the Jockey Club race card (supabase/mtc_data_migration.sql)
   rating: number | null;
   hwt: number | null;

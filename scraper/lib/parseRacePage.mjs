@@ -94,7 +94,14 @@ export function parseRacePage(html) {
     const gear = gearItems.length ? gearItems.join(",") : null;
     const isTipped = $el.hasClass("tipped");
 
-    entries.push({ position, runnerNo, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl, winOdds, placeOdds, gear, isTipped });
+    // Scratched runners usually stay on the page, marked in place (class on the <li>, or "SCR" /
+    // "Non partant" / "Withdrawn" where the price or placing would be). Without this check they
+    // look like normal runners and get un-scratched on every scrape.
+    const SCR_RE = /\b(scr|scratched|withdrawn|non[\s-]?partant|n\/?p)\b/i;
+    const markerText = [$el.find(".r-bets:not(.betting-buttons)").text(), $el.find(".r-placing").text(), $el.find(".r-number").first().text(), $el.find(".r-status, .r-scratched, .scratched").text()].join(" ");
+    const isScratched = /scratch|withdrawn|non-?runner|non-?partant/i.test($el.attr("class") || "") || SCR_RE.test(markerText);
+
+    entries.push({ position, runnerNo, gate, horseName, horseSlug, age, weight, finishTime, jockey, trainer, silkUrl, winOdds, placeOdds, gear, isTipped, isScratched });
   });
 
   // Racing notes block: an <h4>Racing Notes</h4>, one or more <p> of analysis

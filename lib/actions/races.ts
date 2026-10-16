@@ -132,6 +132,10 @@ export type EntryInput = {
   tf_fastest?: string | null;
   tf_days_since?: string | null;
   tf_best3?: string | null;
+  // Scratching (supabase/scratched_manual_migration.sql)
+  scratched?: boolean;
+  scratched_at?: string | null;
+  scratched_manual?: boolean;
 };
 
 export async function createEntry(input: EntryInput) {

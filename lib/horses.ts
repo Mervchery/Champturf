@@ -111,6 +111,7 @@ export type HorseRun = {
 };
 
 export type HorseNextRun = {
+  scratched: boolean; // withdrawn from this race (non-partant)
   raceId: string;
   raceName: string;
   raceDate: string;
@@ -161,10 +162,9 @@ export async function getHorseProfileExtras(horseId: string, nowMs: number): Pro
       .eq("horse_id", horseId),
     supabase
       .from("race_entries")
-      .select("runner_no, gate, weight_kg, odds, odds_prev, jockeys(id, name), races!inner(id, name, race_date, race_time, distance, status)")
+      .select("runner_no, gate, weight_kg, odds, odds_prev, scratched, jockeys(id, name), races!inner(id, name, race_date, race_time, distance, status)")
       .eq("horse_id", horseId)
-      .eq("races.status", "upcoming")
-      .eq("scratched", false),
+      .eq("races.status", "upcoming"),
   ]);
 
   const rawRuns: any[] = runsRes.error ? [] : ((runsRes.data as any) ?? []);
@@ -208,9 +208,11 @@ export async function getHorseProfileExtras(horseId: string, nowMs: number): Pro
   };
 
   const nextRows: any[] = nextRes.error ? [] : ((nextRes.data as any) ?? []);
-  const next = nextRows
+  const upcomingRows = nextRows
     .filter((e) => e.races && getRacePhase(e.races, nowMs) !== "unresulted" && getRacePhase(e.races, nowMs) !== "finished")
-    .sort((a, b) => `${a.races.race_date}T${a.races.race_time}`.localeCompare(`${b.races.race_date}T${b.races.race_time}`))[0];
+    .sort((a, b) => `${a.races.race_date}T${a.races.race_time}`.localeCompare(`${b.races.race_date}T${b.races.race_time}`));
+  // The next race it will actually run in; if every engagement is scratched, show the earliest one as scratched.
+  const next = upcomingRows.find((e) => !e.scratched) ?? upcomingRows[0];
 
   return {
     runs: shown,
@@ -228,6 +230,7 @@ export async function getHorseProfileExtras(horseId: string, nowMs: number): Pro
           jockeyName: next.jockeys?.name ?? null,
           odds: next.odds ?? null,
           oddsPrev: next.odds_prev ?? null,
+          scratched: !!next.scratched,
         }
       : null,
     recorded,

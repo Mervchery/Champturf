@@ -96,13 +96,13 @@ export default async function HorseDetailPage({ params }: { params: { id: string
 
           {next && (
             <div className="panel mt-6 border-l-4 !border-l-gold2">
-              <div className="flex items-center gap-2 text-xs font-semibold opacity-70"><CalendarClock size={14} /> {t("NEXT RUN")}</div>
-              <Link href={`/races/${next.raceId}`} className="block font-display text-lg mt-1 hover:underline">{next.raceName}</Link>
+              <div className="flex items-center gap-2 text-xs font-semibold opacity-70"><CalendarClock size={14} /> {t("NEXT RUN")}{next.scratched && <span className="pill pill-outline font-bold tracking-wide ml-1" title={t("Scratched")}>SCR</span>}</div>
+              <Link href={`/races/${next.raceId}`} className={`block font-display text-lg mt-1 hover:underline ${next.scratched ? "line-through opacity-70" : ""}`}>{next.raceName}</Link>
               <div className="text-xs opacity-70 mt-0.5">
                 {fmtDateLong(lang, next.raceDate)} · {fmtTime(next.raceTime)}{next.distance ? ` · ${next.distance}` : ""}
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-3">
-                <div><div className="stat-label">{t("Off in")}</div><div className="font-semibold mt-0.5"><Countdown target={`${next.raceDate}T${next.raceTime}`} serverNow={nowMs} variant="compact" /></div></div>
+                <div><div className="stat-label">{next.scratched ? t("Status") : t("Off in")}</div><div className="font-semibold mt-0.5">{next.scratched ? t("Scratched") : <Countdown target={`${next.raceDate}T${next.raceTime}`} serverNow={nowMs} variant="compact" />}</div></div>
                 <div><div className="stat-label">{t("Horse No.")}</div><div className="font-semibold mt-0.5">{next.runnerNo ?? t("N/A")}</div></div>
                 <div><div className="stat-label">{t("Gate")}</div><div className="font-semibold mt-0.5">{next.gate ?? t("N/A")}</div></div>
                 <div>
@@ -114,8 +114,8 @@ export default async function HorseDetailPage({ params }: { params: { id: string
                 <div>
                   <div className="stat-label">{t("Win")}</div>
                   <div className="font-mono font-bold mt-0.5 flex items-center gap-1.5">
-                    {fmtOddsS(next.odds) ?? "—"}
-                    {nextDir && (nextDir === "down"
+                    {next.scratched ? "—" : (fmtOddsS(next.odds) ?? "—")}
+                    {!next.scratched && nextDir && (nextDir === "down"
                       ? <ArrowDown size={13} strokeWidth={3} className="text-emerald-600" aria-label={t("Firming")} />
                       : <ArrowUp size={13} strokeWidth={3} className="text-red-600" aria-label={t("Drifting")} />)}
                   </div>

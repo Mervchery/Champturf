@@ -207,7 +207,9 @@ async function scrapeRace(raceUrl) {
         silkImageUrl: entry.silkUrl,
       });
       track("horses", horse);
-      seenHorseIds.add(horse.id);
+      // A runner marked scratched on the page is NOT part of the field: leaving it out of
+      // seenHorseIds lets markScratchedEntries flag it (and stops it being "restored").
+      if (!entry.isScratched) seenHorseIds.add(horse.id);
       track("trainers", horse.trainer);
       track("owners", horse.owner);
 
@@ -236,10 +238,12 @@ async function scrapeRace(raceUrl) {
           gate: entry.gate, weightKg: entry.weight,
           runnerNo: entry.runnerNo ?? entryIndex + 1,
           winOdds: entry.winOdds, placeOdds: entry.placeOdds, gear: entry.gear, isTipped: entry.isTipped,
+          scratched: entry.isScratched,
         });
         track("jockeys", result.jockey);
         track("trainers", result.trainer);
         stats.entriesImported++;
+        if (entry.isScratched) console.log(`    Scratched (marked on the page): ${entry.horseName}`);
         console.log(`    No. ${entry.runnerNo ?? entryIndex + 1} (gate ${entry.gate ?? "-"}): ${entry.horseName} (${entry.jockey ?? "jockey unknown"}) Win ${entry.winOdds ?? "-"} / Place ${entry.placeOdds ?? "-"}${entry.gear ? ` gear ${entry.gear}` : ""}${entry.isTipped ? " ★ tipped" : ""}`);
       }
     } catch (e) {

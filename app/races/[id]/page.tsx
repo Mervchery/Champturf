@@ -273,7 +273,7 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
             </div>
           ) : (
             <div className="mt-6">
-              {entries.length === 0 ? (
+              {entriesAll.length === 0 ? (
                 <EmptyState
                   icon={<Clock size={22} />}
                   title={t("Entries haven't been declared for this race yet.")}
@@ -292,8 +292,9 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                     </span>
                   </div>
                   <div className="space-y-3">
-                    {entries.map((e, i) => (
+                    {entriesAll.map((e, i) => (
                       <EntryRow
+                        scratched={e.scratched}
                         key={e.id}
                         index={i}
                         jockeyId={e.jockeys?.id ?? null}
@@ -323,8 +324,6 @@ export default async function RaceDetailPage({ params }: { params: { id: string 
                       />
                     ))}
                   </div>
-
-                  <ScratchedList entries={scratchedList} />
 
                   <MarketBoard entries={entries} />
 

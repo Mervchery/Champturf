@@ -205,13 +205,13 @@ function oddsMovement(existing, win, place) {
   return out;
 }
 
-export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo, winOdds, placeOdds, gear, isTipped }) {
+export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, gate, weightKg, runnerNo, winOdds, placeOdds, gear, isTipped, scratched = false }) {
   const jockey = jockeyName ? await findOrCreateJockey(jockeyName) : { id: null, created: false, updated: false };
   const trainer = trainerName ? await findOrCreateTrainer(trainerName) : { id: null, created: false, updated: false };
 
   const { data: existing } = await supabaseAdmin
     .from("race_entries")
-    .select("odds, place_odds, odds_open, place_odds_open, odds_prev, place_odds_prev")
+    .select("odds, place_odds, odds_open, place_odds_open, odds_prev, place_odds_prev, scratched, scratched_at, scratched_manual")
     .eq("race_id", raceId).eq("horse_id", horseId).maybeSingle();
 
   const { error } = await supabaseAdmin
@@ -220,7 +220,9 @@ export async function upsertEntry({ raceId, horseId, jockeyName, trainerName, ga
       { race_id: raceId, horse_id: horseId, jockey_id: jockey.id, trainer_id: trainer.id, ...(gate != null ? { gate } : {}), weight_kg: weightKg, runner_no: runnerNo ?? null,
         // Tote prices/gear/tip are re-written on every scrape so late price moves and gear changes are picked up.
         odds: winOdds ?? null, place_odds: placeOdds ?? null, gear: gear ?? null, is_tipped: !!isTipped,
-        scratched: false, scratched_at: null, // seen on the page again -> back in the field
+        // On the page and not marked scratched -> in the field; marked scratched -> flagged (time kept from the first flag).
+        scratched: existing?.scratched_manual ? true : !!scratched,
+        scratched_at: existing?.scratched_manual ? existing.scratched_at : scratched ? (existing?.scratched_at ?? new Date().toISOString()) : null,
         ...oddsMovement(existing, winOdds, placeOdds) },
       { onConflict: "race_id,horse_id" }
     );
@@ -280,10 +282,10 @@ export async function isRaceCompleteInDb(name, raceDate) {
  *  cleared. Never deletes anything. `seenHorseIds` = every horse that WAS on the page. */
 export async function markScratchedEntries(raceId, seenHorseIds) {
   if (!seenHorseIds || seenHorseIds.size === 0) return { scratched: [], restored: 0 };
-  const { data, error } = await supabaseAdmin.from("race_entries").select("id, horse_id, scratched, horses(name)").eq("race_id", raceId);
+  const { data, error } = await supabaseAdmin.from("race_entries").select("id, horse_id, scratched, scratched_manual, horses(name)").eq("race_id", raceId);
   if (error) throw new Error(`Failed to read entries for scratch check: ${error.message}`);
-  const toScratch = (data ?? []).filter((e) => !seenHorseIds.has(e.horse_id) && !e.scratched);
-  const toRestore = (data ?? []).filter((e) => seenHorseIds.has(e.horse_id) && e.scratched);
+  const toScratch = (data ?? []).filter((e) => !seenHorseIds.has(e.horse_id) && !e.scratched && !e.scratched_manual);
+  const toRestore = (data ?? []).filter((e) => seenHorseIds.has(e.horse_id) && e.scratched && !e.scratched_manual); // manual scratches stay
   if (toScratch.length) {
     const { error: e1 } = await supabaseAdmin.from("race_entries")
       .update({ scratched: true, scratched_at: new Date().toISOString() }).in("id", toScratch.map((e) => e.id));

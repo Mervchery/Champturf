@@ -498,7 +498,7 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
             <tr key={e.id} className={e.id === editingId ? "bg-black/[0.03]" : undefined}>
               <td>{e.runner_no ?? "N/A"}</td>
               <td>{e.gate ?? "N/A"}</td>
-              <td className="font-semibold">{e.horses?.name ?? "Unknown"}</td>
+              <td className={`font-semibold ${e.scratched ? "line-through opacity-60" : ""}`}>{e.horses?.name ?? "Unknown"}{e.scratched && <span className="ml-1 text-[10px] font-bold no-underline">SCR</span>}</td>
               <td>{e.horses?.trainer?.name ?? "Unknown"}</td>
               <td>{e.jockeys?.name ?? "Unknown"}</td>
               <td>{e.weight_kg ? `${e.weight_kg}kg` : "N/A"}</td>
@@ -508,6 +508,17 @@ function EntriesEditor({ raceId, entries, horses, jockeys, onAdd, onUpdate, onDe
               <td>{e.place_odds ?? "N/A"}</td>
               <td>{e.is_tipped ? "★" : ""}</td>
               <td className="flex gap-1.5">
+                <button
+                  className="text-xs px-2 py-1 rounded border border-line"
+                  title={e.scratched ? "Put back in the field" : "Scratch this runner (non-partant)"}
+                  onClick={() => {
+                    const msg = e.scratched ? `Put ${e.horses?.name ?? "this horse"} back in the field?` : `Scratch ${e.horses?.name ?? "this horse"}?`;
+                    if (!confirm(msg)) return;
+                    onUpdate(e.id, e.scratched
+                      ? { scratched: false, scratched_at: null, scratched_manual: false }
+                      : { scratched: true, scratched_at: new Date().toISOString(), scratched_manual: true });
+                  }}
+                >{e.scratched ? "Restore" : "Scratch"}</button>
                 <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => startEdit(e)}><Pencil size={12} /></button>
                 <button className="text-xs px-2 py-1 rounded border border-line" onClick={() => onDelete(e.id)}><Trash2 size={12} /></button>
               </td>
