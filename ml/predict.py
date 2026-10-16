@@ -117,7 +117,11 @@ def main(dry_run=False):
     for rid, g in upcoming.groupby("race_id"):
         g = g.reset_index(drop=True)
         pa, ca, fa = score(g, meta, boosters, "A")
-        use_b = "B" in boosters and g["mkt_prob"].notna().all()
+        # Champ Intelligence counts the odds whenever the market is readable: the same 70% price coverage
+        # the feature builder requires. A runner with no price yet is left "missing" for the model (it
+        # handles that) instead of throwing the whole race back to form-only.
+        priced = int(g["mkt_prob"].notna().sum())
+        use_b = "B" in boosters and priced >= max(3, int(np.ceil(0.7 * len(g))))
         if use_b:
             pb, cb, fb_ = score(g, meta, boosters, "B")
             p, c, feats = pb, cb, fb_

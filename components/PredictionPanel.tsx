@@ -16,9 +16,9 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
   if (run.status !== "ready") {
     return (
       <div className="panel mt-8">
-        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> {t("Predictions")}</h2>
+        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> Champ Intelligence</h2>
         <p className="text-sm opacity-75 mt-2">
-          {t("Not enough race history yet to predict reliably ({n} races so far). Predictions appear automatically once there is enough data — nothing is guessed.", { n: String(run.n_races) })}
+          {t("Not enough race history yet to predict reliably ({n} races so far). Champ Intelligence appears automatically once there is enough data — nothing is guessed.", { n: String(run.n_races) })}
         </p>
       </div>
     );
@@ -26,7 +26,7 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
   if (predictions.length === 0) {
     return (
       <div className="panel mt-8">
-        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> {t("Predictions")}</h2>
+        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> Champ Intelligence</h2>
         <p className="text-sm opacity-75 mt-2">{t("No prediction for this race yet. It appears once the runners are declared.")}</p>
       </div>
     );
@@ -48,7 +48,7 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
   return (
     <div className="panel mt-8">
       <div className="flex items-center justify-between gap-2 flex-wrap">
-        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> {t("Predictions")}</h2>
+        <h2 className="font-display text-xl flex items-center gap-2"><Sparkles size={18} /> Champ Intelligence</h2>
         <span className="text-[0.7rem] opacity-70">{usesMarket ? t("Form + live prices") : t("Form only — no prices yet")}</span>
       </div>
 
@@ -82,6 +82,7 @@ export default function PredictionPanel({ entries, predictions, run }: { entries
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-1.5 min-w-0">
                 <Link href={`/horses/${e!.horses!.id}`} className="font-semibold truncate hover:underline">{e!.horses!.name}</Link>
+                {e!.odds && <span className="text-[0.66rem] font-mono opacity-70 shrink-0">{fmtOddsS(e!.odds) ?? ""}</span>}
                 {p.is_value && <Star size={11} fill="currentColor" className="text-gold shrink-0" aria-label={t("Value")} />}
               </div>
               <div className="flex items-center gap-2 mt-1">

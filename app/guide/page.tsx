@@ -66,7 +66,7 @@ const SECTIONS: Section[] = [
       { id: "tip", icon: Star, term: "Tip ★", short: "The race’s tipped horse.", more: "Taken from the published racing notes. It is an opinion, not a promise." },
       { id: "danger", icon: AlertTriangle, term: "Danger", short: "The horse the notes flag as the main threat.", more: "Usually the one most likely to beat the tip." },
       { id: "market", icon: Percent, term: "Share of the market", short: "How much of the betting each horse holds.", more: "Each price is turned into a chance and scaled so the whole field adds up to 100%. “One clear favourite”, “A two-horse market” and “Wide open” describe how that share is spread." },
-      { id: "predictions", icon: Sparkles, term: "Predictions", short: "A model’s estimate of each horse’s chance.", more: "Built from past results. “Value watch” marks a horse the model rates better than its price. Nothing is shown when there isn’t enough data to predict reliably." },
+      { id: "predictions", icon: Sparkles, term: "Champ Intelligence", short: "A model’s estimate of each horse’s chance.", more: "Built from past results and the current odds. “Value watch” marks a horse the model rates better than its price. Nothing is shown when there isn’t enough data to predict reliably." },
     ],
   },
   {

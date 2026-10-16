@@ -1,4 +1,4 @@
-# Champ Turf prediction model
+# Champ Intelligence — Champ Turf prediction model
 
 XGBoost win-probability model trained on Champ Turf's own scraped results. It never invents data: where a
 field is missing the model treats it as missing, and with too little history it refuses to train and the site
