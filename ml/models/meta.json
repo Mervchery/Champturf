@@ -1,6 +1,6 @@
 {
- "version": "v202610101939",
- "odds_unit": null,
+ "version": "v202610171643",
+ "odds_unit": 100.0,
  "models": {
   "A": {
    "features": [
@@ -48,10 +48,10 @@
    ],
    "calibration": {
     "kind": "platt",
-    "a": 1.0977468490600586,
-    "b": 0.3899437189102173
+    "a": 1.0736316442489624,
+    "b": 0.3398890495300293
    },
-   "best_iteration": 62
+   "best_iteration": 69
   }
  }
 }
