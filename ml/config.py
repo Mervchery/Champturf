@@ -6,8 +6,13 @@ MODEL_DIR = os.path.join(os.path.dirname(__file__), "models")
 # Supertote shows 9999 when a runner has no price yet. It is a placeholder, never a real price.
 NO_PRICE = 9999
 
-# Tote prices are stored raw (e.g. "590"). The unit that turns them into decimal returns
-# (590 -> 5.90) is detected from the data in data.detect_odds_unit(); set ODDS_UNIT=100 to force it.
+# Tote prices are stored raw and the two sources use DIFFERENT units (same as lib/oddsFormat.ts, which is
+# what the site shows): pre-race entry prices are the money back on a Rs 100 bet (370 -> 3.70), result-page
+# prices are the money back on a Rs 10 bet (20 -> 2.00). Mixing them into one unit made upcoming prices ten
+# times too big, or all missing when the unit could not be detected ("Form only - no prices yet").
+ENTRY_UNIT = 100.0
+RESULT_UNIT = 10.0
+# Optional override for the entry unit only (kept for old setups).
 ODDS_UNIT_OVERRIDE = float(os.environ["ODDS_UNIT"]) if os.environ.get("ODDS_UNIT") else None
 
 # Not enough history -> the model refuses to train and the site says so instead of guessing.

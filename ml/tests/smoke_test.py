@@ -41,7 +41,7 @@ def main():
     hist, upcoming, fb, info = dataset.build(races, results, entries)
     print("odds unit detected:", info["odds_unit"], info["odds_unit_check"])
     assert info["odds_unit"] == 100.0, "unit detection should find 100 for prices stored x100"
-    assert (hist["odds_dec"].dropna() < 9999 / 100).all(), "9999 placeholders must never become prices"
+    assert (hist["odds_dec"].dropna() < 9999 / 10).all(), "9999 placeholders must never become prices"
 
     # --- no-leakage check: cut the history at race k; race k's features must be identical ---
     k = hist["race_id"].drop_duplicates().iloc[300]; cutoff = hist.loc[hist["race_id"] == k, "dt"].iloc[0]

@@ -1,7 +1,7 @@
 """Turns the raw tables into one training frame (finished races) and one scoring frame (upcoming races)."""
 import numpy as np
 import pandas as pd
-from config import MIN_FIELD
+from config import MIN_FIELD, ENTRY_UNIT, RESULT_UNIT, ODDS_UNIT_OVERRIDE
 from data import parse_margin_len, raw_price, detect_odds_unit
 from features import FeatureBuilder
 
@@ -17,21 +17,22 @@ def build(races, results, entries, odds_unit=None):
         ent[col + "_raw"] = ent[col].map(raw_price) if col in ent else np.nan
     res["close_raw"] = res["win_odds"].map(raw_price)
 
-    # --- decimal odds unit (detected, not assumed) ---
-    if odds_unit is None:
-        per_race = [g["close_raw"].to_numpy() for _, g in res.groupby("race_id")]
-        odds_unit, diag = detect_odds_unit(per_race)
-        info["odds_unit_check"] = diag
-    info["odds_unit"] = odds_unit
+    # --- decimal odds units: fixed per source (see config.py). The detector is now only a sanity check on the
+    # result-page prices; it can no longer switch prices off. ---
+    entry_unit = ODDS_UNIT_OVERRIDE or ENTRY_UNIT
+    per_race = [g["close_raw"].to_numpy() for _, g in res.groupby("race_id")]
+    check_unit, diag = detect_odds_unit(per_race)
+    info["odds_unit_check"] = {"expected_result_unit": RESULT_UNIT, "detected": check_unit, "diag": diag}
+    info["odds_unit"] = entry_unit   # saved in meta; fair_odds are expressed in this raw unit
 
     keyed = ent.set_index(["race_id", "horse_id"])
     res = res.merge(ent[["race_id", "horse_id", "odds_raw", "odds_open_raw"]], on=["race_id", "horse_id"], how="left")
     # Prefer the last price seen BEFORE the race (race_entries); fall back to the result page's price.
     res["price_raw"] = res["odds_raw"].where(res["odds_raw"].notna(), res["close_raw"])
     res["price_src"] = np.where(res["odds_raw"].notna(), "pre-race", np.where(res["close_raw"].notna(), "result-page", "none"))
-    scale = (1.0 / odds_unit) if odds_unit else np.nan
-    res["odds_dec"] = res["price_raw"] * scale
-    res["odds_open_dec"] = res["odds_open_raw"] * scale
+    entry_scale, result_scale = 1.0 / entry_unit, 1.0 / RESULT_UNIT
+    res["odds_dec"] = np.where(res["odds_raw"].notna(), res["odds_raw"] * entry_scale, res["close_raw"] * result_scale)
+    res["odds_open_dec"] = res["odds_open_raw"] * entry_scale
     res["margin_len"] = [parse_margin_len(m, p) for m, p in zip(res.get("margin", [None] * len(res)), res["position"])]
 
     rmap = races.set_index("id")
@@ -64,8 +65,8 @@ def build(races, results, entries, odds_unit=None):
     upcoming_ids = set(races.loc[races["status"] == "upcoming", "id"])
     for rid, g in ent[ent["race_id"].isin(upcoming_ids) & ent["horse_id"].notna()].groupby("race_id"):
         g = g.copy()
-        g["odds_dec"] = g["odds_raw"] * scale
-        g["odds_open_dec"] = g["odds_open_raw"] * scale
+        g["odds_dec"] = g["odds_raw"] * entry_scale
+        g["odds_open_dec"] = g["odds_open_raw"] * entry_scale
         race = dict(race_id=rid, dt=rmap.loc[rid, "dt"], distance_m=rmap.loc[rid, "distance_m"],
                     class_num=rmap.loc[rid, "class_num"], prize=rmap.loc[rid, "prize"])
         g["rating"] = g.get("rating", np.nan)
